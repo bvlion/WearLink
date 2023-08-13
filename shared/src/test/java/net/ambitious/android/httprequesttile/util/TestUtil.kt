@@ -21,4 +21,6 @@ object TestUtil {
     JSONObject(body).getString("data").let {
       JSONObject(it).getString(key)
     }
+
+  fun getTestUrl() = System.getenv("HOST") ?: "https://httpbin.org"
 }
