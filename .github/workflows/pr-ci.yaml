@@ -9,7 +9,7 @@ on:
       - '.github/workflows/pr-ci.yaml'
 
 jobs:
-  shared-ci:
+  pr-ci:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
