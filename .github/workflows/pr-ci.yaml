@@ -3,9 +3,10 @@ name: Pull Request CI
 on:
   pull_request:
     paths:
-      - '**/*.kt'
-      - '**/*.xml'
-      - '.github/workflows/shared-ci.yaml'
+      - '**.kt'
+      - '**.xml'
+      - '**.gradle'
+      - '.github/workflows/pr-ci.yaml'
 
 jobs:
   shared-ci:
