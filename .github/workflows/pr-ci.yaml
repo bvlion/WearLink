@@ -1,12 +1,10 @@
-name: Shared Pull Request CI
+name: Pull Request CI
 
 on:
-  push: # 後で PR に変更する
-    branches:
-      - 'main'
+  pull_request:
     paths:
-      - 'shared/**.kt'
-      - 'shared/**.xml'
+      - '**/*.kt'
+      - '**/*.xml'
       - '.github/workflows/shared-ci.yaml'
 
 jobs:
@@ -28,7 +26,7 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Run test
-        run: ./gradlew :shared:testDebugUnitTest
+        run: ./gradlew testDebugUnitTest
 
       - name: shared test report
         uses: dorny/test-reporter@v1
@@ -36,5 +34,23 @@ jobs:
         with:
           name: shared test
           path: shared/build/test-results/testDebugUnitTest/TEST-*.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: mobile test report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: mobile test
+          path: mobile/build/test-results/testDebugUnitTest/TEST-*.xml
+          reporter: java-junit
+          fail-on-error: false
+
+      - name: wear test report
+        uses: dorny/test-reporter@v1
+        if: always()
+        with:
+          name: wear test
+          path: wear/build/test-results/testDebugUnitTest/TEST-*.xml
           reporter: java-junit
           fail-on-error: false
