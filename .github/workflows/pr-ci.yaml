@@ -36,6 +36,9 @@ jobs:
 
       - name: Start Http Docker
         run: docker run -p 80:80 -d --name httpbin kennethreitz/httpbin
+
+      - name: Run build
+        run: ./gradlew compileDebugUnitTestJavaWithJavac
   
       - name: Wait for the service to start
         run: |
