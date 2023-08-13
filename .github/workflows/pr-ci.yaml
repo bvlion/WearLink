@@ -27,6 +27,9 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Set config files
+        run: echo ${{ secrets.DEBUG_GOOGLE_SERVICES_JSON }} | base64 -d > mobile/src/debug/google-services.json
+
       - name: Run test
         run: ./gradlew testDebugUnitTest
 
