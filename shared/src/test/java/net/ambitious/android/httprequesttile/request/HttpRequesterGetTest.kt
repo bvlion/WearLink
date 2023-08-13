@@ -22,7 +22,7 @@ class HttpRequesterGetTest {
     val actual = runBlocking {
       requester.execute(RequestParams(
         title,
-        "https://httpbin.org/anything",
+        "http://localhost/anything",
         Constant.HttpMethod.GET,
         Constant.BodyType.QUERY,
         parameters = "$parameterKey1=$parameterValue1&$parameterKey2=$parameterValue2"
@@ -46,7 +46,7 @@ class HttpRequesterGetTest {
     val actual = runBlocking {
       requester.execute(RequestParams(
         title,
-        "https://httpbin.org/anything",
+        "http://localhost/anything",
         Constant.HttpMethod.GET,
         Constant.BodyType.QUERY,
         headers = "$headerKey1:$headerValue1\n$headerKey2:$headerValue2"
@@ -74,7 +74,7 @@ class HttpRequesterGetTest {
     val actual = runBlocking {
       requester.execute(RequestParams(
         title,
-        "https://httpbin.org/anything",
+        "http://localhost/anything",
         Constant.HttpMethod.GET,
         Constant.BodyType.QUERY,
         headers = "$headerKey1:$headerValue1\n$headerKey2:$headerValue2",
@@ -108,7 +108,7 @@ class HttpRequesterGetTest {
       val actual = runBlocking {
         requester.execute(RequestParams(
           title,
-          "https://httpbin.org/status/$it",
+          "http://localhost/status/$it",
           Constant.HttpMethod.GET,
           Constant.BodyType.QUERY,
         ))

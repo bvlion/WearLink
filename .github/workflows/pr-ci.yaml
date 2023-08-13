@@ -30,8 +30,22 @@ jobs:
       - name: Set config files
         run: echo ${{ secrets.DEBUG_GOOGLE_SERVICES_JSON }} | base64 -d > mobile/src/debug/google-services.json
 
+      - name: Start Http Docker
+        run: |
+          docker run -p 80:80 -d --name httpbin kennethreitz/httpbin
+  
+      - name: Wait for the service to start
+        run: |
+          while ! curl --output /dev/null --silent --head --fail http://localhost; do
+            sleep 1
+          done
+
       - name: Run test
         run: ./gradlew testDebugUnitTest
+  
+      - name: Stop Docker container
+        run: |
+          docker stop httpbin
 
       - name: shared test report
         uses: dorny/test-reporter@v1
