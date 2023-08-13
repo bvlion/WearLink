@@ -5,18 +5,24 @@ on:
     paths:
       - '**.kt'
       - '**.xml'
-      - '.github/workflows/shared-ci.yaml'
+      - '**.gradle'
+      - '.github/workflows/pr-ci.yaml'
 
 jobs:
-  shared-ci:
+  pr-ci:
     runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
 
-      - name: set up JDK 11
-        uses: actions/setup-java@v1
+    env:
+      HOST: http://localhost
+    
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: set up JDK 17
+        uses: actions/setup-java@v3
         with:
-          java-version: 11
+          distribution: 'corretto'
+          java-version: '17'
 
       - uses: actions/cache@v1
         with:
@@ -25,8 +31,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
+      - name: Set config files
+        run: echo ${{ secrets.DEBUG_GOOGLE_SERVICES_JSON }} | base64 -d > mobile/src/debug/google-services.json
+
+      - name: Start Http Docker
+        run: docker run -p 80:80 -d --name httpbin kennethreitz/httpbin
+
+      - name: Run build
+        run: ./gradlew compileDebugUnitTestJavaWithJavac
+  
+      - name: Wait for the service to start
+        run: |
+          while ! curl --output /dev/null --silent --head --fail http://localhost; do
+            sleep 1
+          done
+
       - name: Run test
         run: ./gradlew testDebugUnitTest
+  
+      - name: Stop Docker container
+        run: docker stop httpbin
 
       - name: shared test report
         uses: dorny/test-reporter@v1

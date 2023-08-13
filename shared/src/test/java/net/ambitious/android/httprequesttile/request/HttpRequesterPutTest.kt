@@ -22,7 +22,7 @@ class HttpRequesterPutTest {
     val actual = runBlocking {
       requester.execute(RequestParams(
         title,
-        "https://httpbin.org/anything",
+        "${TestUtil.getTestUrl()}/anything",
         Constant.HttpMethod.PUT,
         Constant.BodyType.FORM_PARAMS,
         parameters = "$parameterKey1=$parameterValue1&$parameterKey2=$parameterValue2"
@@ -46,7 +46,7 @@ class HttpRequesterPutTest {
     val actual = runBlocking {
       requester.execute(RequestParams(
         title,
-        "https://httpbin.org/anything",
+        "${TestUtil.getTestUrl()}/anything",
         Constant.HttpMethod.PUT,
         Constant.BodyType.JSON,
         parameters = "{\"$parameterKey1\":\"$parameterValue1\",\"$parameterKey2\":\"$parameterValue2\"}"
@@ -70,7 +70,7 @@ class HttpRequesterPutTest {
     val actual = runBlocking {
       requester.execute(RequestParams(
         title,
-        "https://httpbin.org/anything",
+        "${TestUtil.getTestUrl()}/anything",
         Constant.HttpMethod.PUT,
         Constant.BodyType.FORM_PARAMS,
         headers = "$headerKey1:$headerValue1\n$headerKey2:$headerValue2"
@@ -98,7 +98,7 @@ class HttpRequesterPutTest {
     val actual = runBlocking {
       requester.execute(RequestParams(
         title,
-        "https://httpbin.org/anything",
+        "${TestUtil.getTestUrl()}/anything",
         Constant.HttpMethod.PUT,
         Constant.BodyType.FORM_PARAMS,
         headers = "$headerKey1:$headerValue1\n$headerKey2:$headerValue2",
@@ -130,7 +130,7 @@ class HttpRequesterPutTest {
     val actual = runBlocking {
       requester.execute(RequestParams(
         title,
-        "https://httpbin.org/anything",
+        "${TestUtil.getTestUrl()}/anything",
         Constant.HttpMethod.PUT,
         Constant.BodyType.JSON,
         headers = "$headerKey1:$headerValue1\n$headerKey2:$headerValue2",
@@ -164,7 +164,7 @@ class HttpRequesterPutTest {
       val actual = runBlocking {
         requester.execute(RequestParams(
           title,
-          "https://httpbin.org/status/$it",
+          "${TestUtil.getTestUrl()}/status/$it",
           Constant.HttpMethod.PUT,
           Constant.BodyType.FORM_PARAMS,
         ))
