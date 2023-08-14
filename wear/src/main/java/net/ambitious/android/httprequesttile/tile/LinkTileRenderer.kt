@@ -37,7 +37,7 @@ class LinkTileRenderer(context: Context) : SingleTileLayoutRenderer<LinkTileStat
       state = state,
       requestClickableFactory = { requestParams ->
         AppAnalytics.logEvent(
-          AppAnalytics.EVENT_TILE_REQUEST_CLICK,
+          AppAnalytics.EVENT_TILE_REQUEST_TAP,
           mapOf(AppAnalytics.PARAM_EVENT_TILE_REQUEST_TITLE_HASH to requestParams.title.hashCode().toString())
         )
         ModifiersBuilders.Clickable.Builder()

@@ -54,7 +54,7 @@ class MainTileService : SuspendingTileService() {
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "スマートフォンのアプリを呼び出します")
         )
-        AppAnalytics.logEvent(AppAnalytics.EVENT_TILE_HEADER_CLICK)
+        AppAnalytics.logEvent(AppAnalytics.EVENT_TILE_HEADER_TAP)
       }
       AppConstants.SYNC_STORE_DATA -> {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -78,7 +78,7 @@ class MainTileService : SuspendingTileService() {
               )
             }
         }
-        AppAnalytics.logEvent(AppAnalytics.EVENT_TILE_SYNC_CLICK)
+        AppAnalytics.logEvent(AppAnalytics.EVENT_TILE_SYNC_TAP)
       }
     }
     return render.renderTimeline(
