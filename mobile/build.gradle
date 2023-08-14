@@ -38,7 +38,7 @@ android {
             minifyEnabled true
             buildConfigField "String", "ADMOB_NATIVE_KEY", "\"" + System.getenv()['ANDROID_ADMOB_NATIVE_KEY'] + "\""
             manifestPlaceholders = [
-                    admob_key: System.getenv()['ANDROID_ADMOB_KEY'] ?: ""
+                    admob_key: System.getenv()['ADMOB_KEY'] ?: ""
             ]
             signingConfig = signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
