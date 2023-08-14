@@ -19,6 +19,7 @@ import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.tools.TileLayoutPreview
 import com.google.android.horologist.tiles.render.SingleTileLayoutRenderer
 import net.ambitious.android.httprequesttile.R
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
 import net.ambitious.android.httprequesttile.data.AppConstants
 import net.ambitious.android.httprequesttile.data.Constant
 import net.ambitious.android.httprequesttile.data.RequestParams
@@ -35,6 +36,10 @@ class LinkTileRenderer(context: Context) : SingleTileLayoutRenderer<LinkTileStat
       deviceParameters = deviceParameters,
       state = state,
       requestClickableFactory = { requestParams ->
+        AppAnalytics.logEvent(
+          AppAnalytics.EVENT_TILE_REQUEST_CLICK,
+          mapOf(AppAnalytics.PARAM_EVENT_TILE_REQUEST_TITLE_HASH to requestParams.title.hashCode().toString())
+        )
         ModifiersBuilders.Clickable.Builder()
           .setId(requestParams.title)
           .setOnClick(

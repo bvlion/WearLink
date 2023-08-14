@@ -12,6 +12,7 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
 import net.ambitious.android.httprequesttile.data.AppConstants
 import net.ambitious.android.httprequesttile.data.AppDataStore
 import net.ambitious.android.httprequesttile.data.RequestParams.Companion.parseRequestParams
@@ -53,6 +54,7 @@ class MainTileService : SuspendingTileService() {
             .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
             .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "スマートフォンのアプリを呼び出します")
         )
+        AppAnalytics.logEvent(AppAnalytics.EVENT_TILE_HEADER_CLICK)
       }
       AppConstants.SYNC_STORE_DATA -> {
         lifecycleScope.launch(Dispatchers.IO) {
@@ -76,6 +78,7 @@ class MainTileService : SuspendingTileService() {
               )
             }
         }
+        AppAnalytics.logEvent(AppAnalytics.EVENT_TILE_SYNC_CLICK)
       }
     }
     return render.renderTimeline(
