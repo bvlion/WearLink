@@ -36,7 +36,7 @@ android {
         }
         release {
             minifyEnabled true
-            buildConfigField "String", "ADMOB_NATIVE_KEY", "\"" + System.getenv()['ANDROID_ADMOB_NATIVE_KEY'] + "\""
+            buildConfigField "String", "ADMOB_NATIVE_KEY", "\"" + System.getenv()['ADMOB_NATIVE_KEY'] + "\""
             manifestPlaceholders = [
                     admob_key: System.getenv()['ADMOB_KEY'] ?: ""
             ]
