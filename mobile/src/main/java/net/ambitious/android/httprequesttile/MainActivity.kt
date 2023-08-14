@@ -147,6 +147,7 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
                     editRequest.value?.headers
                       ?: "Content-type:application/x-www-form-urlencoded\nUser-Agent:myApp\n",
                     editRequest.value?.parameters ?: "a=b",
+                    editRequest.value?.watchSync ?: false,
                     editRequestIndex.value,
                     it.calculateBottomPadding(),
                     cancel = {
