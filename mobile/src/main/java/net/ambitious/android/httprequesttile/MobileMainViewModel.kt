@@ -29,7 +29,7 @@ import org.json.JSONArray
 import java.util.Date
 
 @ExperimentalMaterialApi
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MobileMainViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
   private val requester = HttpRequester()
   private val wearConnector = WearMobileConnector(application)

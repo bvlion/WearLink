@@ -22,7 +22,7 @@ import androidx.wear.widget.ConfirmationOverlay
 import net.ambitious.android.httprequesttile.data.AppConstants
 import net.ambitious.android.httprequesttile.theme.HttpRequestTileTheme
 
-class MainActivity : ComponentActivity() {
+class WearMainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     setContent {

@@ -42,9 +42,9 @@ import net.ambitious.android.httprequesttile.ui.theme.MainAnimatedVisibility
 import net.ambitious.android.httprequesttile.ui.theme.AppTheme
 
 @ExperimentalMaterialApi
-class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListener {
+class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListener {
 
-  private val viewModel by viewModels<MainViewModel>()
+  private val viewModel by viewModels<MobileMainViewModel>()
   private val messageClient by lazy { Wearable.getMessageClient(this) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
