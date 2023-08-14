@@ -86,16 +86,12 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
           }
         }
     } ?: byteArrayOf()
-    wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVE_REQUEST_PATH, watchSavedRequests) {
-      // TODO Crashlytics
-    }
+    wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVE_REQUEST_PATH, watchSavedRequests)
   }
 
   fun requestResponsesToWear() {
     viewModelScope.launch(Dispatchers.IO) {
-      wearConnector.sendMessageToWear(WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH) {
-        // TODO Crashlytics
-      }
+      wearConnector.sendMessageToWear(WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH)
     }
   }
 
@@ -104,9 +100,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       responses.parseResponseParams().forEach {
         saveResponses(it)
       }
-      wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVED_RESPONSE_PATH) {
-        // TODO Crashlytics
-      }
+      wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVED_RESPONSE_PATH)
     }
   }
 
@@ -251,7 +245,6 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
           }
         }
       ) {
-        // TODO Crashlytics
         if (scope != null && scaffoldState != null) {
           showMessageSnackbar(scope, scaffoldState, "ウェアラブルが見つかりません")
         }

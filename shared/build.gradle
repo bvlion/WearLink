@@ -31,6 +31,11 @@ dependencies {
     implementation 'androidx.datastore:datastore-preferences:1.0.0'
     implementation 'org.jetbrains.kotlinx:kotlinx-coroutines-play-services:1.7.3'
 
+    implementation platform('com.google.firebase:firebase-bom:31.1.1')
+    implementation 'com.google.firebase:firebase-crashlytics-ktx'
+    implementation 'com.google.firebase:firebase-analytics-ktx'
+
+
     testImplementation 'junit:junit:4.13.2'
     testImplementation 'org.json:json:20230618'
 }
