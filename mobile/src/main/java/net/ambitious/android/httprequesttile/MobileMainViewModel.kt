@@ -217,9 +217,15 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
 
   fun copyToClipboard(clipboardManager: ClipboardManager, scope: CoroutineScope, scaffoldState: ScaffoldState, isRequestCopy: Boolean) {
     val clipData = if (isRequestCopy) {
-      ClipData.newPlainText("request", savedRequest.value)
+      ClipData.newPlainText(
+        "request",
+        savedRequest.value?.parseRequestParams()?.joinToString(",", "[", "]") { it.toJsonString() }
+      )
     } else {
-      ClipData.newPlainText("response", savedResponse.value)
+      ClipData.newPlainText(
+        "response",
+        savedResponse.value.parseResponseParams().joinToString(",", "[", "]") { it.toJsonString() }
+      )
     }
     scope.launch {
       clipboardManager.setPrimaryClip(clipData)
