@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
 import net.ambitious.android.httprequesttile.data.AppConstants
 import net.ambitious.android.httprequesttile.data.AppDataStore
 import net.ambitious.android.httprequesttile.data.Constant
@@ -54,11 +55,20 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   private val _viewMode = MutableStateFlow(AppConstants.ViewMode.DEFAULT)
   val viewMode = _viewMode.asStateFlow()
 
+  private val _firstSendAnalytics = MutableStateFlow(false)
+
   init {
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
         _savedRequest.value = value
         requestsSyncToWear()
+        if (!_firstSendAnalytics.value && !value.isNullOrEmpty()) {
+          _firstSendAnalytics.value = true
+          AppAnalytics.logEvent(
+            AppAnalytics.EVENT_START,
+            mapOf(AppAnalytics.PARAM_EVENT_START_REQUEST_SAVED_COUNT to value.parseRequestParams().size.toString())
+          )
+        }
       }
     }
     viewModelScope.launch(Dispatchers.IO) {
@@ -106,7 +116,8 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
 
   fun saveRequest(scope: CoroutineScope?, scaffoldState: ScaffoldState?, savedIndex: Int, request: RequestParams) {
     viewModelScope.launch(Dispatchers.IO) {
-      (savedRequest.value?.parseRequestParams()?.toMutableList() ?: mutableListOf())
+      val savedList = (savedRequest.value?.parseRequestParams()?.toMutableList() ?: mutableListOf())
+      savedList
         .apply {
           if (savedIndex >= 0) {
             set(savedIndex, request)
@@ -117,6 +128,10 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
         .map { it.toJsonString() }
         .let { JSONArray(it).toString() }
         .let { dataStore.saveRequest(it) }
+      AppAnalytics.logEvent(
+        AppAnalytics.EVENT_REQUEST_SAVE_TAP,
+        mapOf(AppAnalytics.PARAM_EVENT_REQUEST_SAVE_COUNT to savedList.size.toString())
+      )
     }
     if (scope != null && scaffoldState != null) {
       showMessageSnackbar(scope, scaffoldState, "「${request.title}」を${if (savedIndex >= 0) "更新" else "作成"}しました。")
@@ -163,16 +178,21 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   }
 
   private suspend fun saveResponses(response: ResponseParams) {
-    if (savedResponse.value.isBlank()) {
+    val savedList = if (savedResponse.value.isBlank()) {
       mutableListOf()
     } else {
       savedResponse.value.parseResponseParams().toMutableList()
     }
+    savedList
       .apply { add(response) }
       .sortedByDescending { it.sendDateTime }
       .map { it.toJsonString() }
       .let { JSONArray(it).toString() }
       .let { dataStore.saveResponse(it) }
+    AppAnalytics.logEvent(
+      AppAnalytics.EVENT_RESPONSE_SAVE_TAP,
+      mapOf(AppAnalytics.PARAM_EVENT_RESPONSE_SAVE_COUNT to savedList.size.toString())
+    )
   }
 
   fun hideBottomSheet(scope: CoroutineScope) {

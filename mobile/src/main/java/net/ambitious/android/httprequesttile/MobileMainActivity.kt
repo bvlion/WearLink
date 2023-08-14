@@ -20,6 +20,7 @@ import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.launch
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
 import net.ambitious.android.httprequesttile.compose.DummyAdCompose
 import net.ambitious.android.httprequesttile.compose.ErrorDialogCompose
 import net.ambitious.android.httprequesttile.compose.LoadingCompose
@@ -213,6 +214,10 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                   editRequestIndex.value = -1
                 }
                 viewModel.hideBottomSheet(scope)
+                AppAnalytics.logEvent(
+                  AppAnalytics.EVENT_TAB_TAP,
+                  mapOf(AppAnalytics.PARAM_EVENT_TAB_TAP_INDEX to it.toString())
+                )
               }
             }
           )
