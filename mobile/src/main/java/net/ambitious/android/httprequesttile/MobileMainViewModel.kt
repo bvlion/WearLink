@@ -15,6 +15,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
 import net.ambitious.android.httprequesttile.data.AppConstants
 import net.ambitious.android.httprequesttile.data.AppDataStore
 import net.ambitious.android.httprequesttile.data.Constant
@@ -29,7 +30,7 @@ import org.json.JSONArray
 import java.util.Date
 
 @ExperimentalMaterialApi
-class MainViewModel(application: Application) : AndroidViewModel(application) {
+class MobileMainViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
   private val requester = HttpRequester()
   private val wearConnector = WearMobileConnector(application)
@@ -54,11 +55,20 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
   private val _viewMode = MutableStateFlow(AppConstants.ViewMode.DEFAULT)
   val viewMode = _viewMode.asStateFlow()
 
+  private val _firstSendAnalytics = MutableStateFlow(false)
+
   init {
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
         _savedRequest.value = value
         requestsSyncToWear()
+        if (!_firstSendAnalytics.value && !value.isNullOrEmpty()) {
+          _firstSendAnalytics.value = true
+          AppAnalytics.logEvent(
+            AppAnalytics.EVENT_START,
+            mapOf(AppAnalytics.PARAM_EVENT_START_REQUEST_SAVED_COUNT to value.parseRequestParams().size.toString())
+          )
+        }
       }
     }
     viewModelScope.launch(Dispatchers.IO) {
@@ -86,16 +96,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
     } ?: byteArrayOf()
-    wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVE_REQUEST_PATH, watchSavedRequests) {
-      // TODO Crashlytics
-    }
+    wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVE_REQUEST_PATH, watchSavedRequests)
   }
 
   fun requestResponsesToWear() {
     viewModelScope.launch(Dispatchers.IO) {
-      wearConnector.sendMessageToWear(WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH) {
-        // TODO Crashlytics
-      }
+      wearConnector.sendMessageToWear(WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH)
     }
   }
 
@@ -104,15 +110,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
       responses.parseResponseParams().forEach {
         saveResponses(it)
       }
-      wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVED_RESPONSE_PATH) {
-        // TODO Crashlytics
-      }
+      wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVED_RESPONSE_PATH)
     }
   }
 
   fun saveRequest(scope: CoroutineScope?, scaffoldState: ScaffoldState?, savedIndex: Int, request: RequestParams) {
     viewModelScope.launch(Dispatchers.IO) {
-      (savedRequest.value?.parseRequestParams()?.toMutableList() ?: mutableListOf())
+      val savedList = (savedRequest.value?.parseRequestParams()?.toMutableList() ?: mutableListOf())
+      savedList
         .apply {
           if (savedIndex >= 0) {
             set(savedIndex, request)
@@ -123,6 +128,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         .map { it.toJsonString() }
         .let { JSONArray(it).toString() }
         .let { dataStore.saveRequest(it) }
+      AppAnalytics.logEvent(
+        AppAnalytics.EVENT_REQUEST_SAVE_TAP,
+        mapOf(AppAnalytics.PARAM_EVENT_REQUEST_SAVE_COUNT to savedList.size.toString())
+      )
     }
     if (scope != null && scaffoldState != null) {
       showMessageSnackbar(scope, scaffoldState, "「${request.title}」を${if (savedIndex >= 0) "更新" else "作成"}しました。")
@@ -169,16 +178,21 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
   }
 
   private suspend fun saveResponses(response: ResponseParams) {
-    if (savedResponse.value.isBlank()) {
+    val savedList = if (savedResponse.value.isBlank()) {
       mutableListOf()
     } else {
       savedResponse.value.parseResponseParams().toMutableList()
     }
+    savedList
       .apply { add(response) }
       .sortedByDescending { it.sendDateTime }
       .map { it.toJsonString() }
       .let { JSONArray(it).toString() }
       .let { dataStore.saveResponse(it) }
+    AppAnalytics.logEvent(
+      AppAnalytics.EVENT_RESPONSE_SAVE_TAP,
+      mapOf(AppAnalytics.PARAM_EVENT_RESPONSE_SAVE_COUNT to savedList.size.toString())
+    )
   }
 
   fun hideBottomSheet(scope: CoroutineScope) {
@@ -203,9 +217,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
   fun copyToClipboard(clipboardManager: ClipboardManager, scope: CoroutineScope, scaffoldState: ScaffoldState, isRequestCopy: Boolean) {
     val clipData = if (isRequestCopy) {
-      ClipData.newPlainText("request", savedRequest.value)
+      ClipData.newPlainText(
+        "request",
+        savedRequest.value?.parseRequestParams()?.joinToString(",", "[", "]") { it.toJsonString() }
+      )
     } else {
-      ClipData.newPlainText("response", savedResponse.value)
+      ClipData.newPlainText(
+        "response",
+        savedResponse.value.parseResponseParams().joinToString(",", "[", "]") { it.toJsonString() }
+      )
     }
     scope.launch {
       clipboardManager.setPrimaryClip(clipData)
@@ -251,7 +271,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
           }
         }
       ) {
-        // TODO Crashlytics
         if (scope != null && scaffoldState != null) {
           showMessageSnackbar(scope, scaffoldState, "ウェアラブルが見つかりません")
         }

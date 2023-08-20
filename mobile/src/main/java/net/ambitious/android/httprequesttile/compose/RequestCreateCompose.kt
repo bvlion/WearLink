@@ -51,6 +51,7 @@ fun RequestCreate(
   defaultBodyType: Constant.BodyType,
   defaultHeader: String,
   defaultBody: String,
+  defaultWatchSync: Boolean,
   savedIndex: Int,
   bottomPadding: Dp = 56.dp,
   save: (Int, RequestParams) -> Unit = { _, _ -> },
@@ -280,7 +281,8 @@ fun RequestCreate(
             method = selectedMethod.value,
             bodyType = selectedBodyType.value,
             headers = header.value,
-            parameters = body.value
+            parameters = body.value,
+            watchSync = defaultWatchSync
           )
         )
       },
@@ -384,6 +386,7 @@ fun RequestCreatePreview() {
       Constant.BodyType.FORM_PARAMS,
       "Content-type:application/x-www-form-urlencoded\nUser-Agent:ワイのアプリ\n",
       "a=b",
+      false,
       0
     )
   }

@@ -3,6 +3,7 @@ package net.ambitious.android.httprequesttile.request
 import android.content.Context
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Wearable
+import com.google.firebase.crashlytics.FirebaseCrashlytics
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.coroutineScope
@@ -24,7 +25,7 @@ class WearMobileConnector(context: Context) {
     path: String,
     data: ByteArray = byteArrayOf(),
     successProcess: () -> Unit = {},
-    errorProcess: (Exception) -> Unit
+    errorProcess: (Exception) -> Unit = {}
   ) = sendMessage(WEAR_CAPABILITY, path, data, successProcess, errorProcess)
 
   private suspend fun sendMessage(
@@ -51,6 +52,7 @@ class WearMobileConnector(context: Context) {
       }.awaitAll()
       successProcess()
     } catch (exception: Exception) {
+      FirebaseCrashlytics.getInstance().recordException(exception)
       errorProcess(exception)
     }
   }

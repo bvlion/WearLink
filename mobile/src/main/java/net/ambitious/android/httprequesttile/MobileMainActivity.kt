@@ -20,6 +20,7 @@ import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.launch
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
 import net.ambitious.android.httprequesttile.compose.DummyAdCompose
 import net.ambitious.android.httprequesttile.compose.ErrorDialogCompose
 import net.ambitious.android.httprequesttile.compose.LoadingCompose
@@ -42,9 +43,9 @@ import net.ambitious.android.httprequesttile.ui.theme.MainAnimatedVisibility
 import net.ambitious.android.httprequesttile.ui.theme.AppTheme
 
 @ExperimentalMaterialApi
-class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListener {
+class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListener {
 
-  private val viewModel by viewModels<MainViewModel>()
+  private val viewModel by viewModels<MobileMainViewModel>()
   private val messageClient by lazy { Wearable.getMessageClient(this) }
 
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -147,6 +148,7 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
                     editRequest.value?.headers
                       ?: "Content-type:application/x-www-form-urlencoded\nUser-Agent:myApp\n",
                     editRequest.value?.parameters ?: "a=b",
+                    editRequest.value?.watchSync ?: false,
                     editRequestIndex.value,
                     it.calculateBottomPadding(),
                     cancel = {
@@ -212,6 +214,10 @@ class MainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListene
                   editRequestIndex.value = -1
                 }
                 viewModel.hideBottomSheet(scope)
+                AppAnalytics.logEvent(
+                  AppAnalytics.EVENT_TAB_TAP,
+                  mapOf(AppAnalytics.PARAM_EVENT_TAB_TAP_INDEX to it.toString())
+                )
               }
             }
           )
