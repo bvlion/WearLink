@@ -102,7 +102,6 @@ dependencies {
 }
 
 play {
-    track.set("alpha")
     serviceAccountCredentials.set(file("../google-play-service.json"))
     artifactDir.set(file("../build/app-bundles"))
 }

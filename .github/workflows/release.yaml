@@ -35,23 +35,31 @@ jobs:
         run: |
           echo $GOOGLE_SERVICES_JSON | base64 -d > mobile/src/release/google-services.json
           echo $GOOGLE_SERVICES_JSON | base64 -d > wear/src/release/google-services.json
+          echo $GOOGLE_PLAY_SERVICE_JSON | base64 -d > google-play-service.json
 
-      - name: Run Build
-        run: |
-          ./gradlew :mobile:bundleRelease
-          ./gradlew :wear:bundleRelease
+      - name: Run Build mobile
+        run: ./gradlew :mobile:bundleRelease
 
-      - name: Move aab files
+      - name: Move mobile aab files
         run: |
+          rm -rf build/app-bundles
           mkdir -p build/app-bundles
           mv mobile/build/outputs/bundle/release/mobile-release.aab build/app-bundles/.
+
+      - name: Run Release mobile
+        run: ./gradlew publishBundle --track production
+
+      - name: Run Build wear
+        run: ./gradlew :wear:bundleRelease
+
+      - name: Move wear aab files
+        run: |
+          rm -rf build/app-bundles
+          mkdir -p build/app-bundles
           mv wear/build/outputs/bundle/release/wear-release.aab build/app-bundles/.
 
-      - name: Set publisher files
-        run: echo $GOOGLE_PLAY_SERVICE_JSON | base64 -d > google-play-service.json
-
-      - name: Run Release
-        run: ./gradlew :mobile:publishBundle
+      - name: Run Release wear
+        run: ./gradlew publishBundle --track wear:production
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v3
