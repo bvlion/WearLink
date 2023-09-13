@@ -26,6 +26,7 @@ import net.ambitious.android.httprequesttile.data.ResponseParams
 import net.ambitious.android.httprequesttile.data.ResponseParams.Companion.parseResponseParams
 import net.ambitious.android.httprequesttile.request.HttpRequester
 import net.ambitious.android.httprequesttile.request.WearMobileConnector
+import net.ambitious.android.httprequesttile.sync.Sync
 import org.json.JSONArray
 import java.util.Date
 
@@ -61,7 +62,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
         _savedRequest.value = value
-        requestsSyncToWear()
+        Sync.requestsSyncToWear(dataStore, wearConnector)
         if (!_firstSendAnalytics.value && !value.isNullOrEmpty()) {
           _firstSendAnalytics.value = true
           AppAnalytics.logEvent(
@@ -82,23 +83,6 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       }
     }
   }
-
-  private suspend fun requestsSyncToWear() {
-    val watchSavedRequests = dataStore.getSavedRequest.first()?.let { value ->
-      value.parseRequestParams()
-        .filter { it.watchSync }
-        .map { it.toJsonString() }
-        .let {
-          if (it.isEmpty()) {
-            byteArrayOf()
-          } else {
-            JSONArray(it).toString().toByteArray()
-          }
-        }
-    } ?: byteArrayOf()
-    wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVE_REQUEST_PATH, watchSavedRequests)
-  }
-
   fun requestResponsesToWear() {
     viewModelScope.launch(Dispatchers.IO) {
       wearConnector.sendMessageToWear(WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH)
@@ -262,7 +246,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
 
   fun syncWatch(scope: CoroutineScope?, scaffoldState: ScaffoldState?) {
     viewModelScope.launch(Dispatchers.IO) {
-      requestsSyncToWear()
+      Sync.requestsSyncToWear(dataStore, wearConnector)
       wearConnector.sendMessageToWear(
         WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH,
         successProcess = {
