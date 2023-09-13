@@ -1,8 +1,9 @@
-name: Android Release CI
+name: Android Alpha Release CI
 
 on:
-  release:
-    types: [published]
+  push:
+    tags:
+      - 'alpha*'
 
 env:
   ADMOB_KEY: ${{ secrets.ADMOB_KEY }}
@@ -47,7 +48,7 @@ jobs:
           mv mobile/build/outputs/bundle/release/mobile-release.aab build/app-bundles/.
 
       - name: Run Release mobile
-        run: ./gradlew publishBundle --track production
+        run: ./gradlew publishBundle --track alpha
 
       - name: Run Build wear
         run: ./gradlew :wear:bundleRelease
@@ -59,14 +60,14 @@ jobs:
           mv wear/build/outputs/bundle/release/wear-release.aab build/app-bundles/.
 
       - name: Run Release wear
-        run: ./gradlew publishBundle --track wear:production
+        run: ./gradlew publishBundle --track wear:alpha
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v3
         with:
           status: ${{ job.status }}
           fields: repo,message,commit,author,action,eventName,ref,workflow # selectable (default: repo,message)
-          username: GHA_RELEASE
+          username: GHA_ALPHA_RELEASE
           icon_emoji: ':sunglasses:'
           channel: '#wearlink'
         env:
