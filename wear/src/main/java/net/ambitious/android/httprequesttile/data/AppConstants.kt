@@ -15,7 +15,8 @@ object AppConstants {
   fun startMobileActivity(
     context: Context,
     scope: CoroutineScope,
-    errorProcess: () -> Unit
+    url: String = "httprequesttile://start",
+    errorProcess: () -> Unit = {}
   ) {
     val remoteActivityHelper = RemoteActivityHelper(context)
     scope.launch {
@@ -23,7 +24,7 @@ object AppConstants {
         remoteActivityHelper.startRemoteActivity(
           Intent(Intent.ACTION_VIEW)
             .addCategory(Intent.CATEGORY_BROWSABLE)
-            .setData(Uri.parse("httprequesttile://start"))
+            .setData(Uri.parse(url))
         ).await()
       } catch (e: Exception) {
         errorProcess()
