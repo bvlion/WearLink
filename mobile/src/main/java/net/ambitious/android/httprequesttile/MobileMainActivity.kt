@@ -64,16 +64,20 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val loading = viewModel.loading.collectAsState()
       val viewMode = viewModel.viewMode.collectAsState()
 
-      BackHandler(viewModel.resultBottomSheet.isVisible) {
-        scope.launch {
-          viewModel.resultBottomSheet.hide()
-        }
-      }
-
       val bottomMenuIndex = remember { mutableStateOf(0) }
       val editRequest = remember { mutableStateOf<RequestParams?>(null) }
       val editRequestIndex = remember { mutableStateOf(-1) }
       val response = remember { mutableStateOf<ResponseParams?>(null) }
+
+      BackHandler(viewModel.resultBottomSheet.isVisible || bottomMenuIndex.value > 1) {
+        if (viewModel.resultBottomSheet.isVisible) {
+          scope.launch {
+            viewModel.resultBottomSheet.hide()
+          }
+        } else if (bottomMenuIndex.value > 1) {
+          bottomMenuIndex.value = 0
+        }
+      }
 
       AppTheme(AppConstants.isDarkMode(viewMode.value, isSystemInDarkTheme())) {
         ErrorDialogCompose(errorDialog.value) {

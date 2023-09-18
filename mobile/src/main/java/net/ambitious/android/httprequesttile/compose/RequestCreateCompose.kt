@@ -1,6 +1,7 @@
 package net.ambitious.android.httprequesttile.compose
 
 import android.webkit.URLUtil
+import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,6 +39,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 import net.ambitious.android.httprequesttile.data.Constant
 import net.ambitious.android.httprequesttile.data.RequestParams
 import net.ambitious.android.httprequesttile.ui.theme.AppTheme
@@ -76,6 +78,14 @@ fun RequestCreate(
   val editCheck = remember { mutableStateOf(false) }
   val cancelCheck = remember { mutableStateOf(false) }
   val deleteCheck = remember { mutableStateOf(false) }
+
+  BackHandler {
+    if (editCheck.value) {
+      cancelCheck.value = true
+      return@BackHandler
+    }
+    cancel()
+  }
 
   Column(
     Modifier
