@@ -39,28 +39,36 @@ jobs:
           echo $GOOGLE_PLAY_SERVICE_JSON | base64 -d > google-play-service.json
 
       - name: Run Build mobile
-        run: ./gradlew :mobile:bundleRelease
+        run: ./gradlew :mobile:bundleRelease :wear:bundleRelease
 
       - name: Move mobile aab files
         run: |
           rm -rf build/app-bundles
           mkdir -p build/app-bundles
           mv mobile/build/outputs/bundle/release/mobile-release.aab build/app-bundles/.
-
-      - name: Run Release mobile
-        run: ./gradlew publishBundle --track alpha
-
-      - name: Run Build wear
-        run: ./gradlew :wear:bundleRelease
-
-      - name: Move wear aab files
-        run: |
-          rm -rf build/app-bundles
-          mkdir -p build/app-bundles
           mv wear/build/outputs/bundle/release/wear-release.aab build/app-bundles/.
 
-      - name: Run Release wear
-        run: ./gradlew publishBundle --track wear:alpha
+      - name: Set up Ruby
+        uses: ruby/setup-ruby@v1
+        with:
+          ruby-version: 3.2.2
+  
+      - name: Cache Bundle packages
+        uses: actions/cache@v1
+        with:
+          path: vendor/bundle
+          key: ${{ runner.os }}-bundle-${{ hashFiles('Gemfile.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bundle-
+  
+      - name: bundler install
+        run: gem install bundler
+  
+      - name: bundler
+        run: bundle install
+  
+      - name: up play store
+        run: bundle exec fastlane deploy_to_play_store
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v3
