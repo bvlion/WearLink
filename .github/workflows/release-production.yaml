@@ -35,26 +35,13 @@ jobs:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: failure()
 
-      - name: set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: '17'
-
-      - uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
-
-      - name: Set config files
-        run: echo ${{ secrets.RELEASE_GOOGLE_SERVICES_JSON }} | base64 -d > google-play-service.json
+      - name: build setup
+        uses: ./.github/workflows/shared-setup.yaml
+        secrets:
+          GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
       - name: Promote Artifact to Production
-        run: |
-          ./gradlew promoteArtifact --from-track alpha --promote-track production --release-status inProgress
-          ./gradlew promoteArtifact --from-track wear:alpha --promote-track wear:production --release-status inProgress
+        run: bundle exec fastlane promote_alpha_to_production
 
       - name: Notify Success to Slack
         uses: 8398a7/action-slack@v3
@@ -66,4 +53,3 @@ jobs:
           channel: '#wearlink'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        if: success()

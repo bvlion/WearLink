@@ -5,11 +5,11 @@ on:
     branches:
       - 'main'
     paths:
-      - 'androidApp/src/main/play/listings/ja-JP/**.txt'
-      - 'androidApp/src/main/play/listings/ja-JP/graphics/**.png'
-
-env:
-  GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
+      - 'fastlane/metadata/android/ja-JP/images/**.png'
+      - 'fastlane/metadata/android/ja-JP/full_description.txt'
+      - 'fastlane/metadata/android/ja-JP/short_description.txt'
+      - 'fastlane/metadata/android/ja-JP/title.txt'
+      - 'fastlane/metadata/android/ja-JP/video.txt'
 
 jobs:
   listing:
@@ -17,17 +17,13 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: '17'
+      - name: build setup
+        uses: ./.github/workflows/shared-setup.yaml
+        secrets:
+          GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
-      - name: Set publisher files
-        run: echo $GOOGLE_PLAY_SERVICE_JSON | base64 -d > google-play-service.json
-
-      - name: Run Release
-        run: ./gradlew publishListing
+      - name: Update Play Store Listing
+        run: bundle exec fastlane update_play_store_listing
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v3

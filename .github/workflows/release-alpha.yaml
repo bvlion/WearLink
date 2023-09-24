@@ -10,7 +10,6 @@ env:
   ADMOB_NATIVE_KEY: ${{ secrets.ADMOB_NATIVE_KEY }}
   KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-  GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
   GOOGLE_SERVICES_JSON: ${{ secrets.RELEASE_GOOGLE_SERVICES_JSON }}
 
 jobs:
@@ -19,48 +18,33 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: '17'
-
-      - uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: build setup
+        uses: ./.github/workflows/shared-setup.yaml
+        secrets:
+          GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
       - name: Set config files
         run: |
           echo $GOOGLE_SERVICES_JSON | base64 -d > mobile/src/release/google-services.json
           echo $GOOGLE_SERVICES_JSON | base64 -d > wear/src/release/google-services.json
-          echo $GOOGLE_PLAY_SERVICE_JSON | base64 -d > google-play-service.json
 
       - name: Run Build mobile
-        run: ./gradlew :mobile:bundleRelease
+        run: ./gradlew :mobile:bundleRelease :wear:bundleRelease
 
       - name: Move mobile aab files
         run: |
           rm -rf build/app-bundles
           mkdir -p build/app-bundles
           mv mobile/build/outputs/bundle/release/mobile-release.aab build/app-bundles/.
-
-      - name: Run Release mobile
-        run: ./gradlew publishBundle --track alpha
-
-      - name: Run Build wear
-        run: ./gradlew :wear:bundleRelease
-
-      - name: Move wear aab files
-        run: |
-          rm -rf build/app-bundles
-          mkdir -p build/app-bundles
           mv wear/build/outputs/bundle/release/wear-release.aab build/app-bundles/.
 
-      - name: Run Release wear
-        run: ./gradlew publishBundle --track wear:alpha
+      - name: Copy changelogs
+        run: |
+            VERSION=$(tail -n 1 gradle.properties | sed -e 's/.*=//')
+            cp -p fastlane/metadata/android/ja-JP/changelogs/1$VERSION.txt fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt
+
+      - name: up play store
+        run: bundle exec fastlane deploy_to_play_store
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v3
