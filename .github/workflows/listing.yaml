@@ -19,7 +19,7 @@ jobs:
 
       - name: build setup
         uses: ./.github/workflows/shared-setup.yaml
-        secrets:
+        with:
           GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
       - name: Update Play Store Listing
