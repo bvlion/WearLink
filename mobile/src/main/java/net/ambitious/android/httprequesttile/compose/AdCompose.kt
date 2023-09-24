@@ -1,5 +1,6 @@
 package net.ambitious.android.httprequesttile.compose
 
+import android.os.Bundle
 import android.widget.ImageView
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -19,6 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidViewBinding
+import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
 import net.ambitious.android.httprequesttile.BuildConfig
@@ -58,7 +60,13 @@ fun NativeAdCompose() {
         }
 
         nativeAdView.setNativeAd(nativeAd)
-      }.build().loadAd(AdRequest.Builder().build())
+      }.build().loadAd(
+        Bundle().apply {
+          putString("max_ad_content_rating", "G")
+        }.let {
+          AdRequest.Builder().addNetworkExtrasBundle(AdMobAdapter::class.java, it).build()
+        }
+      )
   }
 }
 
