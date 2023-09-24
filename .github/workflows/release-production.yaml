@@ -36,7 +36,7 @@ jobs:
         if: failure()
 
       - name: build setup
-        uses: ./.github/workflows/shared-setup.yaml
+        uses: ./.github/actions/shared-setup
         with:
           GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
