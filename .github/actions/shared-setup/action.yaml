@@ -1,7 +1,7 @@
 name: 'Shared Setup'
 
 inputs:
-  RUNNDER_OS:
+  RUNNER_OS:
     required: true
     type: string
   GOOGLE_PLAY_SERVICE_JSON:
@@ -20,14 +20,17 @@ runs:
       uses: actions/cache@v1
       with:
         path: vendor/bundle
-        key: ${{ inputs.RUNNDER_OS }}-bundle-${{ hashFiles('Gemfile.lock') }}
-        restore-keys: ${{ inputs.RUNNDER_OS }}-bundle-
+        key: ${{ inputs.RUNNER_OS }}-bundle-${{ hashFiles('Gemfile.lock') }}
+        restore-keys: ${{ inputs.RUNNER_OS }}-bundle-
   
     - name: install bundler
       run: gem install bundler
+      shell: bash
   
     - name: bundle install
       run: bundle install
+      shell: bash
 
     - name: Set config files
-      run: echo ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }} | base64 -d > google-play-service.json
+      run: echo ${{ inputs.GOOGLE_PLAY_SERVICE_JSON }} | base64 -d > google-play-service.json
+      shell: bash
