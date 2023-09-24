@@ -1,36 +1,33 @@
 name: 'Shared Setup'
-on:
-  workflow_call:
-    inputs:
-      RUNNDER_OS:
-        required: true
-        type: string
-      GOOGLE_PLAY_SERVICE_JSON:
-        required: true
-        type: string
 
-jobs:
-  shared-setup:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.2.2
-  
-      - name: Cache Bundle packages
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: ${{ inputs.RUNNDER_OS }}-bundle-${{ hashFiles('Gemfile.lock') }}
-          restore-keys: |
-            ${{ inputs.RUNNDER_OS }}-bundle-
-  
-      - name: install bundler
-        run: gem install bundler
-  
-      - name: bundle install
-        run: bundle install
+inputs:
+  RUNNDER_OS:
+    required: true
+    type: string
+  GOOGLE_PLAY_SERVICE_JSON:
+    required: true
+    type: string
 
-      - name: Set config files
-        run: echo ${{ inputs.GOOGLE_PLAY_SERVICE_JSON }} | base64 -d > google-play-service.json
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.2.2
+  
+    - name: Cache Bundle packages
+      uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: ${{ inputs.RUNNDER_OS }}-bundle-${{ hashFiles('Gemfile.lock') }}
+        restore-keys: ${{ inputs.RUNNDER_OS }}-bundle-
+  
+    - name: install bundler
+      run: gem install bundler
+  
+    - name: bundle install
+      run: bundle install
+
+    - name: Set config files
+      run: echo ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }} | base64 -d > google-play-service.json
