@@ -20,6 +20,7 @@ jobs:
       - name: build setup
         uses: ./.github/actions/shared-setup
         with:
+          RUNNDER_OS: ${{ runner.os }}
           GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
       - name: Update Play Store Listing
