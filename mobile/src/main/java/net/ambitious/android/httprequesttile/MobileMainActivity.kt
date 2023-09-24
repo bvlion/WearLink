@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.google.android.gms.ads.MobileAds
+import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
@@ -51,6 +52,12 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
     MobileAds.initialize(this)
+    MobileAds.setRequestConfiguration(
+      MobileAds.getRequestConfiguration().toBuilder()
+        .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
+        .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
+        .build()
+    )
     val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     setContent {
