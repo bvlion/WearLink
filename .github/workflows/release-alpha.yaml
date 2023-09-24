@@ -10,7 +10,6 @@ env:
   ADMOB_NATIVE_KEY: ${{ secrets.ADMOB_NATIVE_KEY }}
   KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
-  GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
   GOOGLE_SERVICES_JSON: ${{ secrets.RELEASE_GOOGLE_SERVICES_JSON }}
 
 jobs:
@@ -19,24 +18,15 @@ jobs:
     steps:
       - uses: actions/checkout@v3
 
-      - name: set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'corretto'
-          java-version: '17'
-
-      - uses: actions/cache@v1
-        with:
-          path: ~/.gradle/caches
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-          restore-keys: |
-            ${{ runner.os }}-gradle-
+      - name: build setup
+        uses: ./.github/workflows/shared-setup.yaml
+        secrets:
+          GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
       - name: Set config files
         run: |
           echo $GOOGLE_SERVICES_JSON | base64 -d > mobile/src/release/google-services.json
           echo $GOOGLE_SERVICES_JSON | base64 -d > wear/src/release/google-services.json
-          echo $GOOGLE_PLAY_SERVICE_JSON | base64 -d > google-play-service.json
 
       - name: Run Build mobile
         run: ./gradlew :mobile:bundleRelease :wear:bundleRelease
@@ -48,25 +38,6 @@ jobs:
           mv mobile/build/outputs/bundle/release/mobile-release.aab build/app-bundles/.
           mv wear/build/outputs/bundle/release/wear-release.aab build/app-bundles/.
 
-      - name: Set up Ruby
-        uses: ruby/setup-ruby@v1
-        with:
-          ruby-version: 3.2.2
-  
-      - name: Cache Bundle packages
-        uses: actions/cache@v1
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-bundle-${{ hashFiles('Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-bundle-
-  
-      - name: bundler install
-        run: gem install bundler
-  
-      - name: bundler
-        run: bundle install
-  
       - name: up play store
         run: bundle exec fastlane deploy_to_play_store
 
