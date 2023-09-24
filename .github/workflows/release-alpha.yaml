@@ -38,6 +38,11 @@ jobs:
           mv mobile/build/outputs/bundle/release/mobile-release.aab build/app-bundles/.
           mv wear/build/outputs/bundle/release/wear-release.aab build/app-bundles/.
 
+      - name: Copy changelogs
+        run: |
+            VERSION=$(tail -n 1 gradle.properties | sed -e 's/.*=//')
+            cp -p fastlane/metadata/android/ja-JP/changelogs/1$VERSION.txt fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt
+
       - name: up play store
         run: bundle exec fastlane deploy_to_play_store
 
