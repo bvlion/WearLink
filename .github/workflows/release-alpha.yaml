@@ -55,7 +55,9 @@ jobs:
       - name: Copy changelogs
         run: |
             VERSION=$(tail -n 1 gradle.properties | sed -e 's/.*=//')
-            cp -p fastlane/metadata/android/ja-JP/changelogs/1$VERSION.txt fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt
+            if [ ! -f "fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt" ]; then
+              cp -p fastlane/metadata/android/ja-JP/changelogs/1$VERSION.txt fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt
+            fi
 
       - name: up play store
         run: bundle exec fastlane deploy_to_play_store
