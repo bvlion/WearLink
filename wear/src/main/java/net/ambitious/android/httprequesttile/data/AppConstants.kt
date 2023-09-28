@@ -16,6 +16,7 @@ object AppConstants {
     context: Context,
     scope: CoroutineScope,
     url: String = "httprequesttile://start",
+    successProcess: () -> Unit,
     errorProcess: () -> Unit = {}
   ) {
     val remoteActivityHelper = RemoteActivityHelper(context)
@@ -26,6 +27,7 @@ object AppConstants {
             .addCategory(Intent.CATEGORY_BROWSABLE)
             .setData(Uri.parse(url))
         ).await()
+        successProcess()
       } catch (e: Exception) {
         errorProcess()
       }

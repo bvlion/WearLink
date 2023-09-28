@@ -27,6 +27,8 @@ class MainTileService : SuspendingTileService() {
 
   private val savedRequest = MutableStateFlow<String?>("")
 
+  private val render by lazy { LinkTileRenderer(this) }
+
   override fun onCreate() {
     super.onCreate()
     lifecycleScope.launch(Dispatchers.IO) {
@@ -42,45 +44,51 @@ class MainTileService : SuspendingTileService() {
   override suspend fun tileRequest(requestParams: RequestBuilders.TileRequest): TileBuilders.Tile {
     when (requestParams.state?.lastClickableId) {
       AppConstants.START_MOBILE_ACTIVITY -> {
-        AppConstants.startMobileActivity(this, lifecycleScope) {
-          startActivity(
-            Intent(this, ToastActivity::class.java)
-              .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-              .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "スマートフォンのアプリがインストールされていません")
-          )
+        AppConstants.startMobileActivity(
+          this,
+          lifecycleScope,
+          successProcess = {
+            startActivity(
+              Intent(this, ToastActivity::class.java)
+                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "スマートフォンのアプリを呼び出します")
+            )
+          }
+        ) {
+          showNotFindMobileToast()
         }
-        startActivity(
-          Intent(this, ToastActivity::class.java)
-            .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-            .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "スマートフォンのアプリを呼び出します")
-        )
         AppAnalytics.logEvent(AppAnalytics.EVENT_TILE_HEADER_TAP)
       }
       AppConstants.SYNC_STORE_DATA -> {
-        lifecycleScope.launch(Dispatchers.IO) {
-          AppConstants.startMobileActivity(this@MainTileService, lifecycleScope, "httprequesttile://sync")
-          delay(500)
-          WearMobileConnector(this@MainTileService)
-            .sendMessageToMobile(
-              WearMobileConnector.MOBILE_REQUEST_SYNC_PATH,
-              successProcess = {
-                startActivity(
-                  Intent(this@MainTileService, ToastActivity::class.java)
-                    .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                    .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "同期しました")
-                )
-              }
-            ) {
-              startActivity(
-                Intent(this@MainTileService, ToastActivity::class.java)
-                  .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                  .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "スマートフォンが見つかりませんでした")
-              )
+        AppConstants.startMobileActivity(
+          this,
+          lifecycleScope,
+          "httprequesttile://sync",
+          {
+            lifecycleScope.launch(Dispatchers.IO) {
+              delay(500)
+              WearMobileConnector(this@MainTileService)
+                .sendMessageToMobile(
+                  WearMobileConnector.MOBILE_REQUEST_SYNC_PATH,
+                  successProcess = {
+                    startActivity(
+                      Intent(this@MainTileService, ToastActivity::class.java)
+                        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+                        .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "同期しました")
+                    )
+                  }
+                ) {
+                  showNotFindMobileToast()
+                }
             }
+          }
+        ) {
+          showNotFindMobileToast()
         }
         AppAnalytics.logEvent(AppAnalytics.EVENT_TILE_SYNC_TAP)
       }
     }
+
     return render.renderTimeline(
       LinkTileState(
         savedRequest.value?.let {
@@ -95,7 +103,12 @@ class MainTileService : SuspendingTileService() {
     )
   }
 
-  private val render by lazy { LinkTileRenderer(this) }
+  private fun showNotFindMobileToast() =
+    startActivity(
+      Intent(this, ToastActivity::class.java)
+        .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+        .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, "スマートフォンが見つかりませんでした")
+    )
 
   companion object {
     fun tileUpdate(context: Context) {

@@ -27,12 +27,17 @@ class WearMainActivity : ComponentActivity() {
     super.onCreate(savedInstanceState)
     setContent {
       WearApp {
-        AppConstants.startMobileActivity(this, lifecycleScope) {
+        AppConstants.startMobileActivity(
+          this,
+          lifecycleScope,
+          successProcess = {
+            Toast.makeText(this, "スマートフォンのアプリを起動しました", Toast.LENGTH_SHORT).show()
+          }
+        ) {
           ConfirmationOverlay()
             .setType(ConfirmationOverlay.FAILURE_ANIMATION)
             .showOn(this)
         }
-        Toast.makeText(this, "スマートフォンのアプリを起動しました", Toast.LENGTH_SHORT).show()
       }
     }
   }
