@@ -30,11 +30,13 @@
         <activity
             android:name=".httpexecute.HttpExecuteActivity"
             android:exported="true"
+            android:excludeFromRecents="true"
             android:theme="@android:style/Theme.DeviceDefault" />
 
         <activity
             android:name=".toast.ToastActivity"
             android:exported="false"
+            android:excludeFromRecents="true"
             android:theme="@style/NoAnimationTheme" />
 
         <service
