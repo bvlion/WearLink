@@ -14,12 +14,12 @@
 
         <meta-data
             android:name="com.google.android.wearable.standalone"
-            android:value="false" />
+            android:value="true" />
 
         <activity
             android:name=".WearMainActivity"
             android:exported="true"
-            android:theme="@android:style/Theme.DeviceDefault">
+            android:theme="@style/Theme.App.Starting">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
@@ -30,11 +30,14 @@
         <activity
             android:name=".httpexecute.HttpExecuteActivity"
             android:exported="true"
+            android:excludeFromRecents="true"
+            android:launchMode="singleTask"
             android:theme="@android:style/Theme.DeviceDefault" />
 
         <activity
             android:name=".toast.ToastActivity"
             android:exported="false"
+            android:excludeFromRecents="true"
             android:theme="@style/NoAnimationTheme" />
 
         <service

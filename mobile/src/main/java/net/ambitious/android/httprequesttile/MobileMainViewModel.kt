@@ -201,21 +201,36 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
 
   fun copyToClipboard(clipboardManager: ClipboardManager, scope: CoroutineScope, scaffoldState: ScaffoldState, isRequestCopy: Boolean) {
     val clipData = if (isRequestCopy) {
-      ClipData.newPlainText(
-        "request",
-        savedRequest.value?.parseRequestParams()?.joinToString(",", "[", "]") { it.toJsonString() }
-      )
+      savedRequest.value?.let { value ->
+        ClipData.newPlainText(
+          "request",
+          value.parseRequestParams().joinToString(",", "[", "]") { it.toJsonString() }
+        )
+      }
     } else {
-      ClipData.newPlainText(
-        "response",
-        savedResponse.value.parseResponseParams().joinToString(",", "[", "]") { it.toJsonString() }
+      if (savedResponse.value.isNotEmpty()) {
+        ClipData.newPlainText(
+          "response",
+          savedResponse.value.parseResponseParams()
+            .joinToString(",", "[", "]") { it.toJsonString() }
+        )
+      } else {
+        null
+      }
+    }
+    clipData?.let {
+      scope.launch {
+        clipboardManager.setPrimaryClip(it)
+      }
+    }
+    scope.launch {
+      scaffoldState.snackbarHostState.showSnackbar(
+        if (clipData != null) {
+          "クリップボードにコピーしました。"
+        } else {
+          "エクスポートするデータがありません。"
+        }
       )
-    }
-    scope.launch {
-      clipboardManager.setPrimaryClip(clipData)
-    }
-    scope.launch {
-      scaffoldState.snackbarHostState.showSnackbar("クリップボードにコピーしました。")
     }
   }
 

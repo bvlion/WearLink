@@ -70,6 +70,7 @@ dependencies {
     implementation 'androidx.wear.tiles:tiles-material:1.1.0'
     def horologist_version = captureVersion(implementation('com.google.android.horologist:horologist-compose-tools:0.3.11'))
     implementation "com.google.android.horologist:horologist-tiles:$horologist_version"
+    implementation 'androidx.core:core-splashscreen:1.0.1'
 
     implementation platform('com.google.firebase:firebase-bom:31.1.1')
     implementation 'com.google.firebase:firebase-crashlytics-ktx'

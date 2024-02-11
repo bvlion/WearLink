@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Devices
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
@@ -24,15 +25,21 @@ import net.ambitious.android.httprequesttile.theme.HttpRequestTileTheme
 
 class WearMainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
+    installSplashScreen()
     super.onCreate(savedInstanceState)
     setContent {
       WearApp {
-        AppConstants.startMobileActivity(this, lifecycleScope) {
+        AppConstants.startMobileActivity(
+          this,
+          lifecycleScope,
+          successProcess = {
+            Toast.makeText(this, "スマートフォンのアプリを起動しました", Toast.LENGTH_SHORT).show()
+          }
+        ) {
           ConfirmationOverlay()
             .setType(ConfirmationOverlay.FAILURE_ANIMATION)
             .showOn(this)
         }
-        Toast.makeText(this, "スマートフォンのアプリを起動しました", Toast.LENGTH_SHORT).show()
       }
     }
   }
