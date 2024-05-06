@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.data
+package net.ambitious.android.wearnetvoyage.data
 
 import android.content.Context
 import androidx.datastore.core.DataStore

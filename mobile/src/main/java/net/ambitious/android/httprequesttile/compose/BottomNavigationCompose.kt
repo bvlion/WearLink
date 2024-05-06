@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.compose
+package net.ambitious.android.wearnetvoyage.compose
 
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.BottomNavigationItem
@@ -15,7 +15,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
-import net.ambitious.android.httprequesttile.ui.theme.AppTheme
+import net.ambitious.android.wearnetvoyage.ui.theme.AppTheme
 
 @Composable
 fun MenuBottomNavigation(

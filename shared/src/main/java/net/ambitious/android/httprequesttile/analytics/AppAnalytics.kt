@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.analytics
+package net.ambitious.android.wearnetvoyage.analytics
 
 import android.os.Bundle
 import com.google.firebase.analytics.ktx.analytics

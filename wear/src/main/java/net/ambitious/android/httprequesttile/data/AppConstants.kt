@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.data
+package net.ambitious.android.wearnetvoyage.data
 
 import android.content.Context
 import android.content.Intent
@@ -9,13 +9,13 @@ import kotlinx.coroutines.guava.await
 import kotlinx.coroutines.launch
 
 object AppConstants {
-  const val START_MOBILE_ACTIVITY = "net.ambitious.android.httprequesttile.START_MOBILE_ACTIVITY"
-  const val SYNC_STORE_DATA = "net.ambitious.android.httprequesttile.SYNC_STORE_DATA"
+  const val START_MOBILE_ACTIVITY = "net.ambitious.android.wearnetvoyage.START_MOBILE_ACTIVITY"
+  const val SYNC_STORE_DATA = "net.ambitious.android.wearnetvoyage.SYNC_STORE_DATA"
 
   fun startMobileActivity(
     context: Context,
     scope: CoroutineScope,
-    url: String = "httprequesttile://start",
+    url: String = "wearnetvoyage://start",
     successProcess: () -> Unit,
     errorProcess: () -> Unit = {}
   ) {

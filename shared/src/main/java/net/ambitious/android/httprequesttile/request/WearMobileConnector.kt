@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.request
+package net.ambitious.android.wearnetvoyage.request
 
 import android.content.Context
 import com.google.android.gms.wearable.CapabilityClient

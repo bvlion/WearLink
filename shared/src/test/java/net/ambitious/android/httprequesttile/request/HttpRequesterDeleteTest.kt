@@ -1,9 +1,9 @@
-package net.ambitious.android.httprequesttile.request
+package net.ambitious.android.wearnetvoyage.request
 
 import kotlinx.coroutines.runBlocking
-import net.ambitious.android.httprequesttile.data.Constant
-import net.ambitious.android.httprequesttile.data.RequestParams
-import net.ambitious.android.httprequesttile.util.TestUtil
+import net.ambitious.android.wearnetvoyage.data.Constant
+import net.ambitious.android.wearnetvoyage.data.RequestParams
+import net.ambitious.android.wearnetvoyage.util.TestUtil
 import org.junit.Assert.assertEquals
 import org.junit.Test
 

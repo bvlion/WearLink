@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.toast
+package net.ambitious.android.wearnetvoyage.toast
 
 import android.app.Activity
 import android.os.Bundle

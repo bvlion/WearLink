@@ -4,7 +4,7 @@ plugins {
 }
 
 android {
-    namespace 'net.ambitious.android.httprequesttile'
+    namespace 'net.ambitious.android.wearnetvoyage'
     compileSdk 33
 
     compileOptions {

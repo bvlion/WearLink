@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.compose
+package net.ambitious.android.wearnetvoyage.compose
 
 import android.content.ActivityNotFoundException
 import android.content.Intent
@@ -58,11 +58,11 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import net.ambitious.android.httprequesttile.BuildConfig
-import net.ambitious.android.httprequesttile.data.AppConstants
-import net.ambitious.android.httprequesttile.data.RequestParams.Companion.parseRequestParams
-import net.ambitious.android.httprequesttile.ui.theme.AppTheme
-import net.ambitious.android.httprequesttile.ui.theme.noRippleClickable
+import net.ambitious.android.wearnetvoyage.BuildConfig
+import net.ambitious.android.wearnetvoyage.data.AppConstants
+import net.ambitious.android.wearnetvoyage.data.RequestParams.Companion.parseRequestParams
+import net.ambitious.android.wearnetvoyage.ui.theme.AppTheme
+import net.ambitious.android.wearnetvoyage.ui.theme.noRippleClickable
 import java.net.URLEncoder
 
 @Composable

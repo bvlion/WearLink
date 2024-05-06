@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile
+package net.ambitious.android.wearnetvoyage
 
 import org.junit.Test
 

@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.compose
+package net.ambitious.android.wearnetvoyage.compose
 
 import android.os.Bundle
 import android.widget.ImageView
@@ -23,9 +23,9 @@ import androidx.compose.ui.viewinterop.AndroidViewBinding
 import com.google.ads.mediation.admob.AdMobAdapter
 import com.google.android.gms.ads.AdLoader
 import com.google.android.gms.ads.AdRequest
-import net.ambitious.android.httprequesttile.BuildConfig
-import net.ambitious.android.httprequesttile.databinding.AdmobBinding
-import net.ambitious.android.httprequesttile.ui.theme.AppTheme
+import net.ambitious.android.wearnetvoyage.BuildConfig
+import net.ambitious.android.wearnetvoyage.databinding.AdmobBinding
+import net.ambitious.android.wearnetvoyage.ui.theme.AppTheme
 
 @Composable
 fun NativeAdCompose() {
@@ -74,8 +74,8 @@ fun NativeAdCompose() {
 fun DummyAdCompose() {
   Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.fillMaxWidth().padding(16.dp, 16.dp, 16.dp, 0.dp)) {
     Box(modifier = Modifier
-      .width(120.dp)
-      .height(88.dp), contentAlignment = Alignment.Center) {
+      .width(164.dp)
+      .height(120.dp), contentAlignment = Alignment.Center) {
       Text("画像")
     }
     Column(Modifier.fillMaxWidth().padding(start = 8.dp)) {

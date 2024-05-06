@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.httpexecute
+package net.ambitious.android.wearnetvoyage.httpexecute
 
 import android.os.Bundle
 import androidx.activity.ComponentActivity
@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.sp
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
-import net.ambitious.android.httprequesttile.theme.HttpRequestTileTheme
+import net.ambitious.android.wearnetvoyage.theme.WearNetVoyageTheme
 
 class HttpExecuteActivity : ComponentActivity() {
 
@@ -46,7 +46,7 @@ class HttpExecuteActivity : ComponentActivity() {
 
 @Composable
 fun HttpExecute(title: String) {
-  HttpRequestTileTheme {
+  WearNetVoyageTheme {
     Box(
       modifier = Modifier
         .fillMaxSize()

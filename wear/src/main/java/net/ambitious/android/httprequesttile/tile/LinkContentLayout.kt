@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.tile
+package net.ambitious.android.wearnetvoyage.tile
 
 import android.content.Context
 import androidx.wear.tiles.DeviceParametersBuilders
@@ -7,8 +7,8 @@ import androidx.wear.tiles.ModifiersBuilders
 import androidx.wear.tiles.material.ChipColors
 import androidx.wear.tiles.material.CompactChip
 import androidx.wear.tiles.material.layouts.MultiSlotLayout
-import net.ambitious.android.httprequesttile.data.RequestParams
-import net.ambitious.android.httprequesttile.theme.LinkTileTheme
+import net.ambitious.android.wearnetvoyage.data.RequestParams
+import net.ambitious.android.wearnetvoyage.theme.LinkTileTheme
 
 object LinkContentLayout {
   fun create(

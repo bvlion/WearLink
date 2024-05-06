@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.compose
+package net.ambitious.android.wearnetvoyage.compose
 
 import android.webkit.URLUtil
 import androidx.activity.compose.BackHandler
@@ -40,9 +40,9 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import kotlinx.coroutines.launch
-import net.ambitious.android.httprequesttile.data.Constant
-import net.ambitious.android.httprequesttile.data.RequestParams
-import net.ambitious.android.httprequesttile.ui.theme.AppTheme
+import net.ambitious.android.wearnetvoyage.data.Constant
+import net.ambitious.android.wearnetvoyage.data.RequestParams
+import net.ambitious.android.wearnetvoyage.ui.theme.AppTheme
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable

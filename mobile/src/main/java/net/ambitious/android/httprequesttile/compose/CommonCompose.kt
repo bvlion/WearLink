@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.compose
+package net.ambitious.android.wearnetvoyage.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import net.ambitious.android.httprequesttile.data.ErrorDetail
+import net.ambitious.android.wearnetvoyage.data.ErrorDetail
 
 @Composable
 fun ErrorDialogCompose(err: ErrorDetail?, dismiss: () -> Unit) {

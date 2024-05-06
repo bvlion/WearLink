@@ -1,4 +1,4 @@
-package net.ambitious.android.httprequesttile.ui.theme
+package net.ambitious.android.wearnetvoyage.ui.theme
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
