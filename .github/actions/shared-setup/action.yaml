@@ -3,12 +3,11 @@ name: 'Shared Setup'
 inputs:
   RUNNER_OS:
     required: true
-    description: 'runner os'
+    type: string
   GOOGLE_PLAY_SERVICE_JSON:
     required: true
-    description: 'google-play-service.json'
+    type: string
 
-description: 'set up fastlane'
 runs:
   using: 'composite'
   steps:

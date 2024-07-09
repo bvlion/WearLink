@@ -2,8 +2,8 @@ name: Android Listing CI
 
 on:
   push:
-    tags:
-      - 'listing*'
+    branches:
+      - 'main'
     paths:
       - 'fastlane/metadata/android/ja-JP/images/**.png'
       - 'fastlane/metadata/android/ja-JP/full_description.txt'
