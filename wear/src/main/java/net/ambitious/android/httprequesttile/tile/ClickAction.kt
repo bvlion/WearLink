@@ -1,9 +1,9 @@
-package net.ambitious.android.wearnetvoyage.tile
+package net.ambitious.android.httprequesttile.tile
 
 import android.content.Context
 import androidx.wear.tiles.ActionBuilders
-import net.ambitious.android.wearnetvoyage.data.RequestParams
-import net.ambitious.android.wearnetvoyage.httpexecute.HttpExecuteActivity
+import net.ambitious.android.httprequesttile.data.RequestParams
+import net.ambitious.android.httprequesttile.httpexecute.HttpExecuteActivity
 
 object ClickAction {
   fun requestExecute(
@@ -12,7 +12,7 @@ object ClickAction {
   ): ActionBuilders.AndroidActivity =
     ActionBuilders.AndroidActivity.Builder()
       .setPackageName(context.packageName)
-      .setClassName("net.ambitious.android.wearnetvoyage.httpexecute.HttpExecuteActivity")
+      .setClassName("net.ambitious.android.httprequesttile.httpexecute.HttpExecuteActivity")
       .addKeyToExtraMapping(
         HttpExecuteActivity.EXTRA_REQUEST_PARAMS,
         ActionBuilders.stringExtra(requestParams.toJsonString())

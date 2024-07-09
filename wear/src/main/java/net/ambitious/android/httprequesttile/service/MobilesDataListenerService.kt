@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.service
+package net.ambitious.android.httprequesttile.service
 
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
@@ -7,8 +7,8 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import net.ambitious.android.wearnetvoyage.data.AppDataStore
-import net.ambitious.android.wearnetvoyage.request.WearMobileConnector
+import net.ambitious.android.httprequesttile.data.AppDataStore
+import net.ambitious.android.httprequesttile.request.WearMobileConnector
 
 class MobilesDataListenerService : WearableListenerService() {
 

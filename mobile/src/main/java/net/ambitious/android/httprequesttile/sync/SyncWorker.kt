@@ -1,10 +1,10 @@
-package net.ambitious.android.wearnetvoyage.sync
+package net.ambitious.android.httprequesttile.sync
 
 import android.content.Context
 import androidx.work.CoroutineWorker
 import androidx.work.WorkerParameters
-import net.ambitious.android.wearnetvoyage.data.AppDataStore
-import net.ambitious.android.wearnetvoyage.request.WearMobileConnector
+import net.ambitious.android.httprequesttile.data.AppDataStore
+import net.ambitious.android.httprequesttile.request.WearMobileConnector
 
 class SyncWorker(
   private val context: Context, params: WorkerParameters

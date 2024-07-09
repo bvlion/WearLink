@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage
+package net.ambitious.android.httprequesttile
 
 import androidx.test.platform.app.InstrumentationRegistry
 import androidx.test.ext.junit.runners.AndroidJUnit4
@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("net.ambitious.android.wearnetvoyage", appContext.packageName)
+        assertEquals("net.ambitious.android.httprequesttile", appContext.packageName)
     }
 }

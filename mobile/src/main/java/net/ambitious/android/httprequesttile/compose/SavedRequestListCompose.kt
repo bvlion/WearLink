@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.compose
+package net.ambitious.android.httprequesttile.compose
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -28,10 +28,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.ambitious.android.wearnetvoyage.data.Constant
-import net.ambitious.android.wearnetvoyage.data.RequestParams
-import net.ambitious.android.wearnetvoyage.ui.theme.AppTheme
-import net.ambitious.android.wearnetvoyage.ui.theme.noRippleClickable
+import net.ambitious.android.httprequesttile.data.Constant
+import net.ambitious.android.httprequesttile.data.RequestParams
+import net.ambitious.android.httprequesttile.ui.theme.AppTheme
+import net.ambitious.android.httprequesttile.ui.theme.noRippleClickable
 
 @Composable
 private fun SavedRequest(

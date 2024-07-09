@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.ui.theme
+package net.ambitious.android.httprequesttile.ui.theme
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi

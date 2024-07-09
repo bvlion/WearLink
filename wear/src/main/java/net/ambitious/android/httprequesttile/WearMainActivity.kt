@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage
+package net.ambitious.android.httprequesttile
 
 import android.os.Bundle
 import android.widget.Toast
@@ -20,8 +20,8 @@ import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.widget.ConfirmationOverlay
-import net.ambitious.android.wearnetvoyage.data.AppConstants
-import net.ambitious.android.wearnetvoyage.theme.WearNetVoyageTheme
+import net.ambitious.android.httprequesttile.data.AppConstants
+import net.ambitious.android.httprequesttile.theme.HttpRequestTileTheme
 
 class WearMainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -47,7 +47,7 @@ class WearMainActivity : ComponentActivity() {
 
 @Composable
 fun WearApp(startMobileActivity: () -> Unit = {}) {
-  WearNetVoyageTheme {
+  HttpRequestTileTheme {
     Column(
       modifier = Modifier
         .fillMaxSize()

@@ -18,7 +18,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="wearnetvoyage" android:host="start" />
+                <data android:scheme="httprequesttile" android:host="start" />
             </intent-filter>
         </activity>
 
@@ -31,7 +31,7 @@
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
-                <data android:scheme="wearnetvoyage" android:host="sync" />
+                <data android:scheme="httprequesttile" android:host="sync" />
             </intent-filter>
         </activity>
 

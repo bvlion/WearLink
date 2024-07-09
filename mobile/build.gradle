@@ -6,12 +6,12 @@ plugins {
 }
 
 android {
-    namespace 'net.ambitious.android.wearnetvoyage'
+    namespace 'net.ambitious.android.httprequesttile'
     compileSdk project.COMPILE_SDK.toInteger()
     apply from: '../signing.gradle', to: android
 
     defaultConfig {
-        applicationId "net.ambitious.android.wearnetvoyage"
+        applicationId "net.ambitious.android.httprequesttile"
         minSdk project.MIN_SDK.toInteger()
         targetSdk project.TARGET_SDK.toInteger()
         versionCode 100000000 + project.VERSION_CODE.toInteger()

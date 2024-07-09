@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.data
+package net.ambitious.android.httprequesttile.data
 
 object AppConstants {
   const val LIGHT_TERMS_OF_USE_URL = "https://wearlink.ambitious-i.net/light/terms_of_use.html"

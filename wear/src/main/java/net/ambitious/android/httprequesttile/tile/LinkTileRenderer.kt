@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.tile
+package net.ambitious.android.httprequesttile.tile
 
 import android.content.Context
 import androidx.compose.runtime.Composable
@@ -18,12 +18,12 @@ import androidx.wear.tiles.material.layouts.PrimaryLayout
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.compose.tools.TileLayoutPreview
 import com.google.android.horologist.tiles.render.SingleTileLayoutRenderer
-import net.ambitious.android.wearnetvoyage.R
-import net.ambitious.android.wearnetvoyage.analytics.AppAnalytics
-import net.ambitious.android.wearnetvoyage.data.AppConstants
-import net.ambitious.android.wearnetvoyage.data.Constant
-import net.ambitious.android.wearnetvoyage.data.RequestParams
-import net.ambitious.android.wearnetvoyage.theme.LinkTileTheme
+import net.ambitious.android.httprequesttile.R
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
+import net.ambitious.android.httprequesttile.data.AppConstants
+import net.ambitious.android.httprequesttile.data.Constant
+import net.ambitious.android.httprequesttile.data.RequestParams
+import net.ambitious.android.httprequesttile.theme.LinkTileTheme
 
 @OptIn(ExperimentalHorologistApi::class)
 class LinkTileRenderer(context: Context) : SingleTileLayoutRenderer<LinkTileState, Boolean>(context) {

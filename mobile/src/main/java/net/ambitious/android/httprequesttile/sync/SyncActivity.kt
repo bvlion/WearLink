@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.sync
+package net.ambitious.android.httprequesttile.sync
 
 import android.app.Activity
 import android.os.Bundle

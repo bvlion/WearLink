@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.data
+package net.ambitious.android.httprequesttile.data
 
 object Constant {
 
