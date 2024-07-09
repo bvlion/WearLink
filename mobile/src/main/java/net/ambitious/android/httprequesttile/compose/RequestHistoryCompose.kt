@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.compose
+package net.ambitious.android.httprequesttile.compose
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -23,8 +23,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.ambitious.android.wearnetvoyage.data.ResponseParams
-import net.ambitious.android.wearnetvoyage.ui.theme.AppTheme
+import net.ambitious.android.httprequesttile.data.ResponseParams
+import net.ambitious.android.httprequesttile.ui.theme.AppTheme
 import java.text.NumberFormat
 import java.time.Instant
 import java.time.ZoneId

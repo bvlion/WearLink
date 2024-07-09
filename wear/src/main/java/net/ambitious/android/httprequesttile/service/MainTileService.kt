@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.service
+package net.ambitious.android.httprequesttile.service
 
 import android.content.Context
 import android.content.Intent
@@ -12,14 +12,14 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.launch
-import net.ambitious.android.wearnetvoyage.analytics.AppAnalytics
-import net.ambitious.android.wearnetvoyage.data.AppConstants
-import net.ambitious.android.wearnetvoyage.data.AppDataStore
-import net.ambitious.android.wearnetvoyage.data.RequestParams.Companion.parseRequestParams
-import net.ambitious.android.wearnetvoyage.request.WearMobileConnector
-import net.ambitious.android.wearnetvoyage.tile.LinkTileRenderer
-import net.ambitious.android.wearnetvoyage.tile.LinkTileState
-import net.ambitious.android.wearnetvoyage.toast.ToastActivity
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
+import net.ambitious.android.httprequesttile.data.AppConstants
+import net.ambitious.android.httprequesttile.data.AppDataStore
+import net.ambitious.android.httprequesttile.data.RequestParams.Companion.parseRequestParams
+import net.ambitious.android.httprequesttile.request.WearMobileConnector
+import net.ambitious.android.httprequesttile.tile.LinkTileRenderer
+import net.ambitious.android.httprequesttile.tile.LinkTileState
+import net.ambitious.android.httprequesttile.toast.ToastActivity
 
 @OptIn(ExperimentalHorologistApi::class)
 class MainTileService : SuspendingTileService() {
@@ -63,7 +63,7 @@ class MainTileService : SuspendingTileService() {
         AppConstants.startMobileActivity(
           this,
           lifecycleScope,
-          "wearnetvoyage://sync",
+          "httprequesttile://sync",
           {
             lifecycleScope.launch(Dispatchers.IO) {
               delay(500)

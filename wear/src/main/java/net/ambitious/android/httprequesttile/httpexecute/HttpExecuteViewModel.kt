@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.httpexecute
+package net.ambitious.android.httprequesttile.httpexecute
 
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
@@ -10,11 +10,11 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.ambitious.android.wearnetvoyage.data.AppDataStore
-import net.ambitious.android.wearnetvoyage.data.RequestParams.Companion.parseRequestParam
-import net.ambitious.android.wearnetvoyage.data.ResponseParams
-import net.ambitious.android.wearnetvoyage.data.ResponseParams.Companion.parseResponseParams
-import net.ambitious.android.wearnetvoyage.request.HttpRequester
+import net.ambitious.android.httprequesttile.data.AppDataStore
+import net.ambitious.android.httprequesttile.data.RequestParams.Companion.parseRequestParam
+import net.ambitious.android.httprequesttile.data.ResponseParams
+import net.ambitious.android.httprequesttile.data.ResponseParams.Companion.parseResponseParams
+import net.ambitious.android.httprequesttile.request.HttpRequester
 import org.json.JSONArray
 import java.util.Date
 

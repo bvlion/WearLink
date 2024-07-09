@@ -1,9 +1,9 @@
-package net.ambitious.android.wearnetvoyage.sync
+package net.ambitious.android.httprequesttile.sync
 
 import kotlinx.coroutines.flow.first
-import net.ambitious.android.wearnetvoyage.data.AppDataStore
-import net.ambitious.android.wearnetvoyage.data.RequestParams.Companion.parseRequestParams
-import net.ambitious.android.wearnetvoyage.request.WearMobileConnector
+import net.ambitious.android.httprequesttile.data.AppDataStore
+import net.ambitious.android.httprequesttile.data.RequestParams.Companion.parseRequestParams
+import net.ambitious.android.httprequesttile.request.WearMobileConnector
 import org.json.JSONArray
 
 object Sync {

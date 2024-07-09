@@ -1,10 +1,10 @@
-package net.ambitious.android.wearnetvoyage.request
+package net.ambitious.android.httprequesttile.request
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import net.ambitious.android.wearnetvoyage.data.Constant
-import net.ambitious.android.wearnetvoyage.data.RequestParams
-import net.ambitious.android.wearnetvoyage.data.ResponseParams
+import net.ambitious.android.httprequesttile.data.Constant
+import net.ambitious.android.httprequesttile.data.RequestParams
+import net.ambitious.android.httprequesttile.data.ResponseParams
 import okhttp3.Headers.Companion.toHeaders
 import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient

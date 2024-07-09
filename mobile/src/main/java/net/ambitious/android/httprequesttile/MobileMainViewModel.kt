@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage
+package net.ambitious.android.httprequesttile
 
 import android.app.Application
 import android.content.ClipData
@@ -15,18 +15,18 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
-import net.ambitious.android.wearnetvoyage.analytics.AppAnalytics
-import net.ambitious.android.wearnetvoyage.data.AppConstants
-import net.ambitious.android.wearnetvoyage.data.AppDataStore
-import net.ambitious.android.wearnetvoyage.data.Constant
-import net.ambitious.android.wearnetvoyage.data.ErrorDetail
-import net.ambitious.android.wearnetvoyage.data.RequestParams
-import net.ambitious.android.wearnetvoyage.data.RequestParams.Companion.parseRequestParams
-import net.ambitious.android.wearnetvoyage.data.ResponseParams
-import net.ambitious.android.wearnetvoyage.data.ResponseParams.Companion.parseResponseParams
-import net.ambitious.android.wearnetvoyage.request.HttpRequester
-import net.ambitious.android.wearnetvoyage.request.WearMobileConnector
-import net.ambitious.android.wearnetvoyage.sync.Sync
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
+import net.ambitious.android.httprequesttile.data.AppConstants
+import net.ambitious.android.httprequesttile.data.AppDataStore
+import net.ambitious.android.httprequesttile.data.Constant
+import net.ambitious.android.httprequesttile.data.ErrorDetail
+import net.ambitious.android.httprequesttile.data.RequestParams
+import net.ambitious.android.httprequesttile.data.RequestParams.Companion.parseRequestParams
+import net.ambitious.android.httprequesttile.data.ResponseParams
+import net.ambitious.android.httprequesttile.data.ResponseParams.Companion.parseResponseParams
+import net.ambitious.android.httprequesttile.request.HttpRequester
+import net.ambitious.android.httprequesttile.request.WearMobileConnector
+import net.ambitious.android.httprequesttile.sync.Sync
 import org.json.JSONArray
 import java.util.Date
 

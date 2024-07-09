@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage
+package net.ambitious.android.httprequesttile
 
 import android.content.ClipboardManager
 import android.content.Context
@@ -21,27 +21,27 @@ import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.launch
-import net.ambitious.android.wearnetvoyage.analytics.AppAnalytics
-import net.ambitious.android.wearnetvoyage.compose.DummyAdCompose
-import net.ambitious.android.wearnetvoyage.compose.ErrorDialogCompose
-import net.ambitious.android.wearnetvoyage.compose.LoadingCompose
-import net.ambitious.android.wearnetvoyage.compose.MenuBottomNavigation
-import net.ambitious.android.wearnetvoyage.compose.MenuList
-import net.ambitious.android.wearnetvoyage.compose.NativeAdCompose
-import net.ambitious.android.wearnetvoyage.compose.RequestCreate
-import net.ambitious.android.wearnetvoyage.compose.RequestHistoryDetailContent
-import net.ambitious.android.wearnetvoyage.compose.RequestHistoryList
-import net.ambitious.android.wearnetvoyage.compose.RulesDialogCompose
-import net.ambitious.android.wearnetvoyage.compose.SavedRequestList
-import net.ambitious.android.wearnetvoyage.data.AppConstants
-import net.ambitious.android.wearnetvoyage.data.Constant
-import net.ambitious.android.wearnetvoyage.data.RequestParams
-import net.ambitious.android.wearnetvoyage.data.RequestParams.Companion.parseRequestParams
-import net.ambitious.android.wearnetvoyage.data.ResponseParams
-import net.ambitious.android.wearnetvoyage.data.ResponseParams.Companion.parseResponseParams
-import net.ambitious.android.wearnetvoyage.request.WearMobileConnector
-import net.ambitious.android.wearnetvoyage.ui.theme.MainAnimatedVisibility
-import net.ambitious.android.wearnetvoyage.ui.theme.AppTheme
+import net.ambitious.android.httprequesttile.analytics.AppAnalytics
+import net.ambitious.android.httprequesttile.compose.DummyAdCompose
+import net.ambitious.android.httprequesttile.compose.ErrorDialogCompose
+import net.ambitious.android.httprequesttile.compose.LoadingCompose
+import net.ambitious.android.httprequesttile.compose.MenuBottomNavigation
+import net.ambitious.android.httprequesttile.compose.MenuList
+import net.ambitious.android.httprequesttile.compose.NativeAdCompose
+import net.ambitious.android.httprequesttile.compose.RequestCreate
+import net.ambitious.android.httprequesttile.compose.RequestHistoryDetailContent
+import net.ambitious.android.httprequesttile.compose.RequestHistoryList
+import net.ambitious.android.httprequesttile.compose.RulesDialogCompose
+import net.ambitious.android.httprequesttile.compose.SavedRequestList
+import net.ambitious.android.httprequesttile.data.AppConstants
+import net.ambitious.android.httprequesttile.data.Constant
+import net.ambitious.android.httprequesttile.data.RequestParams
+import net.ambitious.android.httprequesttile.data.RequestParams.Companion.parseRequestParams
+import net.ambitious.android.httprequesttile.data.ResponseParams
+import net.ambitious.android.httprequesttile.data.ResponseParams.Companion.parseResponseParams
+import net.ambitious.android.httprequesttile.request.WearMobileConnector
+import net.ambitious.android.httprequesttile.ui.theme.MainAnimatedVisibility
+import net.ambitious.android.httprequesttile.ui.theme.AppTheme
 
 @ExperimentalMaterialApi
 class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedListener {

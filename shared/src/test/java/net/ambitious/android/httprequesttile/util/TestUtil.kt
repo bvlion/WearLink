@@ -1,4 +1,4 @@
-package net.ambitious.android.wearnetvoyage.util
+package net.ambitious.android.httprequesttile.util
 
 import org.json.JSONObject
 
