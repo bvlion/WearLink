@@ -46,7 +46,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.FontWeight
@@ -58,12 +57,10 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import net.ambitious.android.httprequesttile.BuildConfig
 import net.ambitious.android.httprequesttile.data.AppConstants
 import net.ambitious.android.httprequesttile.data.RequestParams.Companion.parseRequestParams
 import net.ambitious.android.httprequesttile.ui.theme.AppTheme
 import net.ambitious.android.httprequesttile.ui.theme.noRippleClickable
-import java.net.URLEncoder
 
 @Composable
 fun MenuList(
@@ -243,19 +240,6 @@ fun MenuList(
         } else {
           AppConstants.LIGHT_PRIVACY_POLICY_URL
         }
-      )
-    }
-
-    MenuRow("レビューする", Icons.Filled.RateReview) {
-      context.startActivity(
-        Intent(
-          Intent.ACTION_VIEW,
-          try {
-            Uri.parse("market://details?id=${BuildConfig.APPLICATION_ID}")
-          } catch (_: ActivityNotFoundException) {
-            Uri.parse("https://play.google.com/store/apps/details?id=${BuildConfig.APPLICATION_ID}")
-          }
-        )
       )
     }
 

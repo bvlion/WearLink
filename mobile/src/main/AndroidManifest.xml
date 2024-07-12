@@ -34,10 +34,6 @@
                 <data android:scheme="httprequesttile" android:host="sync" />
             </intent-filter>
         </activity>
-
-        <meta-data
-            android:name="com.google.android.gms.ads.APPLICATION_ID"
-            android:value="${admob_key}"/>
     </application>
 
 </manifest>

@@ -28,17 +28,9 @@ android {
             debuggable true
             applicationIdSuffix ".debug"
             versionNameSuffix "-debug"
-            buildConfigField "String", "ADMOB_NATIVE_KEY", "\"ca-app-pub-3940256099942544/2247696110\""
-            manifestPlaceholders = [
-                    admob_key: "ca-app-pub-3940256099942544~3347511713"
-            ]
         }
         release {
             minifyEnabled true
-            buildConfigField "String", "ADMOB_NATIVE_KEY", "\"" + System.getenv()['ADMOB_NATIVE_KEY'] + "\""
-            manifestPlaceholders = [
-                    admob_key: System.getenv()['ADMOB_KEY'] ?: ""
-            ]
             signingConfig = signingConfigs.release
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
@@ -52,9 +44,6 @@ android {
     }
     buildFeatures {
         compose true
-        buildConfig true
-        dataBinding true
-        viewBinding true
     }
     composeOptions {
         kotlinCompilerExtensionVersion '1.4.6'
@@ -74,7 +63,6 @@ dependencies {
     implementation project(":shared")
 
     implementation 'androidx.activity:activity-compose:1.7.2'
-    implementation 'com.google.android.gms:play-services-ads-lite:22.2.0'
     implementation 'androidx.work:work-runtime-ktx:2.8.1'
     def compose_ui_version = captureVersion(implementation('androidx.compose.ui:ui:1.4.3'))
     implementation "androidx.compose.ui:ui-tooling-preview:$compose_ui_version"
