@@ -15,19 +15,15 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.google.android.gms.ads.MobileAds
-import com.google.android.gms.ads.RequestConfiguration
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.launch
 import net.ambitious.android.httprequesttile.analytics.AppAnalytics
-import net.ambitious.android.httprequesttile.compose.DummyAdCompose
 import net.ambitious.android.httprequesttile.compose.ErrorDialogCompose
 import net.ambitious.android.httprequesttile.compose.LoadingCompose
 import net.ambitious.android.httprequesttile.compose.MenuBottomNavigation
 import net.ambitious.android.httprequesttile.compose.MenuList
-import net.ambitious.android.httprequesttile.compose.NativeAdCompose
 import net.ambitious.android.httprequesttile.compose.RequestCreate
 import net.ambitious.android.httprequesttile.compose.RequestHistoryDetailContent
 import net.ambitious.android.httprequesttile.compose.RequestHistoryList
@@ -51,13 +47,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 
   override fun onCreate(savedInstanceState: Bundle?) {
     super.onCreate(savedInstanceState)
-    MobileAds.initialize(this)
-    MobileAds.setRequestConfiguration(
-      MobileAds.getRequestConfiguration().toBuilder()
-        .setTagForChildDirectedTreatment(RequestConfiguration.TAG_FOR_CHILD_DIRECTED_TREATMENT_TRUE)
-        .setMaxAdContentRating(RequestConfiguration.MAX_AD_CONTENT_RATING_G)
-        .build()
-    )
     val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     setContent {
@@ -101,7 +90,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
         ) {
           Scaffold(
             scaffoldState = scaffoldState,
-            topBar = { NativeAdCompose() },
             content = {
               ModalBottomSheetLayout(
                 sheetState = viewModel.resultBottomSheet,
@@ -268,7 +256,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 fun DefaultPreview() {
   AppTheme {
     Scaffold(
-      topBar = { DummyAdCompose() },
       content = { SavedRequestList(emptyList(), bottomPadding = it.calculateBottomPadding()) },
       bottomBar = { MenuBottomNavigation() }
     )

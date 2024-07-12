@@ -6,8 +6,6 @@ on:
       - 'alpha*'
 
 env:
-  ADMOB_KEY: ${{ secrets.ADMOB_KEY }}
-  ADMOB_NATIVE_KEY: ${{ secrets.ADMOB_NATIVE_KEY }}
   KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
   GOOGLE_SERVICES_JSON: ${{ secrets.RELEASE_GOOGLE_SERVICES_JSON }}
