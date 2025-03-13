@@ -1,0 +1,36 @@
+name: 'Shared Setup'
+
+inputs:
+  RUNNER_OS:
+    required: true
+    type: string
+  GOOGLE_PLAY_SERVICE_JSON:
+    required: true
+    type: string
+
+runs:
+  using: 'composite'
+  steps:
+    - name: Set up Ruby
+      uses: ruby/setup-ruby@v1
+      with:
+        ruby-version: 3.2.2
+  
+    - name: Cache Bundle packages
+      uses: actions/cache@v1
+      with:
+        path: vendor/bundle
+        key: ${{ inputs.RUNNER_OS }}-bundle-${{ hashFiles('Gemfile.lock') }}
+        restore-keys: ${{ inputs.RUNNER_OS }}-bundle-
+  
+    - name: install bundler
+      run: gem install bundler
+      shell: bash
+  
+    - name: bundle install
+      run: bundle install
+      shell: bash
+
+    - name: Set config files
+      run: echo ${{ inputs.GOOGLE_PLAY_SERVICE_JSON }} | base64 -d > google-play-service.json
+      shell: bash

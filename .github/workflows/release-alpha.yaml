@@ -14,7 +14,13 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v3
+
+      - name: build setup
+        uses: ./.github/actions/shared-setup
+        with:
+          RUNNER_OS: ${{ runner.os }}
+          GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
       - name: Set config files
         run: |
@@ -22,12 +28,12 @@ jobs:
           echo $GOOGLE_SERVICES_JSON | base64 -d > wear/src/release/google-services.json
       
       - name: set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: '17'
 
-      - uses: actions/cache@v4
+      - uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -35,17 +41,24 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Run Build mobile
-        run: ./gradlew :mobile:assembleRelease :wear:assembleRelease
+        run: ./gradlew :mobile:bundleRelease :wear:bundleRelease
 
-      - name: Move mobile apk files
+      - name: Move mobile aab files
         run: |
-          rm -rf build/app-assembles
-          mkdir -p build/app-assembles
-          mv mobile/build/outputs/apk/release/mobile-release.apk build/app-assembles/.
-          mv wear/build/outputs/apk/release/wear-release.apk build/app-assembles/.
+          rm -rf build/app-bundles
+          mkdir -p build/app-bundles
+          mv mobile/build/outputs/bundle/release/mobile-release.aab build/app-bundles/.
+          mv wear/build/outputs/bundle/release/wear-release.aab build/app-bundles/.
+
+      - name: Copy changelogs
+        run: |
+            VERSION=$(tail -n 1 gradle.properties | sed -e 's/.*=//')
+            if [ ! -f "fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt" ]; then
+              cp -p fastlane/metadata/android/ja-JP/changelogs/1$VERSION.txt fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt
+            fi
 
       - name: up play store
-        run: echo 'upload apk to server TODO'
+        run: bundle exec fastlane deploy_to_play_store
 
       - name: Notify Slack
         uses: 8398a7/action-slack@v3
