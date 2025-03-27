@@ -8,12 +8,12 @@ plugins {
 
 android {
   namespace = "info.bvlion.wearlink"
-  compileSdk = providers.gradleProperty("COMPILE_SDK").get().toInt()
+  compileSdk = providers.gradleProperty("WEAR_COMPILE_SDK").get().toInt()
 
   defaultConfig {
     applicationId = "info.bvlion.wearlink"
     minSdk = providers.gradleProperty("WEAR_MIN_SDK").get().toInt()
-    targetSdk = providers.gradleProperty("TARGET_SDK").get().toInt()
+    targetSdk = providers.gradleProperty("WEAR_TARGET_SDK").get().toInt()
     versionCode = 200000000 + providers.gradleProperty("VERSION_CODE").get().toInt()
     versionName = providers.gradleProperty("VERSION_NAME").get()
 
