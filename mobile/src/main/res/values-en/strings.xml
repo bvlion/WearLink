@@ -1,0 +1,91 @@
+<resources>
+  <!-- 共通 -->
+  <string name="app_name">WearLink</string>
+  <string name="request_error">A communication error occurred</string>
+
+  <!-- bottom nav -->
+  <string name="bottom_nav_home">Home</string>
+  <string name="bottom_nav_edit">Edit</string>
+  <string name="bottom_nav_history">History</string>
+  <string name="bottom_nav_menu">Menu</string>
+
+  <!-- common -->
+  <string name="close">Close</string>
+  <string name="create">Create</string>
+  <string name="update">Update</string>
+  <string name="delete">Delete</string>
+  <string name="cancel">Cancel</string>
+  <string name="input_error">Input error</string>
+
+  <!-- delete execute history -->
+  <string name="delete_execute_history_title">Do you want to delete the execution history?</string>
+  <string name="delete_execute_history_description">All execution history will be deleted.\nThis action cannot be undone.</string>
+
+  <!-- request import -->
+  <string name="request_import_title">Import Request</string>
+  <string name="request_import_input_hint">Request in JSON format</string>
+  <string name="request_import_input_error_blank">Please enter a value</string>
+  <string name="request_import_input_error_format">The JSON value is invalid. Please export once, check the format, and ensure consistency.</string>
+
+  <!-- menu -->
+  <string name="view_mode_default">Default</string>
+  <string name="view_mode_dark">Dark</string>
+  <string name="view_mode_light">Light</string>
+  <string name="menu_title_sync_with_wearable">Sync with Wearable</string>
+  <string name="menu_title_export_request">Export Request</string>
+  <string name="menu_title_import_request">Import Request</string>
+  <string name="menu_title_export_execution_history">Export Execution History</string>
+  <string name="menu_title_delete_execution_history">Delete Execution History</string>
+  <string name="menu_title_change_log">Change log</string>
+  <string name="menu_title_terms_of_use">Terms of Use</string>
+  <string name="menu_title_privacy_policy">Privacy Policy</string>
+  <string name="menu_title_feedback">Feedback</string>
+
+  <!-- request edit -->
+  <string name="request_edit_input_title">Title</string>
+  <string name="request_edit_input_title_error_tint">Title Input Error</string>
+  <string name="request_edit_input_title_error_blank">Please enter a title</string>
+  <string name="request_edit_select_method">Method</string>
+  <string name="request_edit_select_body_type">Body Type</string>
+  <string name="request_edit_input_url">URL</string>
+  <string name="request_edit_input_url_error_tint">URL Input Error</string>
+  <string name="request_edit_input_url_error_blank">Please enter a URL</string>
+  <string name="request_edit_input_request_headers">Request Headers</string>
+  <string name="request_edit_input_request_body">Request Body</string>
+  <string name="request_edit_interrupt_title">Do you want to interrupt the input?</string>
+  <string name="request_edit_interrupt_description">If you interrupt, the current input will be discarded.</string>
+  <string name="request_edit_interrupt_confirm">Interrupt input</string>
+  <string name="request_edit_delete_title">Do you want to delete this?</string>
+  <string name="request_edit_delete_description">Delete "%s".\nThis action cannot be undone.</string>
+
+  <!-- request history -->
+  <string name="request_history_from_mobile">Sent from Mobile</string>
+  <string name="request_history_from_wearlable">Sent from Wearable</string>
+  <string name="request_history_card_response">Response: %s</string>
+  <string name="request_history_empty">No request history</string>
+  <string name="request_history_bottom_sheet_response_code">Response Code:</string>
+  <string name="request_history_bottom_sheet_exec_time_title">Execution Time:</string>
+  <string name="request_history_bottom_sheet_exec_time_sec">%s msec</string>
+  <string name="request_history_bottom_sheet_response_body">Response Body:</string>
+  <string name="request_history_bottom_sheet_response_header">Response Header:</string>
+
+  <!-- saved request -->
+  <string name="saved_request_sync_wearlable">Sync with Wearable</string>
+  <string name="saved_request_send_icon_tint">Send Button</string>
+  <string name="saved_request_empty_message">No saved requests</string>
+  <string name="saved_request_empty_create_button">Create a new request</string>
+
+  <!-- activity action -->
+  <string name="request_created">%s Created</string>
+  <string name="request_updated">%s Updated</string>
+  <string name="request_deleted">Deleted</string>
+  <string name="request_sent">Sent</string>
+  <string name="copied_clipboard">Copied to clipboard</string>
+  <string name="copied_clipboard_error">No data available for export</string>
+  <string name="request_imported">Imported</string>
+  <string name="execute_history_deleted">Execution history deleted</string>
+  <string name="sync_wearable">Synced with wearable</string>
+  <string name="sync_wearable_error">Wearable not found</string>
+  <string name="sync_wearable_error_title">Wearable Sync Error</string>
+  <string name="sync_wearable_error_description">Up to %s connections can be synced.\nPlease uncheck another synced connection.</string>
+</resources>

@@ -10,4 +10,4 @@
 -dontwarn org.openjsse.net.ssl.OpenJSSE
 
 # Keep - ClassName Call
--keep class net.ambitious.android.httprequesttile.httpexecute.HttpExecuteActivity { *; }
+-keep class info.bvlion.wearlink.httpexecute.HttpExecuteActivity { *; }
