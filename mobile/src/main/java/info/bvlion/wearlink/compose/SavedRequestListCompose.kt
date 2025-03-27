@@ -119,7 +119,7 @@ fun SavedRequestList(
     }
   }
   else -> LazyColumn(Modifier.fillMaxWidth()) {
-    itemsIndexed(requests, key = { _, item -> item.title }) { index, requestParams ->
+    itemsIndexed(requests) { index, requestParams ->
       SavedRequest(
         if (index == 0) topPadding else 0.dp,
         if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
