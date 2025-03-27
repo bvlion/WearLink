@@ -30,8 +30,10 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -68,10 +70,10 @@ fun RequestCreate(
   val url = rememberSaveable { mutableStateOf(defaultUrl) }
   val urlError = rememberSaveable { mutableStateOf(false) }
 
-  val methodExpanded = rememberSaveable { mutableStateOf(false) }
+  val methodExpanded = remember { mutableStateOf(false) }
   val selectedMethod = rememberSaveable { mutableStateOf(defaultMethod) }
 
-  val bodyTypeExpanded = rememberSaveable { mutableStateOf(false) }
+  val bodyTypeExpanded = remember { mutableStateOf(false) }
   val selectedBodyType = rememberSaveable { mutableStateOf(defaultBodyType) }
 
   val header = rememberSaveable { mutableStateOf(defaultHeader) }
@@ -156,7 +158,8 @@ fun RequestCreate(
               expanded = methodExpanded.value
             )
           },
-          colors = ExposedDropdownMenuDefaults.textFieldColors()
+          colors = ExposedDropdownMenuDefaults.textFieldColors(),
+          modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
         ExposedDropdownMenu(
           expanded = methodExpanded.value,
@@ -196,7 +199,8 @@ fun RequestCreate(
               expanded = bodyTypeExpanded.value
             )
           },
-          colors = ExposedDropdownMenuDefaults.textFieldColors()
+          colors = ExposedDropdownMenuDefaults.textFieldColors(),
+          modifier = Modifier.menuAnchor(MenuAnchorType.PrimaryNotEditable)
         )
         ExposedDropdownMenu(
           expanded = bodyTypeExpanded.value,
