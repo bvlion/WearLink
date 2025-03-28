@@ -1,4 +1,3 @@
-# Keep - Library
 -dontwarn org.bouncycastle.jsse.BCSSLParameters
 -dontwarn org.bouncycastle.jsse.BCSSLSocket
 -dontwarn org.bouncycastle.jsse.provider.BouncyCastleJsseProvider
@@ -10,4 +9,4 @@
 -dontwarn org.openjsse.net.ssl.OpenJSSE
 
 # Keep - ClassName Call
--keep class net.ambitious.android.httprequesttile.httpexecute.HttpExecuteActivity { *; }
+-keep class info.bvlion.wearlink.httpexecute.HttpExecuteActivity { *; }
