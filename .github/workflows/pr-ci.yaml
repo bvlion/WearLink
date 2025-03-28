@@ -66,7 +66,7 @@ jobs:
 
       - name: shared test report
         uses: dorny/test-reporter@v1
-        if: always()
+        if: github.actor != 'dependabot[bot]'
         with:
           name: shared test
           path: shared/build/test-results/testDebugUnitTest/TEST-*.xml
@@ -75,7 +75,7 @@ jobs:
 
       - name: mobile test report
         uses: dorny/test-reporter@v1
-        if: always()
+        if: github.actor != 'dependabot[bot]'
         with:
           name: mobile test
           path: mobile/build/test-results/testDebugUnitTest/TEST-*.xml
@@ -84,7 +84,7 @@ jobs:
 
       - name: wear test report
         uses: dorny/test-reporter@v1
-        if: always()
+        if: github.actor != 'dependabot[bot]'
         with:
           name: wear test
           path: wear/build/test-results/testDebugUnitTest/TEST-*.xml
