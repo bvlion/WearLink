@@ -9,7 +9,7 @@ jobs:
   release:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       
       - name: Verify tags
         run: |
@@ -30,7 +30,7 @@ jobs:
           fields: workflow,job,commit,repo,ref,author
           username: GHA_PRODUCTION_RELEASE
           icon_emoji: ':pleading_face:'
-          channel: '#wearlink'
+          channel: '#android-app'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: failure()
@@ -51,6 +51,6 @@ jobs:
           fields: repo,message,commit,author,action,eventName,ref,workflow # selectable (default: repo,message)
           username: GHA_RELEASE
           icon_emoji: ':sunglasses:'
-          channel: '#wearlink'
+          channel: '#android-app'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
