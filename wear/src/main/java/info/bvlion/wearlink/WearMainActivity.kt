@@ -22,6 +22,7 @@ import androidx.wear.widget.ConfirmationOverlay
 import androidx.wear.tooling.preview.devices.WearDevices
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
+import info.bvlion.wearlink.wear.R
 
 class WearMainActivity : ComponentActivity() {
   override fun onCreate(savedInstanceState: Bundle?) {

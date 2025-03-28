@@ -57,6 +57,7 @@ import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
+import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.WearMobileConnector
 import info.bvlion.wearlink.ui.MainAnimatedVisibility
 import info.bvlion.wearlink.ui.theme.WearLinkTheme

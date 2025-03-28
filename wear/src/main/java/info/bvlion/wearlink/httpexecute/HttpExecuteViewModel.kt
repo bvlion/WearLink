@@ -3,7 +3,6 @@ package info.bvlion.wearlink.httpexecute
 import android.app.Application
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import info.bvlion.wearlink.R
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParam
 import info.bvlion.wearlink.data.ResponseParams
@@ -54,7 +53,7 @@ class HttpExecuteViewModel(application: Application) : AndroidViewModel(applicat
             -1,
             System.currentTimeMillis() - start,
             "",
-            "${getString(R.string.request_error)}\n${e.message}",
+            "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}",
             Date().time,
             false
           )

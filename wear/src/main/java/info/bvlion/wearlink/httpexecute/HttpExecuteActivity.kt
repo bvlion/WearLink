@@ -21,7 +21,7 @@ import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.Text
 import androidx.wear.tooling.preview.devices.WearDevices
-import info.bvlion.wearlink.R
+import info.bvlion.wearlink.wear.R
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
 
 class HttpExecuteActivity : ComponentActivity() {
