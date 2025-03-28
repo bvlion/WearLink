@@ -58,7 +58,7 @@ import androidx.core.net.toUri
 import com.google.firebase.firestore.FirebaseFirestore
 import info.bvlion.appinfomanager.changelog.ChangeLogManager
 import info.bvlion.appinfomanager.contents.ContentsManager
-import info.bvlion.wearlink.R
+import info.bvlion.wearlink.mobile.R
 
 @Composable
 fun MenuList(

@@ -20,7 +20,7 @@ import androidx.wear.tooling.preview.devices.WearDevices
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.tiles.render.SingleTileLayoutRenderer
 import info.bvlion.appinfomanager.analytics.AnalyticsManager
-import info.bvlion.wearlink.R
+import info.bvlion.wearlink.wear.R
 import info.bvlion.wearlink.analytics.AppAnalytics
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.Constant
@@ -62,7 +62,7 @@ private fun linkTileLayout(
 ) = PrimaryLayout.Builder(deviceParameters)
   .setResponsiveContentInsetEnabled(true)
   .setPrimaryLabelTextContent(
-    Text.Builder(context, context.getString(R.string.app_name))
+    Text.Builder(context, context.getString(info.bvlion.wearlink.shared.R.string.app_name))
       .setModifiers(
         ModifiersBuilders.Modifiers.Builder().setClickable(
           ModifiersBuilders.Clickable.Builder()

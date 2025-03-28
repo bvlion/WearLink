@@ -17,6 +17,7 @@ import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
+import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.HttpRequester
 import info.bvlion.wearlink.request.WearMobileConnector
 import info.bvlion.wearlink.sync.Sync
@@ -154,7 +155,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
           -1,
           System.currentTimeMillis() - start,
           "",
-          "${getString(R.string.request_error)}\n${e.message}",
+          "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}",
           Date().time,
           true
         )

@@ -10,7 +10,7 @@ import androidx.wear.tiles.TileBuilders
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.tiles.SuspendingTileService
 import info.bvlion.appinfomanager.analytics.AnalyticsManager
-import info.bvlion.wearlink.R
+import info.bvlion.wearlink.wear.R
 import info.bvlion.wearlink.analytics.AppAnalytics
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppDataStore

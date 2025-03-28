@@ -5,7 +5,7 @@ plugins {
 }
 
 android {
-  namespace = "info.bvlion.wearlink"
+  namespace = "info.bvlion.wearlink.shared"
   compileSdk = providers.gradleProperty("COMPILE_SDK").get().toInt()
 
   buildTypes {
