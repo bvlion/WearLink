@@ -26,6 +26,7 @@ wearToolingPreview = "1.0.0"
 wearTiles = "1.4.1"
 protolayout = "1.2.1"
 splashscreen = "1.0.1"
+json = "20231013"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
@@ -59,6 +60,7 @@ androidx-splashscreen = { group = "androidx.core", name = "core-splashscreen", v
 
 okhttp-bom = { group = "com.squareup.okhttp3", name = "okhttp-bom", version.ref = "okhttpBom" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp" }
+json = { group = "org.json", name = "json", version.ref = "json" }
 
 kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "kotlinxCoroutines" }
 kotlinx-coroutines-play-services = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-play-services", version.ref = "kotlinxCoroutines" }

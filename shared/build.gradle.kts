@@ -41,5 +41,5 @@ dependencies {
   implementation(libs.firebase.analytics.ktx)
 
   testImplementation(libs.junit)
-  testImplementation(libs.junit)
+  testImplementation(libs.json)
 }
