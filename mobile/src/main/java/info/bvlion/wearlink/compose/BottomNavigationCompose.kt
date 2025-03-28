@@ -16,7 +16,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import info.bvlion.wearlink.R
+import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
 
 @Composable

@@ -7,7 +7,7 @@ plugins {
 }
 
 android {
-  namespace = "info.bvlion.wearlink"
+  namespace = "info.bvlion.wearlink.wear"
   compileSdk = providers.gradleProperty("WEAR_COMPILE_SDK").get().toInt()
 
   defaultConfig {
