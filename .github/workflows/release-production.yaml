@@ -1,0 +1,56 @@
+name: Android Production Release CI
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Verify tags
+        run: |
+          LATEST_ALPHA_TAG=$(git tag -l 'alpha*' | sort -V | tail -n 1)
+          LATEST_V_TAG=$(git tag -l 'v*' | sort -V | tail -n 1)
+
+          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
+            if [[ -z "$LATEST_ALPHA_TAG" || "$LATEST_V_TAG" != "$GITHUB_REF" ]]; then
+              echo "The latest v tag is being pushed without the latest alpha tag or the alpha tag does not exist."
+              exit 1
+            fi
+          fi
+
+      - name: Notify Error to Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: workflow,job,commit,repo,ref,author
+          username: GHA_PRODUCTION_RELEASE
+          icon_emoji: ':pleading_face:'
+          channel: '#android-app'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: failure()
+
+      - name: build setup
+        uses: ./.github/actions/shared-setup
+        with:
+          RUNNER_OS: ${{ runner.os }}
+          GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
+
+      - name: Promote Artifact to Production
+        run: bundle exec fastlane promote_alpha_to_production
+
+      - name: Notify Success to Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow # selectable (default: repo,message)
+          username: GHA_RELEASE
+          icon_emoji: ':sunglasses:'
+          channel: '#android-app'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}

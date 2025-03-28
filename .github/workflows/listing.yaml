@@ -1,0 +1,39 @@
+name: Android Listing CI
+
+on:
+  push:
+    branches:
+      - 'main'
+    paths:
+      - 'fastlane/metadata/android/ja-JP/images/**.png'
+      - 'fastlane/metadata/android/ja-JP/full_description.txt'
+      - 'fastlane/metadata/android/ja-JP/short_description.txt'
+      - 'fastlane/metadata/android/ja-JP/title.txt'
+      - 'fastlane/metadata/android/ja-JP/video.txt'
+
+jobs:
+  listing:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build setup
+        uses: ./.github/actions/shared-setup
+        with:
+          RUNNER_OS: ${{ runner.os }}
+          GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
+
+      - name: Update Play Store Listing
+        run: bundle exec fastlane update_play_store_listing
+
+      - name: Notify Slack
+        uses: 8398a7/action-slack@v3
+        with:
+          status: ${{ job.status }}
+          fields: repo,message,commit,author,action,eventName,ref,workflow # selectable (default: repo,message)
+          username: GHA_LISTING
+          icon_emoji: ':smiling_face_with_3_hearts:'
+          channel: '#android-app'
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        if: always()
