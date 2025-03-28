@@ -1,0 +1,16 @@
+<resources>
+  <string name="main_launched_mobile">App launched on your phone</string>
+  <string name="main_launch_mobile">Launch the smartphone</string>
+  <string name="tile_description">Quick launch for WearLink</string>
+
+  <!-- execute -->
+  <string name="execute_message">Executing "%s"…</string>
+
+  <!-- service -->
+  <string name="tiles_toast_called_mobile">Calling the app on your smartphone</string>
+  <string name="tiles_toast_synced">Synced successfully</string>
+  <string name="tiles_toast_not_found_mobile">Smartphone not found</string>
+
+  <!-- tile -->
+  <string name="tile_sync_button">Sync</string>
+</resources>
