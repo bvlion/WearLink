@@ -5,7 +5,9 @@ on:
     paths:
       - '**.kt'
       - '**.xml'
-      - '**.gradle'
+      - '**.kts'
+      - '**.properties'
+      - 'gradle/libs.versions.toml'
       - '.github/workflows/pr-ci.yaml'
 
 permissions:
