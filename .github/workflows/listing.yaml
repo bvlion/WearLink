@@ -15,7 +15,7 @@ jobs:
   listing:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       - name: build setup
         uses: ./.github/actions/shared-setup
@@ -33,7 +33,7 @@ jobs:
           fields: repo,message,commit,author,action,eventName,ref,workflow # selectable (default: repo,message)
           username: GHA_LISTING
           icon_emoji: ':smiling_face_with_3_hearts:'
-          channel: '#wearlink'
+          channel: '#android-app'
         env:
           SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         if: always()
