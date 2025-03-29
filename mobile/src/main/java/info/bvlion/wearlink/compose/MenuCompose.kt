@@ -1,5 +1,6 @@
 package info.bvlion.wearlink.compose
 
+import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -31,11 +32,12 @@ import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.History
+import androidx.compose.material.icons.filled.Reviews
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -141,7 +143,7 @@ fun MenuList(
 
     val showChangeLog = rememberSaveable { mutableStateOf(false) }
     ChangeLogManager(FirebaseFirestore.getInstance(), context).ShowChangeLog(showChangeLog)
-    MenuRow(stringResource(R.string.menu_title_change_log), Icons.Filled.Description) {
+    MenuRow(stringResource(R.string.menu_title_change_log), Icons.Filled.History) {
       showChangeLog.value = true
     }
 
@@ -161,6 +163,18 @@ fun MenuList(
     )
     MenuRow(stringResource(R.string.menu_title_privacy_policy), Icons.Filled.Description) {
       showPrivacyPolicy.value = true
+    }
+
+    MenuRow(stringResource(R.string.menu_title_review), Icons.Filled.Reviews) {
+      context.startActivity(
+        try {
+          Intent(Intent.ACTION_VIEW, "market://details?id=${context.packageName}".toUri()).apply {
+            addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
+          }
+        } catch (e: ActivityNotFoundException) {
+          Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=${context.packageName}".toUri())
+        }
+      )
     }
 
     MenuRow(stringResource(R.string.menu_title_feedback), Icons.Filled.ContactMail) {

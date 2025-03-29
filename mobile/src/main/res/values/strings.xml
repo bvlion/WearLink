@@ -32,10 +32,11 @@
   <string name="menu_title_import_request">Request をインポート</string>
   <string name="menu_title_export_execution_history">実行履歴をエクスポート</string>
   <string name="menu_title_delete_execution_history">実行履歴を削除</string>
-  <string name="menu_title_change_log">更新履歴</string>
-  <string name="menu_title_terms_of_use">利用規約</string>
-  <string name="menu_title_privacy_policy">プライバシー・ポリシー</string>
-  <string name="menu_title_feedback">ご意見</string>
+  <string name="menu_title_change_log">更新履歴を確認</string>
+  <string name="menu_title_terms_of_use">利用規約を確認</string>
+  <string name="menu_title_privacy_policy">プライバシー・ポリシーを確認</string>
+  <string name="menu_title_review">応援レビューを書く</string>
+  <string name="menu_title_feedback">フィードバックを送る</string>
 
   <!-- request edit -->
   <string name="request_edit_input_title">タイトル</string>

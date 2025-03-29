@@ -32,10 +32,11 @@
   <string name="menu_title_import_request">Import Request</string>
   <string name="menu_title_export_execution_history">Export Execution History</string>
   <string name="menu_title_delete_execution_history">Delete Execution History</string>
-  <string name="menu_title_change_log">Change log</string>
-  <string name="menu_title_terms_of_use">Terms of Use</string>
-  <string name="menu_title_privacy_policy">Privacy Policy</string>
-  <string name="menu_title_feedback">Feedback</string>
+  <string name="menu_title_change_log">View Change Log</string>
+  <string name="menu_title_terms_of_use">View Terms of Use</string>
+  <string name="menu_title_privacy_policy">View Privacy Policy</string>
+  <string name="menu_title_review">Write a Review</string>
+  <string name="menu_title_feedback">Send Feedback</string>
 
   <!-- request edit -->
   <string name="request_edit_input_title">Title</string>
