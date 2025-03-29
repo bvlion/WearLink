@@ -19,7 +19,7 @@
       android:value="true" />
 
     <activity
-      android:name=".WearMainActivity"
+      android:name="info.bvlion.wearlink.WearMainActivity"
       android:exported="true"
       android:taskAffinity="info.bvlion.wearlink.singleTop"
       android:theme="@style/Theme.App.Starting">
@@ -31,7 +31,7 @@
     </activity>
 
     <activity
-      android:name=".httpexecute.HttpExecuteActivity"
+      android:name="info.bvlion.wearlink.httpexecute.HttpExecuteActivity"
       android:exported="true"
       android:excludeFromRecents="true"
       android:launchMode="singleTask"
@@ -39,7 +39,7 @@
       android:theme="@android:style/Theme.DeviceDefault" />
 
     <activity
-      android:name=".toast.ToastActivity"
+      android:name="info.bvlion.wearlink.toast.ToastActivity"
       android:exported="false"
       android:excludeFromRecents="true"
       android:noHistory="true"
@@ -63,8 +63,8 @@
     </service>
 
     <service
-      android:name=".service.MainTileService"
       android:description="@string/tile_description"
+      android:name="info.bvlion.wearlink.service.MainTileService"
       android:exported="true"
       android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER">
 
