@@ -1,7 +1,7 @@
 <resources>
   <string name="main_launched_mobile">スマートフォンのアプリを起動しました</string>
   <string name="main_launch_mobile">スマートフォンを起動する</string>
-  <string name="tile_description">WearLink のショート起動です</string>
+  <string name="tile_description">お気に入りアクションをすぐに実行</string>
 
   <!-- execute -->
   <string name="execute_message">「%s」を実行しています…</string>

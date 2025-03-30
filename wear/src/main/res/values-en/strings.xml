@@ -1,7 +1,7 @@
 <resources>
   <string name="main_launched_mobile">App launched on your phone</string>
   <string name="main_launch_mobile">Launch the smartphone</string>
-  <string name="tile_description">Quick launch for WearLink</string>
+  <string name="tile_description">Access your favorite actions</string>
 
   <!-- execute -->
   <string name="execute_message">Executing "%s"…</string>
