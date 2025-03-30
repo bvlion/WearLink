@@ -16,7 +16,7 @@ http request from Wear OS
 
 ## VERSION_CODE
 
-mobile と wear を分けるために 10 億の位を分けている
+mobile と wear を分けるために 1 億の位を分けている
 
 - 100000000: mobile
 - 200000000: wear
