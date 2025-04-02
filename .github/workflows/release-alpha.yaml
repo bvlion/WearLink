@@ -6,6 +6,7 @@ on:
       - 'alpha*'
 
 env:
+  RELEASE_JKS: ${{ secrets.RELEASE_JKS }}
   KEYSTORE_ALIAS: ${{ secrets.KEYSTORE_ALIAS }}
   KEYSTORE_PASSWORD: ${{ secrets.KEYSTORE_PASSWORD }}
   GOOGLE_SERVICES_JSON: ${{ secrets.RELEASE_GOOGLE_SERVICES_JSON }}
@@ -27,6 +28,7 @@ jobs:
 
       - name: Set config files
         run: |
+          echo $RELEASE_JKS | base64 -d > release.jks
           echo $GOOGLE_SERVICES_JSON | base64 -d > mobile/src/release/google-services.json
           echo $GOOGLE_SERVICES_JSON | base64 -d > wear/src/release/google-services.json
       
