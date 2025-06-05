@@ -24,7 +24,7 @@ googleServices = "4.4.2"
 firebaseCrashlytics = "3.0.3"
 wearToolingPreview = "1.0.0"
 wearTiles = "1.4.1"
-protolayout = "1.2.1"
+protolayout = "1.3.0"
 splashscreen = "1.0.1"
 json = "20250107"
 
