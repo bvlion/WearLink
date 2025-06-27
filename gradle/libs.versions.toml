@@ -26,7 +26,7 @@ wearToolingPreview = "1.0.0"
 wearTiles = "1.4.1"
 protolayout = "1.2.1"
 splashscreen = "1.0.1"
-json = "20250107"
+json = "20250517"
 
 [libraries]
 androidx-activity-compose = { group = "androidx.activity", name = "activity-compose", version.ref = "activityCompose" }
