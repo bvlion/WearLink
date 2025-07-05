@@ -1,9 +1,9 @@
-name: Android Alpha Release CI
+name: Android Internal Release CI
 
 on:
   push:
     tags:
-      - 'alpha*'
+      - 'v*'
 
 env:
   RELEASE_JKS: ${{ secrets.RELEASE_JKS }}
@@ -54,13 +54,6 @@ jobs:
           mkdir -p build/app-bundles
           mv mobile/build/outputs/bundle/release/mobile-release.aab build/app-bundles/.
           mv wear/build/outputs/bundle/release/wear-release.aab build/app-bundles/.
-
-      - name: Copy changelogs
-        run: |
-            VERSION=$(tail -n 1 gradle.properties | sed -e 's/.*=//')
-            if [ ! -f "fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt" ]; then
-              cp -p fastlane/metadata/android/ja-JP/changelogs/1$VERSION.txt fastlane/metadata/android/ja-JP/changelogs/2$VERSION.txt
-            fi
 
       - name: up play store
         run: bundle exec fastlane deploy_to_play_store

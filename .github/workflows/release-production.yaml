@@ -3,7 +3,7 @@ name: Android Production Release CI
 on:
   push:
     tags:
-      - 'v*'
+      - 'release*'
 
 jobs:
   release:
@@ -42,7 +42,7 @@ jobs:
           GOOGLE_PLAY_SERVICE_JSON: ${{ secrets.GOOGLE_PLAY_SERVICE_JSON }}
 
       - name: Promote Artifact to Production
-        run: bundle exec fastlane promote_alpha_to_production
+        run: bundle exec fastlane promote_internal_to_production
 
       - name: Notify Success to Slack
         uses: 8398a7/action-slack@v3

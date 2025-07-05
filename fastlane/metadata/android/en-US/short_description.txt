@@ -1,0 +1,1 @@
+HTTP on Wear OS! Register requests via phone, control IoT & get info instantly!

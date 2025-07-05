@@ -1,0 +1,28 @@
+You can now trigger actions right from the watch face!
+
+
+
+
+2.0.0
+（マップ）
+
+
+date
+"2025/03/28"
+（文字列）
+
+
+messageEn
+"We've made a major update to the previous version and released it as v2.0.0!"
+（文字列）
+
+
+messageJa
+"従来バージョンを大幅にアップデートし v2.0.0 としてリリースしました！"
+（文字列）
+
+
+データベースの場所: asia-northeast1
+Vertex AI in Firebase が Firebase AI Logic になり、Gemini Developer API にアクセスできるようになりました
+Vertex AI in Firebase が Firebase AI Logic になり、Gemini Developer API にアクセスできるようになりました
+

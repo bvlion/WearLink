@@ -56,7 +56,7 @@ data class RequestParams(
           it.getString(HEADERS),
           it.getString(PARAMETERS),
           it.getBoolean(WATCH_SYNC),
-          it.getBoolean(WATCH_FACE_SHORTCUT)
+          it.optBoolean(WATCH_FACE_SHORTCUT)
         )
       }
   }
