@@ -10,7 +10,7 @@ object Sync {
   suspend fun requestsSyncToWear(dataStore: AppDataStore, wearConnector: WearMobileConnector) {
     val watchSavedRequests = dataStore.getSavedRequest.first()?.let { value ->
       value.parseRequestParams()
-        .filter { it.watchSync }
+        .filter { it.watchSync || it.watchfaceShortcut }
         .map { it.toJsonString() }
         .let {
           if (it.isEmpty()) {

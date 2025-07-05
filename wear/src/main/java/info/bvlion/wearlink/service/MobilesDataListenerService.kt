@@ -1,5 +1,7 @@
 package info.bvlion.wearlink.service
 
+import android.content.ComponentName
+import androidx.wear.watchface.complications.datasource.ComplicationDataSourceUpdateRequester
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.WearableListenerService
 import kotlinx.coroutines.CoroutineScope
@@ -8,6 +10,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import info.bvlion.wearlink.data.AppDataStore
+import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.request.WearMobileConnector
 
 class MobilesDataListenerService : WearableListenerService() {
@@ -23,8 +26,18 @@ class MobilesDataListenerService : WearableListenerService() {
     when (messageEvent.path) {
       WearMobileConnector.WEAR_SAVE_REQUEST_PATH ->
         scope.launch {
-          dataStore.saveRequest(String(messageEvent.data))
+          val requestData = String(messageEvent.data)
+          dataStore.saveRequest(requestData)
           MainTileService.tileUpdate(this@MobilesDataListenerService)
+          if (requestData.parseRequestParams().any { it.watchfaceShortcut }) {
+            ComplicationDataSourceUpdateRequester.create(
+              this@MobilesDataListenerService,
+              ComponentName(
+                this@MobilesDataListenerService,
+                ComplicationService::class.java
+              )
+            ).requestUpdateAll()
+          }
         }
       WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH ->
         scope.launch {

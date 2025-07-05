@@ -82,6 +82,7 @@ dependencies {
   implementation(libs.androidx.ui.graphics)
   implementation(libs.androidx.wear.tooling.preview)
   implementation(libs.androidx.wear.tiles.tooling.preview)
+  implementation(libs.androidx.watchface.complications.data.source.ktx)
 
   testImplementation(libs.junit)
 

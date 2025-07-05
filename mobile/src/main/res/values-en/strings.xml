@@ -49,6 +49,7 @@
   <string name="request_edit_input_url_error_blank">Please enter a URL</string>
   <string name="request_edit_input_request_headers">Request Headers</string>
   <string name="request_edit_input_request_body">Request Body</string>
+  <string name="request_edit_watchface_shortcut">Set as the watch face action</string>
   <string name="request_edit_interrupt_title">Do you want to interrupt the input?</string>
   <string name="request_edit_interrupt_description">If you interrupt, the current input will be discarded.</string>
   <string name="request_edit_interrupt_confirm">Interrupt input</string>
@@ -68,6 +69,7 @@
 
   <!-- saved request -->
   <string name="saved_request_sync_wearlable">Sync with Wearable</string>
+  <string name="saved_request_set_watchface">Set on watch face</string>
   <string name="saved_request_send_icon_tint">Send Button</string>
   <string name="saved_request_empty_message">No saved requests</string>
   <string name="saved_request_empty_create_button">Create a new request</string>

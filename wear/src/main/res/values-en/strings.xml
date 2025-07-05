@@ -1,16 +1,27 @@
 <resources>
-  <string name="main_launched_mobile">App launched on your phone</string>
-  <string name="main_launch_mobile">Launch the smartphone</string>
+  <string name="main_launched_mobile">Opened the app on your phone</string>
+  <string name="main_launch_mobile">Open the app on your phone</string>
   <string name="tile_description">Access your favorite actions</string>
 
   <!-- execute -->
   <string name="execute_message">Executing "%s"…</string>
+  <string name="execute_message_confirm">Do you want to execute "%s"?</string>
+  <string name="execute_message_confirm_yes">Yes</string>
+  <string name="execute_message_confirm_no">No</string>
 
   <!-- service -->
-  <string name="tiles_toast_called_mobile">Calling the app on your smartphone</string>
+  <string name="tiles_toast_called_mobile">Opening the app on your smartphone</string>
   <string name="tiles_toast_synced">Synced successfully</string>
-  <string name="tiles_toast_not_found_mobile">Smartphone not found</string>
+  <string name="tiles_toast_not_found_mobile">Couldn’t find your smartphone</string>
 
   <!-- tile -->
   <string name="tile_sync_button">Sync</string>
+
+  <!-- complication -->
+  <string name="complication_text">Execute</string>
+  <string name="complication_description">Execute favorite action</string>
+  <string name="complication_main_description">Execute "%s"</string>
+  <string name="no_complication_text">Unset</string>
+  <string name="no_complication_description">No favorite action is set</string>
+
 </resources>

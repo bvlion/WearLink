@@ -13,7 +13,8 @@ data class RequestParams(
   val bodyType: Constant.BodyType,
   val headers: String = "",
   val parameters: String = "",
-  val watchSync: Boolean = false
+  val watchSync: Boolean = false,
+  val watchfaceShortcut: Boolean = false,
 ): Parcelable {
   fun toJsonString(): String = JSONObject().apply {
     put(TITLE, title)
@@ -23,6 +24,7 @@ data class RequestParams(
     put(HEADERS, headers)
     put(PARAMETERS, parameters)
     put(WATCH_SYNC, watchSync)
+    put(WATCH_FACE_SHORTCUT, watchfaceShortcut)
   }.toString()
 
   companion object {
@@ -33,6 +35,7 @@ data class RequestParams(
     private const val HEADERS = "headers"
     private const val PARAMETERS = "parameters"
     private const val WATCH_SYNC = "watchSync"
+    private const val WATCH_FACE_SHORTCUT = "watchfaceShortcut"
 
     fun String.parseRequestParams(): List<RequestParams> {
       val list = mutableListOf<RequestParams>()
@@ -52,7 +55,8 @@ data class RequestParams(
           Constant.BodyType.valueOf(it.getString(BODY_TYPE)),
           it.getString(HEADERS),
           it.getString(PARAMETERS),
-          it.getBoolean(WATCH_SYNC)
+          it.getBoolean(WATCH_SYNC),
+          it.getBoolean(WATCH_FACE_SHORTCUT)
         )
       }
   }

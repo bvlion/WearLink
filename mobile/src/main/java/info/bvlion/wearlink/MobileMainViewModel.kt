@@ -101,8 +101,15 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
     getString: ((Int, String) -> String)?
   ) {
     viewModelScope.launch(Dispatchers.IO) {
-      val savedList = (savedRequest.value?.parseRequestParams()?.toMutableList() ?: mutableListOf())
-      savedList
+        (savedRequest.value?.parseRequestParams()?.toMutableList() ?: mutableListOf())
+        .map {
+          if (request.watchfaceShortcut) {
+            it.copy(watchfaceShortcut = false)
+          } else {
+            it
+          }
+        }
+        .toMutableList()
         .apply {
           if (savedIndex >= 0) {
             set(savedIndex, request)
@@ -115,7 +122,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
         .let { dataStore.saveRequest(it) }
       AnalyticsManager.logEvent(
         AppAnalytics.EVENT_REQUEST_SAVE_TAP,
-        mapOf(AppAnalytics.PARAM_EVENT_REQUEST_SAVE_COUNT to savedList.size.toString())
+        mapOf(AppAnalytics.PARAM_EVENT_REQUEST_SAVE_COUNT to savedRequest.value?.parseRequestParams()?.size.toString())
       )
     }
     getString?.invoke(
