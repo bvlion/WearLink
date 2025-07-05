@@ -77,7 +77,7 @@ dependencies {
   implementation(libs.androidx.ui.tooling.preview)
   implementation(libs.android.material)
   implementation(libs.androidx.material3)
-  implementation(libs.androidx.splashscreen)
+  implementation(libs.core.splashscreen)
   testImplementation(libs.junit)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)

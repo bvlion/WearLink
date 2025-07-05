@@ -49,6 +49,7 @@
   <string name="request_edit_input_url_error_blank">URL を入力してください</string>
   <string name="request_edit_input_request_headers">Request Headers</string>
   <string name="request_edit_input_request_body">Request Body</string>
+  <string name="request_edit_watchface_shortcut">ウォッチフェイスのアクションに設定する</string>
   <string name="request_edit_interrupt_title">入力を中断しますか？</string>
   <string name="request_edit_interrupt_description">中断すると今の入力内容は破棄されます。</string>
   <string name="request_edit_interrupt_confirm">入力をやめる</string>
@@ -68,6 +69,7 @@
 
   <!-- saved request -->
   <string name="saved_request_sync_wearlable">ウェアラブルに同期</string>
+  <string name="saved_request_set_watchface">ウォッチフェイスに設定</string>
   <string name="saved_request_send_icon_tint">送信ボタン</string>
   <string name="saved_request_empty_message">保存されたリクエストがありません</string>
   <string name="saved_request_empty_create_button">新規リクエストを作成する</string>

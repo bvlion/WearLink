@@ -196,6 +196,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       ?: "Content-type:application/x-www-form-urlencoded\nUser-Agent:myApp\n",
                     editRequest.value?.parameters ?: "a=b",
                     editRequest.value?.watchSync ?: false,
+                    editRequest.value?.watchfaceShortcut ?: false,
                     editRequestIndex.intValue,
                     it.calculateTopPadding(),
                     it.calculateBottomPadding(),

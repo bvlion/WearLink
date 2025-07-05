@@ -97,6 +97,7 @@ class MainTileService : SuspendingTileService() {
         savedRequest.value
           ?.takeIf { it.isNotEmpty() }
           ?.parseRequestParams()
+          ?.filter { it.watchSync }
           ?: listOf()
       ),
       requestParams

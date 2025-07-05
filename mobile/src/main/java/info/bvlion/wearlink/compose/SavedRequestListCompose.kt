@@ -20,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -71,8 +72,30 @@ private fun SavedRequest(
         }
         Text(
           text = requestParams.title,
-          modifier = Modifier.padding(start = 16.dp, top = 8.dp, bottom = 24.dp)
+          fontSize = 18.sp,
+          modifier = Modifier.padding(
+            start = 16.dp,
+            bottom = if (requestParams.watchfaceShortcut) {
+              0.dp
+            } else {
+              20.dp
+            }
+          )
         )
+        if (requestParams.watchfaceShortcut) {
+          Card(
+            modifier = Modifier.padding(top = 12.dp, start = 8.dp, bottom = 16.dp),
+            colors = CardDefaults.cardColors().copy(
+              contentColor = MaterialTheme.colorScheme.primary,
+              containerColor = MaterialTheme.colorScheme.primaryContainer)
+          ) {
+            Text(
+              text = stringResource(R.string.saved_request_set_watchface),
+              fontSize = 14.sp,
+              modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
+            )
+          }
+        }
       }
       IconButton(
         onClick = { send(requestParams) },
@@ -150,6 +173,14 @@ fun SavedRequestListHasItemPreview() {
         "https://www.google.com/",
         Constant.HttpMethod.GET,
         Constant.BodyType.QUERY,
+        watchfaceShortcut = true
+      ),
+      RequestParams(
+        "ぐーぐる",
+        "https://www.google.com/",
+        Constant.HttpMethod.GET,
+        Constant.BodyType.QUERY,
+        watchSync = true
       )
     ))
   }

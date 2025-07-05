@@ -29,12 +29,14 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -46,6 +48,7 @@ import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
+import info.bvlion.wearlink.ui.theme.noRippleClickable
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,6 +60,7 @@ fun RequestCreate(
   defaultHeader: String,
   defaultBody: String,
   defaultWatchSync: Boolean,
+  defaultWatchfaceShortcut: Boolean,
   savedIndex: Int,
   topPadding: Dp = 0.dp,
   bottomPadding: Dp = 0.dp,
@@ -78,6 +82,7 @@ fun RequestCreate(
 
   val header = rememberSaveable { mutableStateOf(defaultHeader) }
   val body = rememberSaveable { mutableStateOf(defaultBody) }
+  val watchfaceShortcut = rememberSaveable { mutableStateOf(defaultWatchfaceShortcut) }
 
   val editCheck = rememberSaveable { mutableStateOf(false) }
   val showCancelDialog = rememberSaveable { mutableStateOf(false) }
@@ -87,6 +92,12 @@ fun RequestCreate(
     update()
     editCheck.value = true
   }
+  val toggleCheck = {
+    updateEditCheck {
+      watchfaceShortcut.value = !watchfaceShortcut.value
+    }
+  }
+
 
   BackHandler {
     if (editCheck.value) {
@@ -215,7 +226,7 @@ fun RequestCreate(
                   selectedBodyType.value = it
                   bodyTypeExpanded.value = false
                 }
-              }, text ={
+              }, text = {
                 Text(text = it.name)
               }
             )
@@ -291,6 +302,26 @@ fun RequestCreate(
         .fillMaxWidth()
     )
 
+    // ウォッチフェイスショートカットのチェックボックス
+    Row(
+      verticalAlignment = Alignment.CenterVertically,
+      modifier = Modifier
+        .fillMaxWidth()
+        .noRippleClickable { toggleCheck() }
+        .padding(start = 8.dp, end = 16.dp, bottom = 8.dp)
+    ) {
+      Checkbox(
+        checked = watchfaceShortcut.value,
+        onCheckedChange = {
+          toggleCheck()
+        }
+      )
+      Text(
+        text = stringResource(R.string.request_edit_watchface_shortcut),
+        fontSize = 14.sp
+      )
+    }
+
     Button(
       onClick = {
         if (title.value.isEmpty()) {
@@ -312,7 +343,8 @@ fun RequestCreate(
             bodyType = selectedBodyType.value,
             headers = header.value,
             parameters = body.value,
-            watchSync = defaultWatchSync
+            watchSync = defaultWatchSync,
+            watchfaceShortcut = watchfaceShortcut.value,
           )
         )
       },
@@ -450,6 +482,7 @@ private fun RequestCreatePreview() {
       Constant.BodyType.FORM_PARAMS,
       "Content-type:application/x-www-form-urlencoded\nUser-Agent:ワイのアプリ\n",
       "a=b",
+      false,
       false,
       0
     )
