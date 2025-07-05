@@ -1,0 +1,25 @@
+WearLink is an application that synchronizes HTTP requests registered on your smartphone with your Wear OS smartwatch, allowing each device to perform HTTP communication. You can instantly send synchronized custom requests from your smartwatch tiles.
+
+【WearLink's Mechanism and Key Features】
+
+Register and Manage HTTP Requests on Your Smartphone:
+Set and manage destination URLs, HTTP methods, necessary headers, and bodies, etc., using the smartphone app. You can optionally synchronize registered requests with your smartwatch.
+
+One-Tap Execution of Synchronized Requests from Wear OS Tiles:
+HTTP requests registered on your smartphone and synchronized with your smartwatch can be instantly executed from your smartwatch tiles without needing to take out your smartphone.
+
+Check Execution History on Your Smartphone:
+The history of HTTP communication executed from either your smartphone or smartwatch can be checked on the smartphone app. This helps you keep track of what requests were sent and when.
+
+Convenient for These Situations:
+
+IoT Device Integration:
+Easily send commands to your home IoT devices (e.g., turning lights on/off, controlling appliances) from your smartwatch. Even if your smartphone is not nearby, communication is possible with your smartwatch alone (Wi-Fi or mobile network connection required).
+
+Simple API Execution:
+Quickly send requests to simple API endpoints of monitoring systems or personal servers from your smartphone or smartwatch to check their status.
+
+Instant Acquisition of Specific Information:
+Register frequently checked Web API endpoints to instantly retrieve information (e.g., weather information, stock prices) with a single tap from your smartphone or smartwatch.
+
+Leverage WearLink to easily perform HTTP communication from both your smartphone and smartwatch, leading to a smarter life!

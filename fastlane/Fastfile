@@ -19,14 +19,14 @@ platform :android do
   desc "Submit a new sAlpha Build to Play Store"
   lane :deploy_to_play_store do
     upload_to_play_store(
-      track: 'alpha',
+      track: 'internal',
       aab: 'build/app-bundles/mobile-release.aab',
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
     upload_to_play_store(
-      track: 'wear:alpha',
+      track: 'wear:internal',
       aab: 'build/app-bundles/wear-release.aab',
       skip_upload_metadata: true,
       skip_upload_images: true,
@@ -34,17 +34,17 @@ platform :android do
     )
   end
 
-  desc "Promote Alpha to Production"
-  lane :promote_alpha_to_production do
+  desc "Promote Internal to Production"
+  lane :promote_internal_to_production do
     upload_to_play_store(
-      track: 'alpha',
+      track: 'internal',
       track_promote_to: 'production',
       skip_upload_metadata: true,
       skip_upload_images: true,
       skip_upload_screenshots: true
     )
     upload_to_play_store(
-      track: 'wear:alpha',
+      track: 'wear:internal',
       track_promote_to: 'wear:production',
       skip_upload_metadata: true,
       skip_upload_images: true,
