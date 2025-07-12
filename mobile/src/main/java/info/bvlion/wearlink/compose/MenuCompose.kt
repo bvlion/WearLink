@@ -194,7 +194,7 @@ fun MenuList(
     ) {
       Icon(
         Icons.Filled.Sell,
-        contentDescription = BuildConfig.VERSION_NAME,
+        contentDescription = null,
         modifier = Modifier.padding(start = 16.dp)
       )
       Text(text = stringResource(R.string.menu_title_version, BuildConfig.VERSION_NAME), modifier = Modifier.padding(16.dp))
