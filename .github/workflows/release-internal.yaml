@@ -63,7 +63,7 @@ jobs:
         with:
           status: ${{ job.status }}
           fields: repo,message,commit,author,action,eventName,ref,workflow # selectable (default: repo,message)
-          username: GHA_ALPHA_RELEASE
+          username: GHA_INTERNAL_RELEASE
           icon_emoji: ':sunglasses:'
           channel: '#android-app'
         env:

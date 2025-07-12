@@ -105,35 +105,41 @@ fun HttpExecuteConfirm(
   onFinish: () -> Unit = {}
 ) {
   WearLinkTheme {
-    Column(
+    Box(
       modifier = Modifier
         .fillMaxSize()
-        .padding(24.dp)
         .background(MaterialTheme.colors.background),
-      verticalArrangement = Arrangement.Center,
+      contentAlignment = Alignment.Center
     ) {
-      Text(
-        fontSize = 14.sp,
-        text = stringResource(R.string.execute_message_confirm, title)
-      )
-      Row(
-        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-        horizontalArrangement = Arrangement.Center
+      Column(
+        modifier = Modifier
+          .fillMaxSize()
+          .padding(24.dp),
+        verticalArrangement = Arrangement.Center,
       ) {
-        Button(
-          onClick = onFinish,
-          modifier = Modifier.padding(end = 8.dp)
+        Text(
+          fontSize = 14.sp,
+          text = stringResource(R.string.execute_message_confirm, title)
+        )
+        Row(
+          modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+          horizontalArrangement = Arrangement.Center
         ) {
-          Text(
-            text = stringResource(R.string.execute_message_confirm_no),
-            fontSize = 12.sp,
-          )
-        }
-        Button(onClick = onExecute) {
-          Text(
-            text = stringResource(R.string.execute_message_confirm_yes),
-            fontSize = 12.sp,
-          )
+          Button(
+            onClick = onFinish,
+            modifier = Modifier.padding(end = 8.dp)
+          ) {
+            Text(
+              text = stringResource(R.string.execute_message_confirm_no),
+              fontSize = 12.sp,
+            )
+          }
+          Button(onClick = onExecute) {
+            Text(
+              text = stringResource(R.string.execute_message_confirm_yes),
+              fontSize = 12.sp,
+            )
+          }
         }
       }
     }
