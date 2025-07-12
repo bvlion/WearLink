@@ -37,6 +37,7 @@
   <string name="menu_title_privacy_policy">プライバシー・ポリシーを確認</string>
   <string name="menu_title_review">応援レビューを書く</string>
   <string name="menu_title_feedback">フィードバックを送る</string>
+  <string name="menu_title_version">バージョン: %s</string>
 
   <!-- request edit -->
   <string name="request_edit_input_title">タイトル</string>
