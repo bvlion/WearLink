@@ -7,5 +7,3 @@ updates:
       time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 15
-    reviewers:
-      - bvlion
