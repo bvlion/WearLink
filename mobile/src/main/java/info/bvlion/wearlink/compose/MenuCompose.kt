@@ -34,7 +34,6 @@ import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.History
-import androidx.compose.material.icons.filled.Label
 import androidx.compose.material.icons.filled.Reviews
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.Sync
