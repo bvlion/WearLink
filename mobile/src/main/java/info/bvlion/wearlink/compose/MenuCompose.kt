@@ -1,5 +1,6 @@
 package info.bvlion.wearlink.compose
 
+import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
 import androidx.compose.foundation.clickable
@@ -34,7 +35,9 @@ import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Reviews
+import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Upload
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
@@ -60,6 +63,7 @@ import androidx.core.net.toUri
 import com.google.firebase.firestore.FirebaseFirestore
 import info.bvlion.appinfomanager.changelog.ChangeLogManager
 import info.bvlion.appinfomanager.contents.ContentsManager
+import info.bvlion.wearlink.mobile.BuildConfig
 import info.bvlion.wearlink.mobile.R
 
 @Composable
@@ -142,7 +146,10 @@ fun MenuList(
     }
 
     val showChangeLog = rememberSaveable { mutableStateOf(false) }
-    ChangeLogManager(FirebaseFirestore.getInstance(), context).ShowChangeLog(showChangeLog)
+    ChangeLogManager(FirebaseFirestore.getInstance(), context).ShowChangeLog(
+      showChangeLog,
+      BuildConfig.VERSION_NAME
+    )
     MenuRow(stringResource(R.string.menu_title_change_log), Icons.Filled.History) {
       showChangeLog.value = true
     }
@@ -171,7 +178,7 @@ fun MenuList(
           Intent(Intent.ACTION_VIEW, "market://details?id=${context.packageName}".toUri()).apply {
             addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
           }
-        } catch (e: ActivityNotFoundException) {
+        } catch (_: ActivityNotFoundException) {
           Intent(Intent.ACTION_VIEW, "https://play.google.com/store/apps/details?id=${context.packageName}".toUri())
         }
       )
@@ -179,6 +186,18 @@ fun MenuList(
 
     MenuRow(stringResource(R.string.menu_title_feedback), Icons.Filled.ContactMail) {
       context.startActivity(Intent(Intent.ACTION_VIEW, AppConstants.INQUIRY_URL.toUri()))
+    }
+
+    Row(
+      modifier = Modifier.fillMaxWidth(),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
+      Icon(
+        Icons.Filled.Sell,
+        contentDescription = null,
+        modifier = Modifier.padding(start = 16.dp)
+      )
+      Text(text = stringResource(R.string.menu_title_version, BuildConfig.VERSION_NAME), modifier = Modifier.padding(16.dp))
     }
 
     Spacer(modifier = Modifier.height(8.dp + bottomPadding))
@@ -222,6 +241,7 @@ private fun DeleteExecuteHistoryConfirmDialog(onDismiss: () -> Unit, onConfirm: 
   )
 }
 
+@SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
 private fun RequestImportDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
   val context = LocalContext.current
@@ -293,7 +313,7 @@ private fun RequestImportDialog(onDismiss: () -> Unit, onConfirm: (String) -> Un
 
                 try {
                   pasteText.value.parseRequestParams()
-                } catch (e: Exception) {
+                } catch (_: Exception) {
                   pasteError.value = context.getString(R.string.request_import_input_error_format)
                   return@Button
                 }
