@@ -53,7 +53,7 @@
       </intent-filter>
       <intent-filter>
         <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
-        <data android:scheme="wear" android:host="*" android:pathPrefix="/request-to-send-response" />
+        <data android:scheme="wear" android:host="*" android:pathPrefix="/request-to-send-responses" />
       </intent-filter>
       <intent-filter>
         <action android:name="com.google.android.gms.wearable.MESSAGE_RECEIVED" />
