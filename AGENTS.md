@@ -54,7 +54,10 @@ Java 17と、リポジトリ同梱のGradle Wrapperを使用します。
 - `./gradlew testDebugUnitTest`
 - `git diff --check`
 
-HTTP関連テストでは、`http://localhost`でhttpbinが必要です。CIと同じ環境が必要な場合は `docker run -p 80:80 -d --name httpbin kennethreitz/httpbin` を実行してください。
+HTTP関連テストではhttpbinが必要です。ローカルでCIと同じ構成を使う場合は、httpbinを起動して`HOST`を指定してください。
+
+- `docker run -p 80:80 -d --name httpbin kennethreitz/httpbin`
+- `HOST=http://localhost ./gradlew testDebugUnitTest`
 
 計装テストは、変更内容に必要であり、端末またはエミュレーターを利用できる場合に実行してください。
 
