@@ -1,12 +1,17 @@
 package info.bvlion.wearlink
 
+import android.Manifest
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -38,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
@@ -89,6 +95,15 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val closeLabel = stringResource(R.string.close)
 
       val getString = { id: Int -> getString(id) }
+      val pendingRequest = remember { mutableStateOf<RequestParams?>(null) }
+      val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+      ) {
+        pendingRequest.value?.let { request ->
+          viewModel.sendRequest(request, getString)
+        }
+        pendingRequest.value = null
+      }
       val isDarkMode = AppConstants.isDarkMode(viewMode.value, isSystemInDarkTheme())
 
       LaunchedEffect(Unit) {
@@ -171,8 +186,21 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       editRequest.value = request
                       bottomMenuIndex.intValue = 1
                     },
-                    send = {
-                      viewModel.sendRequest(it, getString)
+                    send = { request ->
+                      if (
+                        Build.VERSION.SDK_INT < Build.VERSION_CODES.CINNAMON_BUN ||
+                        ContextCompat.checkSelfPermission(
+                          this,
+                          Manifest.permission.ACCESS_LOCAL_NETWORK
+                        ) == PackageManager.PERMISSION_GRANTED
+                      ) {
+                        viewModel.sendRequest(request, getString)
+                      } else {
+                        pendingRequest.value = request
+                        localNetworkPermissionLauncher.launch(
+                          Manifest.permission.ACCESS_LOCAL_NETWORK
+                        )
+                      }
                     }
                   )
                   if (loading.value) {

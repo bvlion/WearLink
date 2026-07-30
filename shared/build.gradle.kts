@@ -2,8 +2,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 
 plugins {
   alias(libs.plugins.android.library)
-  alias(libs.plugins.kotlin.android)
-  alias(libs.plugins.kotlin.parcelize)
 }
 
 android {
@@ -37,12 +35,15 @@ dependencies {
   implementation(libs.okhttp)
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.kotlinx.coroutines.play.services)
+  implementation(libs.kotlin.parcelize.runtime)
   implementation(libs.androidx.ui)
   implementation(libs.datastore.preferences)
   implementation(platform(libs.androidx.compose.bom))
 
   implementation(platform(libs.firebase.bom))
   implementation(libs.firebase.crashlytics.ktx)
+
+  add("kotlinCompilerPluginClasspath", libs.kotlin.parcelize.compiler)
 
   testImplementation(libs.junit)
   testImplementation(libs.json)
