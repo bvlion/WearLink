@@ -8,6 +8,7 @@ on:
       - '**.kts'
       - '**.properties'
       - 'gradle/libs.versions.toml'
+      - '.github/actions/**'
       - '.github/workflows/**'
 
 permissions:
