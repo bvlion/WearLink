@@ -35,6 +35,7 @@
       android:excludeFromRecents="true"
       android:launchMode="singleTask"
       android:noHistory="true"
+      android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER"
       android:theme="@android:style/Theme.DeviceDefault" />
 
     <activity
