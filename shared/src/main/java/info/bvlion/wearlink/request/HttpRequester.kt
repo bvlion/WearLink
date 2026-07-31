@@ -10,7 +10,6 @@ import okhttp3.MediaType.Companion.toMediaType
 import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
-import okhttp3.internal.http.HttpMethod
 import org.json.JSONObject
 import java.util.Date
 
@@ -22,10 +21,11 @@ class HttpRequester {
     isMobile: Boolean = true
   ): ResponseParams = withContext(Dispatchers.IO) {
     val start = System.currentTimeMillis()
+    val isRequestBodyPermitted = params.method != Constant.HttpMethod.GET
 
     val request = Request.Builder()
       .url(
-        if (HttpMethod.permitsRequestBody(params.method.toString()) || params.parameters.isEmpty()) {
+        if (isRequestBodyPermitted || params.parameters.isEmpty()) {
           params.url
         } else {
           "${params.url}?${params.parameters}"
@@ -33,7 +33,7 @@ class HttpRequester {
       )
       .method(
         params.method.toString(),
-        if (HttpMethod.permitsRequestBody(params.method.toString())) {
+        if (isRequestBodyPermitted) {
           params.parameters.toByteArray().let {
             it.toRequestBody(
               if (params.bodyType == Constant.BodyType.JSON) {
