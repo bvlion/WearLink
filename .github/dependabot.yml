@@ -7,3 +7,12 @@ updates:
       time: "09:00"
       timezone: "Asia/Tokyo"
     open-pull-requests-limit: 15
+  - package-ecosystem: "github-actions"
+    directories:
+      - "/"
+      - "/.github/actions/shared-setup"
+    schedule:
+      interval: "daily"
+      time: "09:00"
+      timezone: "Asia/Tokyo"
+    open-pull-requests-limit: 15

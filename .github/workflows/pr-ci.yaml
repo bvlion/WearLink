@@ -8,8 +8,8 @@ on:
       - '**.kts'
       - '**.properties'
       - 'gradle/libs.versions.toml'
-      - '.github/workflows/dependabot-auto-merge.yaml'
-      - '.github/workflows/pr-ci.yaml'
+      - '.github/actions/**'
+      - '.github/workflows/**'
 
 permissions:
   id-token: write
