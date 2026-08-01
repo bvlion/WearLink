@@ -10,17 +10,21 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
       
       - name: Verify tags
         run: |
-          LATEST_ALPHA_TAG=$(git tag -l 'alpha*' | sort -V | tail -n 1)
-          LATEST_V_TAG=$(git tag -l 'v*' | sort -V | tail -n 1)
+          LATEST_INTERNAL_TAG=$(git tag -l 'v*' | sort -V | tail -n 1)
 
-          if [[ "$GITHUB_REF" == refs/tags/v* ]]; then
-            if [[ -z "$LATEST_ALPHA_TAG" || "$LATEST_V_TAG" != "$GITHUB_REF" ]]; then
-              echo "The latest v tag is being pushed without the latest alpha tag or the alpha tag does not exist."
-              exit 1
-            fi
+          if [[ -z "$LATEST_INTERNAL_TAG" ]]; then
+            echo "The internal release tag does not exist."
+            exit 1
+          fi
+
+          if [[ "$(git rev-list -n 1 "$LATEST_INTERNAL_TAG")" != "$(git rev-parse HEAD)" ]]; then
+            echo "The release tag does not point to the same commit as the latest internal release tag."
+            exit 1
           fi
 
       - name: Notify Error to Slack
