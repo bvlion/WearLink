@@ -4,12 +4,10 @@ import android.app.Application
 import android.content.ClipData
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import info.bvlion.appinfomanager.analytics.AnalyticsManager
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import info.bvlion.wearlink.analytics.AppAnalytics
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.ErrorDetail
@@ -52,20 +50,11 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   private val _clipboard = Channel<ClipData>(Channel.BUFFERED)
   val clipboard = _clipboard.receiveAsFlow()
 
-  private val _firstSendAnalytics = MutableStateFlow(false)
-
   init {
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
         _savedRequest.value = value
         Sync.requestsSyncToWear(dataStore, wearConnector)
-        if (!_firstSendAnalytics.value && !value.isNullOrEmpty()) {
-          _firstSendAnalytics.value = true
-          AnalyticsManager.logEvent(
-            AppAnalytics.EVENT_START,
-            mapOf(AppAnalytics.PARAM_EVENT_START_REQUEST_SAVED_COUNT to value.parseRequestParams().size.toString())
-          )
-        }
       }
     }
     viewModelScope.launch(Dispatchers.IO) {
@@ -120,10 +109,6 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
         .map { it.toJsonString() }
         .let { JSONArray(it).toString() }
         .let { dataStore.saveRequest(it) }
-      AnalyticsManager.logEvent(
-        AppAnalytics.EVENT_REQUEST_SAVE_TAP,
-        mapOf(AppAnalytics.PARAM_EVENT_REQUEST_SAVE_COUNT to savedRequest.value?.parseRequestParams()?.size.toString())
-      )
     }
     getString?.invoke(
       if (savedIndex >= 0)
@@ -185,10 +170,6 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       .map { it.toJsonString() }
       .let { JSONArray(it).toString() }
       .let { dataStore.saveResponse(it) }
-    AnalyticsManager.logEvent(
-      AppAnalytics.EVENT_RESPONSE_SAVE_TAP,
-      mapOf(AppAnalytics.PARAM_EVENT_RESPONSE_SAVE_COUNT to savedList.size.toString())
-    )
   }
 
   fun copyToClipboard(isRequestCopy: Boolean, getString: (Int) -> String) {

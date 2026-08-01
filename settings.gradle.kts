@@ -20,5 +20,4 @@ dependencyResolutionManagement {
 }
 
 rootProject.name = "WearLink"
-include(":mobile", ":wear", ":shared", ":AppInfoManager")
- 
+include(":mobile", ":wear", ":shared")

@@ -7,19 +7,9 @@ WearLink は Kotlin で実装された Android マルチモジュールプロジ
 - `mobile/`: Androidスマートフォン向けアプリ
 - `wear/`: Wear OS向けアプリ
 - `shared/`: mobileとwearで共有する通信処理、データモデル、DataStore、HTTP関連処理
-- `AppInfoManager/`: アプリ情報、更新確認、変更履歴を扱うGitサブモジュール
 - `fastlane/metadata/android/`: Google Play掲載情報
 
 Java 17と、リポジトリ同梱のGradle Wrapperを使用します。
-
-## AppInfoManagerサブモジュール
-
-`AppInfoManager/`は独立したGitリポジトリを参照するサブモジュールです。
-
-- 明示的に依頼されない限り、`AppInfoManager/`内を変更しないでください。
-- WearLink側の作業として、サブモジュールの参照コミットを不用意に変更しないでください。
-- AppInfoManager自体の修正が必要な場合は、WearLinkの変更と分離して報告してください。
-- 初期化が必要な場合は `git submodule update --init --recursive` を使用してください。
 
 ## 変更方針
 

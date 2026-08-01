@@ -65,7 +65,6 @@ kotlin {
 
 dependencies {
   implementation(project(":shared"))
-  implementation(project(":AppInfoManager"))
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.work.runtime.ktx)

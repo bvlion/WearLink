@@ -63,7 +63,6 @@ kotlin {
 
 dependencies {
   implementation(project(":shared"))
-  implementation(project(":AppInfoManager"))
   implementation(libs.play.services.wearable)
   implementation(libs.wear)
   implementation(libs.wear.remote.interactions)
