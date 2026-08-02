@@ -19,9 +19,7 @@ import androidx.wear.tiles.tooling.preview.TilePreviewHelper
 import androidx.wear.tooling.preview.devices.WearDevices
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.tiles.render.SingleTileLayoutRenderer
-import info.bvlion.appinfomanager.analytics.AnalyticsManager
 import info.bvlion.wearlink.wear.R
-import info.bvlion.wearlink.analytics.AppAnalytics
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
@@ -38,10 +36,6 @@ class LinkTileRenderer(context: Context) : SingleTileLayoutRenderer<LinkTileStat
       deviceParameters = deviceParameters,
       state = state,
       requestClickableFactory = { requestParams ->
-        AnalyticsManager.logEvent(
-          AppAnalytics.EVENT_TILE_REQUEST_TAP,
-          mapOf(AppAnalytics.PARAM_EVENT_TILE_REQUEST_TITLE_HASH to requestParams.title.hashCode().toString())
-        )
         ModifiersBuilders.Clickable.Builder()
           .setId(requestParams.title)
           .setOnClick(

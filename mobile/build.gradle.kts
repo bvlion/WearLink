@@ -65,15 +65,12 @@ kotlin {
 
 dependencies {
   implementation(project(":shared"))
-  implementation(project(":AppInfoManager"))
   implementation(libs.androidx.activity.compose)
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.work.runtime.ktx)
   implementation(libs.play.services.wearable)
   implementation(platform(libs.firebase.bom))
   implementation(libs.firebase.crashlytics.ktx)
-  implementation(libs.firebase.analytics.ktx)
-  implementation(libs.firebase.firestore.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(platform(libs.androidx.compose.bom))
   implementation(libs.datastore.preferences)

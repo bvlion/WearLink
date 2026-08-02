@@ -43,7 +43,6 @@ dependencies {
 
   implementation(platform(libs.firebase.bom))
   implementation(libs.firebase.crashlytics.ktx)
-  implementation(libs.firebase.analytics.ktx)
 
   testImplementation(libs.junit)
   testImplementation(libs.json)

@@ -9,9 +9,7 @@ import androidx.wear.protolayout.ResourceBuilders
 import androidx.wear.tiles.TileBuilders
 import com.google.android.horologist.annotations.ExperimentalHorologistApi
 import com.google.android.horologist.tiles.SuspendingTileService
-import info.bvlion.appinfomanager.analytics.AnalyticsManager
 import info.bvlion.wearlink.wear.R
-import info.bvlion.wearlink.analytics.AppAnalytics
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
@@ -61,7 +59,6 @@ class MainTileService : SuspendingTileService() {
         ) {
           showNotFindMobileToast()
         }
-        AnalyticsManager.logEvent(AppAnalytics.EVENT_TILE_HEADER_TAP, null)
       }
       AppConstants.SYNC_STORE_DATA -> {
         AppConstants.startMobileActivity(
@@ -88,7 +85,6 @@ class MainTileService : SuspendingTileService() {
         ) {
           showNotFindMobileToast()
         }
-        AnalyticsManager.logEvent(AppAnalytics.EVENT_TILE_SYNC_TAP, null)
       }
     }
 

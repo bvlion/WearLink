@@ -41,10 +41,6 @@ import androidx.compose.ui.unit.dp
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
-import com.google.firebase.firestore.FirebaseFirestore
-import info.bvlion.appinfomanager.analytics.AnalyticsManager
-import info.bvlion.appinfomanager.update.AppUpdateManager
-import info.bvlion.wearlink.analytics.AppAnalytics
 import info.bvlion.wearlink.compose.ErrorDialogCompose
 import info.bvlion.wearlink.compose.LoadingCompose
 import info.bvlion.wearlink.compose.MenuBottomNavigation
@@ -59,7 +55,6 @@ import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
-import info.bvlion.wearlink.mobile.BuildConfig
 import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.WearMobileConnector
 import info.bvlion.wearlink.ui.MainAnimatedVisibility
@@ -78,8 +73,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
     val clipboardManager = getSystemService(Context.CLIPBOARD_SERVICE) as ClipboardManager
 
     setContent {
-      AppUpdateManager(FirebaseFirestore.getInstance(), this).CheckForUpdate(BuildConfig.VERSION_CODE)
-
       val errorDialog = viewModel.errorDialog.collectAsState()
       val viewMode = viewModel.viewMode.collectAsState()
 
@@ -270,10 +263,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                   editRequestIndex.intValue = -1
                 }
                 response.value = null
-                AnalyticsManager.logEvent(
-                  AppAnalytics.EVENT_TAB_TAP,
-                  mapOf(AppAnalytics.PARAM_EVENT_TAB_TAP_INDEX to it.toString())
-                )
               }
             }
           )

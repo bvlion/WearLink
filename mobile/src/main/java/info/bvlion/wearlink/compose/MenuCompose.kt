@@ -30,10 +30,8 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContactMail
 import androidx.compose.material.icons.filled.Delete
-import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material.icons.filled.History
 import androidx.compose.material.icons.filled.Reviews
 import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.Sync
@@ -60,9 +58,6 @@ import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
 import info.bvlion.wearlink.ui.theme.noRippleClickable
 import androidx.core.net.toUri
-import com.google.firebase.firestore.FirebaseFirestore
-import info.bvlion.appinfomanager.changelog.ChangeLogManager
-import info.bvlion.appinfomanager.contents.ContentsManager
 import info.bvlion.wearlink.mobile.BuildConfig
 import info.bvlion.wearlink.mobile.R
 
@@ -143,33 +138,6 @@ fun MenuList(
     }
     MenuRow(stringResource(R.string.menu_title_delete_execution_history), Icons.Filled.Delete) {
       shouldShowDeleteConfirmDialogState.value = true
-    }
-
-    val showChangeLog = rememberSaveable { mutableStateOf(false) }
-    ChangeLogManager(FirebaseFirestore.getInstance(), context).ShowChangeLog(
-      showChangeLog,
-      BuildConfig.VERSION_NAME
-    )
-    MenuRow(stringResource(R.string.menu_title_change_log), Icons.Filled.History) {
-      showChangeLog.value = true
-    }
-
-    val showTermsOfService = rememberSaveable { mutableStateOf(false) }
-    ContentsManager(FirebaseFirestore.getInstance(), context).ShowTermsOfServiceDialog(
-      showTermsOfService,
-      AppConstants.isDarkMode(viewMode, AppConstants.isSystemInDarkTheme(context))
-    )
-    MenuRow(stringResource(R.string.menu_title_terms_of_use), Icons.Filled.Description) {
-      showTermsOfService.value = true
-    }
-
-    val showPrivacyPolicy = rememberSaveable { mutableStateOf(false) }
-    ContentsManager(FirebaseFirestore.getInstance(), context).ShowPrivacyPolicyDialog(
-      showPrivacyPolicy,
-      AppConstants.isDarkMode(viewMode, AppConstants.isSystemInDarkTheme(context))
-    )
-    MenuRow(stringResource(R.string.menu_title_privacy_policy), Icons.Filled.Description) {
-      showPrivacyPolicy.value = true
     }
 
     MenuRow(stringResource(R.string.menu_title_review), Icons.Filled.Reviews) {
