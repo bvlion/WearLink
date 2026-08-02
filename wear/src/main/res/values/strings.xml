@@ -1,6 +1,9 @@
 <resources>
   <string name="main_launched_mobile">スマートフォンのアプリを起動しました</string>
   <string name="main_launch_mobile">スマートフォンでアプリを開く</string>
+  <string name="local_network_access">ローカルネットワークアクセス</string>
+  <string name="local_network_access_grant">許可する</string>
+  <string name="local_network_access_granted">許可済み</string>
   <string name="tile_description">お気に入りアクションをすぐに実行</string>
 
   <!-- execute -->

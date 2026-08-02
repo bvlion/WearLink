@@ -1,6 +1,9 @@
 <resources>
   <string name="main_launched_mobile">Opened the app on your phone</string>
   <string name="main_launch_mobile">Open the app on your phone</string>
+  <string name="local_network_access">Local network access</string>
+  <string name="local_network_access_grant">Allow</string>
+  <string name="local_network_access_granted">Allowed</string>
   <string name="tile_description">Access your favorite actions</string>
 
   <!-- execute -->

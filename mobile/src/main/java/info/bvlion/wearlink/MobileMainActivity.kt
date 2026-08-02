@@ -1,12 +1,17 @@
 package info.bvlion.wearlink
 
+import android.Manifest
 import android.content.ClipboardManager
 import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -38,6 +43,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.google.android.gms.wearable.MessageClient
 import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
@@ -65,6 +71,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 
   private val viewModel by viewModels<MobileMainViewModel>()
   private val messageClient by lazy { Wearable.getMessageClient(this) }
+  private val isLocalNetworkPermissionGranted = mutableStateOf(false)
 
   @OptIn(ExperimentalMaterial3Api::class)
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -89,6 +96,14 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val closeLabel = stringResource(R.string.close)
 
       val getString = { id: Int -> getString(id) }
+      val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+      ) {
+        isLocalNetworkPermissionGranted.value = ContextCompat.checkSelfPermission(
+          this@MobileMainActivity,
+          Manifest.permission.ACCESS_LOCAL_NETWORK
+        ) == PackageManager.PERMISSION_GRANTED
+      }
       val isDarkMode = AppConstants.isDarkMode(viewMode.value, isSystemInDarkTheme())
 
       LaunchedEffect(Unit) {
@@ -171,9 +186,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       editRequest.value = request
                       bottomMenuIndex.intValue = 1
                     },
-                    send = {
-                      viewModel.sendRequest(it, getString)
-                    }
+                    send = { request -> viewModel.sendRequest(request, getString) }
                   )
                   if (loading.value) {
                     LoadingCompose()
@@ -245,6 +258,17 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     copyToClipboard = {
                       viewModel.copyToClipboard(it, getString)
                     },
+                    isLocalNetworkPermissionGranted = isLocalNetworkPermissionGranted.value,
+                    requestLocalNetworkPermission = {
+                      if (
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
+                        !isLocalNetworkPermissionGranted.value
+                      ) {
+                        localNetworkPermissionLauncher.launch(
+                          Manifest.permission.ACCESS_LOCAL_NETWORK
+                        )
+                      }
+                    }
                   )
                 }
                 Box( // status bar の透け感
@@ -308,6 +332,12 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 
   override fun onResume() {
     super.onResume()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+      isLocalNetworkPermissionGranted.value = ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.ACCESS_LOCAL_NETWORK
+      ) == PackageManager.PERMISSION_GRANTED
+    }
     messageClient.addListener(this)
     viewModel.requestResponsesToWear()
   }
