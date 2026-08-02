@@ -79,7 +79,6 @@ dependencies {
 
   implementation(platform(libs.firebase.bom))
   implementation(libs.firebase.crashlytics.ktx)
-  implementation(libs.firebase.analytics.ktx)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(platform(libs.androidx.compose.bom))
   implementation(libs.datastore.preferences)
