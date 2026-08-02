@@ -71,6 +71,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 
   private val viewModel by viewModels<MobileMainViewModel>()
   private val messageClient by lazy { Wearable.getMessageClient(this) }
+  private val isLocalNetworkPermissionGranted = mutableStateOf(false)
 
   @OptIn(ExperimentalMaterial3Api::class)
   override fun onCreate(savedInstanceState: Bundle?) {
@@ -95,14 +96,13 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val closeLabel = stringResource(R.string.close)
 
       val getString = { id: Int -> getString(id) }
-      val pendingRequest = remember { mutableStateOf<RequestParams?>(null) }
       val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
       ) {
-        pendingRequest.value?.let { request ->
-          viewModel.sendRequest(request, getString)
-        }
-        pendingRequest.value = null
+        isLocalNetworkPermissionGranted.value = ContextCompat.checkSelfPermission(
+          this@MobileMainActivity,
+          Manifest.permission.ACCESS_LOCAL_NETWORK
+        ) == PackageManager.PERMISSION_GRANTED
       }
       val isDarkMode = AppConstants.isDarkMode(viewMode.value, isSystemInDarkTheme())
 
@@ -186,22 +186,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       editRequest.value = request
                       bottomMenuIndex.intValue = 1
                     },
-                    send = { request ->
-                      if (
-                        Build.VERSION.SDK_INT < Build.VERSION_CODES.CINNAMON_BUN ||
-                        ContextCompat.checkSelfPermission(
-                          this@MobileMainActivity,
-                          Manifest.permission.ACCESS_LOCAL_NETWORK
-                        ) == PackageManager.PERMISSION_GRANTED
-                      ) {
-                        viewModel.sendRequest(request, getString)
-                      } else {
-                        pendingRequest.value = request
-                        localNetworkPermissionLauncher.launch(
-                          Manifest.permission.ACCESS_LOCAL_NETWORK
-                        )
-                      }
-                    }
+                    send = { request -> viewModel.sendRequest(request, getString) }
                   )
                   if (loading.value) {
                     LoadingCompose()
@@ -273,6 +258,17 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     copyToClipboard = {
                       viewModel.copyToClipboard(it, getString)
                     },
+                    isLocalNetworkPermissionGranted = isLocalNetworkPermissionGranted.value,
+                    requestLocalNetworkPermission = {
+                      if (
+                        Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
+                        !isLocalNetworkPermissionGranted.value
+                      ) {
+                        localNetworkPermissionLauncher.launch(
+                          Manifest.permission.ACCESS_LOCAL_NETWORK
+                        )
+                      }
+                    }
                   )
                 }
                 Box( // status bar の透け感
@@ -336,6 +332,12 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 
   override fun onResume() {
     super.onResume()
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+      isLocalNetworkPermissionGranted.value = ContextCompat.checkSelfPermission(
+        this,
+        Manifest.permission.ACCESS_LOCAL_NETWORK
+      ) == PackageManager.PERMISSION_GRANTED
+    }
     messageClient.addListener(this)
     viewModel.requestResponsesToWear()
   }

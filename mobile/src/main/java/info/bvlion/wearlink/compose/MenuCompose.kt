@@ -3,6 +3,7 @@ package info.bvlion.wearlink.compose
 import android.annotation.SuppressLint
 import android.content.ActivityNotFoundException
 import android.content.Intent
+import android.os.Build
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -37,6 +38,7 @@ import androidx.compose.material.icons.filled.Sell
 import androidx.compose.material.icons.filled.Sync
 import androidx.compose.material.icons.filled.Tag
 import androidx.compose.material.icons.filled.Upload
+import androidx.compose.material.icons.filled.Wifi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -71,6 +73,8 @@ fun MenuList(
   historyDelete: () -> Unit = {},
   savePasteRequest: (String) -> Unit = {},
   copyToClipboard: (Boolean) -> Unit = {},
+  isLocalNetworkPermissionGranted: Boolean = false,
+  requestLocalNetworkPermission: () -> Unit = {},
 ) {
   val context = LocalContext.current
 
@@ -108,6 +112,37 @@ fun MenuList(
 
     MenuRow(stringResource(R.string.menu_title_sync_with_wearable), Icons.Filled.Sync) {
       syncWatch()
+    }
+
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+      Row(
+        modifier = Modifier
+          .fillMaxWidth()
+          .clickable(
+            enabled = !isLocalNetworkPermissionGranted,
+            onClick = requestLocalNetworkPermission
+          ),
+        verticalAlignment = Alignment.CenterVertically
+      ) {
+        Icon(
+          Icons.Filled.Wifi,
+          contentDescription = stringResource(R.string.local_network_access),
+          modifier = Modifier.padding(start = 16.dp)
+        )
+        Column(modifier = Modifier.padding(16.dp)) {
+          Text(text = stringResource(R.string.local_network_access))
+          Text(
+            text = stringResource(
+              if (isLocalNetworkPermissionGranted) {
+                R.string.local_network_access_granted
+              } else {
+                R.string.local_network_access_grant
+              }
+            ),
+            style = MaterialTheme.typography.bodySmall
+          )
+        }
+      }
     }
 
     MenuRow(stringResource(R.string.menu_title_export_request), Icons.Filled.Upload) {

@@ -28,6 +28,9 @@
   <string name="view_mode_dark">ダーク</string>
   <string name="view_mode_light">ライト</string>
   <string name="menu_title_sync_with_wearable">ウェアラブルと同期</string>
+  <string name="local_network_access">ローカルネットワークアクセス</string>
+  <string name="local_network_access_grant">許可する</string>
+  <string name="local_network_access_granted">許可済み</string>
   <string name="menu_title_export_request">Request をエクスポート</string>
   <string name="menu_title_import_request">Request をインポート</string>
   <string name="menu_title_export_execution_history">実行履歴をエクスポート</string>

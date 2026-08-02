@@ -2,4 +2,5 @@
   <!-- 共通 -->
   <string name="app_name">WearLink</string>
   <string name="request_error">通信エラーが発生しました</string>
+  <string name="local_network_permission_guidance">ローカルネットワーク上のURLへ接続する場合は、アプリの設定からローカルネットワークアクセスを許可してください</string>
 </resources>

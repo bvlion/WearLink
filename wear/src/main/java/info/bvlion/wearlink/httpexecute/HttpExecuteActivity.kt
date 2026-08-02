@@ -1,13 +1,8 @@
 package info.bvlion.wearlink.httpexecute
 
-import android.Manifest
-import android.content.pm.PackageManager
-import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
-import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -28,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.content.ContextCompat
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.CircularProgressIndicator
 import androidx.wear.compose.material.MaterialTheme
@@ -48,13 +42,6 @@ class HttpExecuteActivity : ComponentActivity() {
       val showConfirmation = intent.getBooleanExtra(EXTRA_SHOW_CONFIRMATION, false)
 
       val showConfirmationState = remember { mutableStateOf(showConfirmation) }
-      val pendingRequestParams = remember { mutableStateOf<String?>(null) }
-      val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-      ) {
-        viewModel.sendRequest(pendingRequestParams.value) { getString(it) }
-        pendingRequestParams.value = null
-      }
 
       if (showConfirmationState.value) {
         HttpExecuteConfirm(
@@ -65,23 +52,8 @@ class HttpExecuteActivity : ComponentActivity() {
       } else {
         HttpExecute(title)
         LaunchedEffect(Unit) {
-          val requestParams = intent.getStringExtra(EXTRA_REQUEST_PARAMS)
-          if (
-            requestParams.isNullOrEmpty() ||
-            Build.VERSION.SDK_INT < Build.VERSION_CODES.CINNAMON_BUN ||
-            ContextCompat.checkSelfPermission(
-              this@HttpExecuteActivity,
-              Manifest.permission.ACCESS_LOCAL_NETWORK
-            ) == PackageManager.PERMISSION_GRANTED
-          ) {
-            viewModel.sendRequest(requestParams) {
-              getString(it)
-            }
-          } else {
-            pendingRequestParams.value = requestParams
-            localNetworkPermissionLauncher.launch(
-              Manifest.permission.ACCESS_LOCAL_NETWORK
-            )
+          viewModel.sendRequest(intent.getStringExtra(EXTRA_REQUEST_PARAMS)) {
+            getString(it)
           }
         }
 

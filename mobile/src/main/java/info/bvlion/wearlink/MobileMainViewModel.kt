@@ -1,7 +1,11 @@
 package info.bvlion.wearlink
 
+import android.Manifest
 import android.app.Application
 import android.content.ClipData
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -142,12 +146,24 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       val response = try {
         requester.execute(request)
       } catch (e: Exception) {
+        val localNetworkPermissionGuidance = if (
+          Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
+          ContextCompat.checkSelfPermission(
+            getApplication<Application>(),
+            Manifest.permission.ACCESS_LOCAL_NETWORK
+          ) != PackageManager.PERMISSION_GRANTED
+        ) {
+          "\n${getString(info.bvlion.wearlink.shared.R.string.local_network_permission_guidance)}"
+        } else {
+          ""
+        }
         ResponseParams(
           request.title,
           -1,
           System.currentTimeMillis() - start,
           "",
-          "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}",
+          "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}" +
+            localNetworkPermissionGuidance,
           Date().time,
           true
         )
