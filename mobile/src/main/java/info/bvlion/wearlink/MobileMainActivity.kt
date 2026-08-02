@@ -190,7 +190,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       if (
                         Build.VERSION.SDK_INT < Build.VERSION_CODES.CINNAMON_BUN ||
                         ContextCompat.checkSelfPermission(
-                          this,
+                          this@MobileMainActivity,
                           Manifest.permission.ACCESS_LOCAL_NETWORK
                         ) == PackageManager.PERMISSION_GRANTED
                       ) {
