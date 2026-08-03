@@ -88,17 +88,18 @@ fi
 is_worktree_root_created=false
 is_target_worktree_created=false
 is_worktree_creation_started=false
+is_issue_branch_created=false
 is_completed=false
 
 cleanup() {
   exit_status=$?
-  if [[ "$is_completed" == true || "$is_worktree_creation_started" != true ]]; then
+  if [[ "$is_completed" == true || "$is_issue_branch_created" != true ]]; then
     return
   fi
 
   printf '作成処理に失敗したため、今回作成したworktreeとブランチを削除します。\n' >&2
-  is_issue_branch_created=false
-  if git -C "$source_worktree" worktree list --porcelain |
+  if [[ "$is_worktree_creation_started" == true ]] &&
+    git -C "$source_worktree" worktree list --porcelain |
     awk -v target="$target_worktree" '
       $1 == "worktree" {
         sub(/^worktree /, "")
@@ -106,13 +107,10 @@ cleanup() {
       }
       END { exit !found }
     '; then
-    is_issue_branch_created=true
     if ! git -C "$source_worktree" worktree remove --force "$target_worktree"; then
       printf 'worktreeを削除できませんでした。確認後に次を実行してください:\n  git -C %q worktree remove --force %q\n' \
         "$source_worktree" "$target_worktree" >&2
     fi
-  elif [[ -e "${target_worktree}/.git" || -L "${target_worktree}/.git" ]]; then
-    is_issue_branch_created=true
   fi
   if [[ "$is_target_worktree_created" == true && ( -e "$target_worktree" || -L "$target_worktree" ) ]]; then
     if ! rm -rf -- "$target_worktree"; then
@@ -120,8 +118,7 @@ cleanup() {
         "$target_worktree" >&2
     fi
   fi
-  if [[ "$is_issue_branch_created" == true ]] &&
-    git -C "$source_worktree" show-ref --verify --quiet "refs/heads/${branch_name}"; then
+  if git -C "$source_worktree" show-ref --verify --quiet "refs/heads/${branch_name}"; then
     if ! git -C "$source_worktree" branch -D "$branch_name"; then
       printf 'ブランチを削除できませんでした。確認後に次を実行してください:\n  git -C %q branch -D %q\n' \
         "$source_worktree" "$branch_name" >&2
@@ -140,10 +137,13 @@ if [[ ! -d "$worktree_root" ]]; then
   is_worktree_root_created=true
 fi
 
+git -C "$source_worktree" branch --no-track "$branch_name" origin/main
+is_issue_branch_created=true
+
 mkdir "$target_worktree"
 is_target_worktree_created=true
 is_worktree_creation_started=true
-git -C "$source_worktree" worktree add --no-track -b "$branch_name" "$target_worktree" origin/main
+git -C "$source_worktree" worktree add "$target_worktree" "$branch_name"
 
 if git -C "$target_worktree" rev-parse --abbrev-ref --symbolic-full-name '@{upstream}' >/dev/null 2>&1; then
   die "作成したIssueブランチにupstreamが設定されています: ${branch_name}"
