@@ -11,6 +11,12 @@ WearLink は Kotlin で実装された Android マルチモジュールプロジ
 
 Java 17と、リポジトリ同梱のGradle Wrapperを使用します。
 
+## Worktree
+
+- Codexは、現在のworktreeと対応ブランチ内だけを変更してください。
+- 他のworktreeや、`scripts/create-codex-worktree.sh`を実行したコピー元worktreeを変更しないでください。
+- Issue用worktreeは、コピー元worktreeで`scripts/create-codex-worktree.sh <Issue番号> <接尾辞>`を実行して作成してください。
+
 ## 変更方針
 
 - 依頼された問題の解決に必要な最小限の差分にしてください。
@@ -67,9 +73,12 @@ HTTP関連テストではhttpbinが必要です。ローカルでCIと同じ構�
 - 作業ごとに専用ブランチを使用してください。
 - ブランチ名は原則として `agent/<short-task-name>` としてください。
 - コミット件名は英語の命令形で簡潔に記述してください。
-- 明示的に依頼された場合のみ、コミット、push、Pull Request作成を行ってください。
-- Pull Requestには、原因または目的、変更内容、実行した検証、未実施または失敗した検証を記載してください。
+- Issue対応を依頼された場合は、調査、実装、検証、コミット、pushを行い、Pull RequestをDraftではなくReady for reviewとして作成してください。
+- Pull Request本文には対応Issueを記載し、原因または目的、変更内容、最終的な検証結果を記載してください。
+- 影響のある未実施または失敗した検証が残る場合はPull Request本文に記載し、解消済みの途中経過や試行錯誤は記載しないでください。
 - UI変更には可能であればスクリーンショットを添付してください。
 - ユーザーの承認なしにPull Requestをマージしないでください。
+- Issueを手動でcloseせず、タグやReleaseを作成しないでください。
+- 破壊的操作、追加の認証、依頼範囲外の変更が必要な場合は、実行前にユーザーへ確認してください。
 - ユーザーが明示的に依頼した場合は、必須CIとブランチ保護を満たすGitHub auto-mergeを設定してかまいません。
 - Pull Requestを自動Approveしないでください。
