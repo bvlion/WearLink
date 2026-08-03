@@ -65,7 +65,7 @@ jobs:
         run: docker stop httpbin
 
       - name: shared test report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         if: github.actor != 'dependabot[bot]'
         with:
           name: shared test
@@ -74,7 +74,7 @@ jobs:
           fail-on-error: false
 
       - name: mobile test report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         if: github.actor != 'dependabot[bot]'
         with:
           name: mobile test
@@ -83,7 +83,7 @@ jobs:
           fail-on-error: false
 
       - name: wear test report
-        uses: dorny/test-reporter@v1
+        uses: dorny/test-reporter@v3
         if: github.actor != 'dependabot[bot]'
         with:
           name: wear test
