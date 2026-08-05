@@ -41,7 +41,7 @@ dependencies {
   implementation(platform(libs.androidx.compose.bom))
 
   implementation(platform(libs.firebase.bom))
-  implementation(libs.firebase.crashlytics.ktx)
+  implementation(libs.firebase.crashlytics)
 
   add("kotlinCompilerPluginClasspath", libs.kotlin.parcelize.compiler)
 

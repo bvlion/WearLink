@@ -77,7 +77,7 @@ dependencies {
   implementation(libs.core.splashscreen)
 
   implementation(platform(libs.firebase.bom))
-  implementation(libs.firebase.crashlytics.ktx)
+  implementation(libs.firebase.crashlytics)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(platform(libs.androidx.compose.bom))
   implementation(libs.datastore.preferences)
