@@ -1,11 +1,7 @@
 package info.bvlion.wearlink
 
-import android.Manifest
 import android.app.Application
 import android.content.ClipData
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -16,21 +12,23 @@ import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.ErrorDetail
 import info.bvlion.wearlink.data.RequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
 import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import info.bvlion.wearlink.mobile.R
-import info.bvlion.wearlink.request.HttpRequester
+import info.bvlion.wearlink.request.RequestExecutor
 import info.bvlion.wearlink.request.WearMobileConnector
+import info.bvlion.wearlink.shortcut.RequestShortcuts
 import info.bvlion.wearlink.sync.Sync
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.json.JSONArray
-import java.util.Date
 
 class MobileMainViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
-  private val requester = HttpRequester()
+  private val requestExecutor = RequestExecutor(application)
   private val wearConnector = WearMobileConnector(application)
 
   private val _savedRequest = MutableStateFlow<String?>("")
@@ -58,7 +56,11 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
         _savedRequest.value = value
-        Sync.requestsSyncToWear(dataStore, wearConnector)
+        if (value != null && value.needsRequestIdMigration()) {
+          dataStore.saveRequest(value.parseRequestParams().toRequestParamsJson())
+        } else {
+          Sync.requestsSyncToWear(dataStore, wearConnector)
+        }
       }
     }
     viewModelScope.launch(Dispatchers.IO) {
@@ -113,6 +115,9 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
         .map { it.toJsonString() }
         .let { JSONArray(it).toString() }
         .let { dataStore.saveRequest(it) }
+      if (savedIndex >= 0) {
+        RequestShortcuts.updateLabel(getApplication(), request)
+      }
     }
     getString?.invoke(
       if (savedIndex >= 0)
@@ -126,14 +131,22 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun deleteRequest(deleteIndex: Int, getString: (Int) -> String) {
     viewModelScope.launch {
       savedRequest.value?.run {
-        parseRequestParams()
-          .toMutableList()
+        val requests = parseRequestParams().toMutableList()
+        val deletedRequest = requests.getOrNull(deleteIndex)
+        requests
           .apply {
             removeAt(deleteIndex)
           }
           .map { it.toJsonString() }
           .let { JSONArray(it).toString() }
           .let { dataStore.saveRequest(it) }
+        deletedRequest?.let {
+          RequestShortcuts.disable(
+            getApplication(),
+            it.id,
+            getString(R.string.shortcut_request_deleted)
+          )
+        }
       }
     }
     showSnackbar(getString(R.string.request_deleted))
@@ -141,37 +154,21 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
 
   fun sendRequest(request: RequestParams, getString: (Int) -> String) {
     _loading.value = true
-    val start = System.currentTimeMillis()
     viewModelScope.launch(Dispatchers.IO) {
-      val response = try {
-        requester.execute(request)
-      } catch (e: Exception) {
-        val localNetworkPermissionGuidance = if (
-          Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
-          ContextCompat.checkSelfPermission(
-            getApplication<Application>(),
-            Manifest.permission.ACCESS_LOCAL_NETWORK
-          ) != PackageManager.PERMISSION_GRANTED
-        ) {
-          "\n${getString(info.bvlion.wearlink.shared.R.string.local_network_permission_guidance)}"
-        } else {
-          ""
-        }
-        ResponseParams(
-          request.title,
-          -1,
-          System.currentTimeMillis() - start,
-          "",
-          "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}" +
-            localNetworkPermissionGuidance,
-          Date().time,
-          true
-        )
-      }
+      requestExecutor.execute(request, getString)
       _loading.value = false
       showSnackbar(getString(R.string.request_sent))
-      saveResponses(response)
     }
+  }
+
+  fun addShortcut(request: RequestParams, getString: (Int) -> String) {
+    val context = getApplication<Application>()
+    if (!RequestShortcuts.isSupported(context)) {
+      showSnackbar(getString(R.string.request_edit_add_shortcut_unsupported))
+      return
+    }
+    RequestShortcuts.requestPin(context, request)
+    showSnackbar(getString(R.string.request_edit_add_shortcut_requested))
   }
 
   private suspend fun saveResponses(response: ResponseParams) {

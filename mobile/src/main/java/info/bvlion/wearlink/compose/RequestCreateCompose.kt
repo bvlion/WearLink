@@ -26,6 +26,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Error
@@ -49,6 +50,7 @@ import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
 import info.bvlion.wearlink.ui.theme.noRippleClickable
+import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -67,6 +69,8 @@ fun RequestCreate(
   save: (Int, RequestParams) -> Unit = { _, _ -> },
   cancel: () -> Unit = {},
   delete: (Int) -> Unit = {},
+  addShortcut: (RequestParams) -> Unit = {},
+  defaultId: String? = null,
 ) {
   val title = rememberSaveable { mutableStateOf(defaultTitle) }
   val titleError = rememberSaveable { mutableStateOf(false) }
@@ -83,6 +87,8 @@ fun RequestCreate(
   val header = rememberSaveable { mutableStateOf(defaultHeader) }
   val body = rememberSaveable { mutableStateOf(defaultBody) }
   val watchfaceShortcut = rememberSaveable { mutableStateOf(defaultWatchfaceShortcut) }
+
+  val requestId = rememberSaveable { defaultId ?: UUID.randomUUID().toString() }
 
   val editCheck = rememberSaveable { mutableStateOf(false) }
   val showCancelDialog = rememberSaveable { mutableStateOf(false) }
@@ -345,6 +351,7 @@ fun RequestCreate(
             parameters = body.value,
             watchSync = defaultWatchSync,
             watchfaceShortcut = watchfaceShortcut.value,
+            id = requestId,
           )
         )
       },
@@ -355,6 +362,33 @@ fun RequestCreate(
       enabled = title.value.isNotEmpty() && URLUtil.isValidUrl(url.value)
     ) {
       Text(text = if (savedIndex > -1) stringResource(R.string.update) else stringResource(R.string.create))
+    }
+
+    if (savedIndex > -1) {
+      OutlinedButton(
+        onClick = {
+          addShortcut(
+            RequestParams(
+              title = title.value,
+              url = url.value,
+              method = selectedMethod.value,
+              bodyType = selectedBodyType.value,
+              headers = header.value,
+              parameters = body.value,
+              watchSync = defaultWatchSync,
+              watchfaceShortcut = watchfaceShortcut.value,
+              id = requestId,
+            )
+          )
+        },
+        modifier = Modifier
+          .fillMaxWidth()
+          .padding(16.dp, 0.dp)
+          .height(44.dp),
+      ) {
+        Icon(Icons.AutoMirrored.Filled.AddToHomeScreen, contentDescription = stringResource(R.string.request_edit_add_shortcut))
+        Text(text = stringResource(R.string.request_edit_add_shortcut), modifier = Modifier.padding(start = 8.dp))
+      }
     }
 
     Row(
