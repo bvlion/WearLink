@@ -36,6 +36,12 @@ data class RequestParams(
     private const val PARAMETERS = "parameters"
     private const val WATCH_SYNC = "watchSync"
     private const val WATCH_FACE_SHORTCUT = "watchfaceShortcut"
+    private const val EMPTY_JSON_ARRAY = "[]"
+
+    fun List<RequestParams>.toRequestParamsJson(): String =
+      JSONArray(map { it.toJsonString() }).toString()
+
+    fun String.normalizeRequestParamsJson(): String = if (isBlank()) EMPTY_JSON_ARRAY else this
 
     fun String.parseRequestParams(): List<RequestParams> {
       val list = mutableListOf<RequestParams>()

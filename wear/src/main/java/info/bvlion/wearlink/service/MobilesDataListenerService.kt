@@ -10,6 +10,7 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import info.bvlion.wearlink.data.AppDataStore
+import info.bvlion.wearlink.data.RequestParams.Companion.normalizeRequestParamsJson
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.request.WearMobileConnector
 
@@ -26,7 +27,7 @@ class MobilesDataListenerService : WearableListenerService() {
     when (messageEvent.path) {
       WearMobileConnector.WEAR_SAVE_REQUEST_PATH ->
         scope.launch {
-          val requestData = String(messageEvent.data)
+          val requestData = String(messageEvent.data).normalizeRequestParamsJson()
           dataStore.saveRequest(requestData)
           MainTileService.tileUpdate(this@MobilesDataListenerService)
           if (requestData.parseRequestParams().any { it.watchfaceShortcut }) {
