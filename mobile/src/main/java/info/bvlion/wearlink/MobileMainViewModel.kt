@@ -12,6 +12,7 @@ import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.ErrorDetail
 import info.bvlion.wearlink.data.RequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
@@ -57,7 +58,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       dataStore.getSavedRequest.collect { value ->
         _savedRequest.value = value
         if (value != null && value.needsRequestIdMigration()) {
-          dataStore.saveRequest(value.parseRequestParams().toRequestParamsJson())
+          dataStore.saveRequest(value.parseRequestParams().deduplicateIds().toRequestParamsJson())
         } else {
           Sync.requestsSyncToWear(dataStore, wearConnector)
         }

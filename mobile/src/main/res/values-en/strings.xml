@@ -59,6 +59,7 @@
   <string name="request_edit_add_shortcut">Add to Home screen</string>
   <string name="request_edit_add_shortcut_unsupported">This device does not support adding to the Home screen</string>
   <string name="request_edit_add_shortcut_requested">Please confirm on the Home screen</string>
+  <string name="request_edit_add_shortcut_unsaved">Save your changes before adding to the Home screen</string>
 
   <!-- request history -->
   <string name="request_history_from_mobile">Sent from Mobile</string>

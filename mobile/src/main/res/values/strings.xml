@@ -59,6 +59,7 @@
   <string name="request_edit_add_shortcut">ホーム画面に追加</string>
   <string name="request_edit_add_shortcut_unsupported">この端末はホーム画面への追加に対応していません</string>
   <string name="request_edit_add_shortcut_requested">ホーム画面への追加を確認してください</string>
+  <string name="request_edit_add_shortcut_unsaved">変更を保存してからホーム画面へ追加してください</string>
 
   <!-- request history -->
   <string name="request_history_from_mobile">モバイルから送信</string>

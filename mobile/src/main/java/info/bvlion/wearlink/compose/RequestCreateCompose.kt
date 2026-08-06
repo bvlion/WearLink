@@ -365,6 +365,8 @@ fun RequestCreate(
     }
 
     if (savedIndex > -1) {
+      val canAddShortcut = !editCheck.value && title.value.isNotEmpty() && URLUtil.isValidUrl(url.value)
+
       OutlinedButton(
         onClick = {
           addShortcut(
@@ -385,9 +387,19 @@ fun RequestCreate(
           .fillMaxWidth()
           .padding(16.dp, 0.dp)
           .height(44.dp),
+        enabled = canAddShortcut,
       ) {
         Icon(Icons.AutoMirrored.Filled.AddToHomeScreen, contentDescription = stringResource(R.string.request_edit_add_shortcut))
         Text(text = stringResource(R.string.request_edit_add_shortcut), modifier = Modifier.padding(start = 8.dp))
+      }
+      if (!canAddShortcut) {
+        Text(
+          text = stringResource(R.string.request_edit_add_shortcut_unsaved),
+          modifier = Modifier.padding(start = 32.dp, end = 16.dp, top = 4.dp),
+          color = MaterialTheme.colorScheme.error,
+          fontSize = 12.sp,
+          fontWeight = FontWeight.Bold
+        )
       }
     }
 

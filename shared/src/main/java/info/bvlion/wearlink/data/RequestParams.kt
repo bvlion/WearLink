@@ -47,12 +47,30 @@ data class RequestParams(
 
     fun List<RequestParams>.findById(id: String): RequestParams? = find { it.id == id }
 
+    fun List<RequestParams>.deduplicateIds(): List<RequestParams> {
+      val seenIds = mutableSetOf<String>()
+      return map { request ->
+        if (seenIds.add(request.id)) {
+          request
+        } else {
+          request.copy(id = UUID.randomUUID().toString())
+        }
+      }
+    }
+
     fun String.normalizeRequestParamsJson(): String = if (isBlank()) EMPTY_JSON_ARRAY else this
 
-    fun String.needsRequestIdMigration(): Boolean =
-      JSONArray(normalizeRequestParamsJson()).let { array ->
-        (0 until array.length()).any { i -> !JSONObject(array[i].toString()).has(ID) }
+    fun String.needsRequestIdMigration(): Boolean {
+      val array = JSONArray(normalizeRequestParamsJson())
+      val seenIds = mutableSetOf<String>()
+      for (i in 0 until array.length()) {
+        val id = JSONObject(array[i].toString()).optString(ID, "")
+        if (id.isBlank() || !seenIds.add(id)) {
+          return true
+        }
       }
+      return false
+    }
 
     fun String.parseRequestParams(): List<RequestParams> {
       val list = mutableListOf<RequestParams>()
@@ -74,7 +92,7 @@ data class RequestParams(
           it.getString(PARAMETERS),
           it.getBoolean(WATCH_SYNC),
           it.optBoolean(WATCH_FACE_SHORTCUT),
-          if (it.has(ID)) it.getString(ID) else UUID.randomUUID().toString()
+          it.optString(ID, "").ifBlank { UUID.randomUUID().toString() }
         )
       }
   }

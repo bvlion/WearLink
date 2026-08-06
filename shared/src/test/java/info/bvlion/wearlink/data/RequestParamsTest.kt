@@ -1,5 +1,6 @@
 package info.bvlion.wearlink.data
 
+import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
 import info.bvlion.wearlink.data.RequestParams.Companion.findById
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.normalizeRequestParamsJson
@@ -40,6 +41,18 @@ class RequestParamsTest {
     put("parameters", "")
     put("watchSync", false)
     put("watchfaceShortcut", false)
+  }.toString()
+
+  private fun legacyJsonWithId(title: String, id: String) = JSONObject().apply {
+    put("title", title)
+    put("url", "https://example.com/legacy")
+    put("method", Constant.HttpMethod.GET.name)
+    put("bodyType", Constant.BodyType.QUERY.name)
+    put("headers", "")
+    put("parameters", "")
+    put("watchSync", false)
+    put("watchfaceShortcut", false)
+    put("id", id)
   }.toString()
 
   @Test
@@ -132,6 +145,74 @@ class RequestParamsTest {
   fun needsRequestIdMigrationFalseForEmptyArrayTest() {
     assertFalse("[]".needsRequestIdMigration())
     assertFalse("".needsRequestIdMigration())
+  }
+
+  @Test
+  fun needsRequestIdMigrationTrueWhenIdBlankTest() {
+    val blankIdArray = JSONArray(listOf(legacyJsonWithId("blank id request", "   "))).toString()
+    val emptyIdArray = JSONArray(listOf(legacyJsonWithId("empty id request", ""))).toString()
+
+    assertTrue(blankIdArray.needsRequestIdMigration())
+    assertTrue(emptyIdArray.needsRequestIdMigration())
+  }
+
+  @Test
+  fun needsRequestIdMigrationTrueWhenIdDuplicatedTest() {
+    val duplicatedArray = JSONArray(
+      listOf(
+        legacyJsonWithId("first", "duplicate-id"),
+        legacyJsonWithId("second", "duplicate-id")
+      )
+    ).toString()
+
+    assertTrue(duplicatedArray.needsRequestIdMigration())
+  }
+
+  @Test
+  fun parseRequestParamWithBlankIdAssignsNonBlankIdTest() {
+    val parsed = legacyJsonWithId("blank id request", "   ").parseRequestParam()
+
+    assertTrue(parsed.id.isNotBlank())
+  }
+
+  @Test
+  fun deduplicateIdsProducesUniqueNonBlankIdsTest() {
+    val duplicatedArray = JSONArray(
+      listOf(
+        legacyJsonWithId("first", "duplicate-id"),
+        legacyJsonWithId("second", "duplicate-id"),
+        legacyJsonWithId("third", "duplicate-id")
+      )
+    ).toString()
+
+    val normalized = duplicatedArray.parseRequestParams().deduplicateIds()
+
+    assertTrue(normalized.all { it.id.isNotBlank() })
+    assertEquals(normalized.size, normalized.map { it.id }.toSet().size)
+  }
+
+  @Test
+  fun deduplicateIdsPreservesExistingValidUniqueIdsTest() {
+    val requests = listOf(watchSyncRequest, watchfaceShortcutRequest)
+
+    val normalized = requests.deduplicateIds()
+
+    assertEquals(requests, normalized)
+  }
+
+  @Test
+  fun deduplicateIdsKeepsFirstOccurrenceOfDuplicateIdTest() {
+    val duplicatedArray = JSONArray(
+      listOf(
+        legacyJsonWithId("first", "duplicate-id"),
+        legacyJsonWithId("second", "duplicate-id")
+      )
+    ).toString()
+
+    val normalized = duplicatedArray.parseRequestParams().deduplicateIds()
+
+    assertEquals("duplicate-id", normalized[0].id)
+    assertNotEquals("duplicate-id", normalized[1].id)
   }
 
   @Test
