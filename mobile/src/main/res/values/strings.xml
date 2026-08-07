@@ -58,7 +58,6 @@
   <string name="request_edit_delete_description">「%s」を削除します。\nこの操作は元に戻せません。</string>
   <string name="request_edit_add_shortcut">ホーム画面に追加</string>
   <string name="request_edit_add_shortcut_unsupported">この端末はホーム画面への追加に対応していません</string>
-  <string name="request_edit_add_shortcut_requested">ホーム画面への追加を確認してください</string>
   <string name="request_edit_add_shortcut_unsaved">変更を保存してからホーム画面へ追加してください</string>
 
   <!-- request history -->
@@ -98,4 +97,6 @@
   <string name="shortcut_request_deleted">Requestが削除されています</string>
   <string name="shortcut_request_success">「%s」を送信しました</string>
   <string name="shortcut_request_failure">「%s」の送信に失敗しました</string>
+  <string name="shortcut_execute_message">「%s」を送信しています…</string>
+  <string name="shortcut_execute_message_generic">送信しています…</string>
 </resources>

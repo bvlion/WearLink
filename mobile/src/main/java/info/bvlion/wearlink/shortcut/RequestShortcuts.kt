@@ -6,7 +6,6 @@ import androidx.core.content.pm.ShortcutInfoCompat
 import androidx.core.content.pm.ShortcutManagerCompat
 import androidx.core.graphics.drawable.IconCompat
 import info.bvlion.wearlink.data.RequestParams
-import info.bvlion.wearlink.splash.SplashActivity
 
 object RequestShortcuts {
   const val ACTION_EXECUTE_SHORTCUT = "info.bvlion.wearlink.action.EXECUTE_SHORTCUT"
@@ -34,7 +33,7 @@ object RequestShortcuts {
       .setShortLabel(request.title)
       .setIcon(IconCompat.createWithResource(context, info.bvlion.wearlink.shared.R.mipmap.ic_launcher))
       .setIntent(
-        Intent(context, SplashActivity::class.java).apply {
+        Intent(context, ShortcutExecuteActivity::class.java).apply {
           action = ACTION_EXECUTE_SHORTCUT
           putExtra(EXTRA_REQUEST_ID, request.id)
         }

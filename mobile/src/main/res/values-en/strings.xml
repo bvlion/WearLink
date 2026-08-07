@@ -58,7 +58,6 @@
   <string name="request_edit_delete_description">Delete "%s".\nThis action cannot be undone.</string>
   <string name="request_edit_add_shortcut">Add to Home screen</string>
   <string name="request_edit_add_shortcut_unsupported">This device does not support adding to the Home screen</string>
-  <string name="request_edit_add_shortcut_requested">Please confirm on the Home screen</string>
   <string name="request_edit_add_shortcut_unsaved">Save your changes before adding to the Home screen</string>
 
   <!-- request history -->
@@ -98,4 +97,6 @@
   <string name="shortcut_request_deleted">The request has been deleted</string>
   <string name="shortcut_request_success">Sent "%s"</string>
   <string name="shortcut_request_failure">Failed to send "%s"</string>
+  <string name="shortcut_execute_message">Sending "%s"…</string>
+  <string name="shortcut_execute_message_generic">Sending…</string>
 </resources>

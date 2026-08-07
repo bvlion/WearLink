@@ -14,7 +14,6 @@
         <activity
             android:name="info.bvlion.wearlink.splash.SplashActivity"
             android:exported="true"
-            android:taskAffinity=""
             android:theme="@style/Theme.Splash">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -37,7 +36,8 @@
 
         <activity
             android:name="info.bvlion.wearlink.shortcut.ShortcutExecuteActivity"
-            android:exported="false"
+            android:exported="true"
+            android:taskAffinity=""
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:noHistory="true"

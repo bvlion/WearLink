@@ -80,6 +80,7 @@ dependencies {
   implementation(libs.androidx.material3)
   implementation(libs.core.splashscreen)
   testImplementation(libs.junit)
+  testImplementation(libs.json)
   androidTestImplementation(libs.androidx.junit)
   androidTestImplementation(libs.androidx.espresso.core)
   androidTestImplementation(platform(libs.androidx.compose.bom))

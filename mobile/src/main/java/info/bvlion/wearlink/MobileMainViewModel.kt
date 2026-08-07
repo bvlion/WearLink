@@ -1,7 +1,11 @@
 package info.bvlion.wearlink
 
+import android.Manifest
 import android.app.Application
 import android.content.ClipData
+import android.content.pm.PackageManager
+import android.os.Build
+import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -19,17 +23,18 @@ import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
 import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import info.bvlion.wearlink.mobile.R
-import info.bvlion.wearlink.request.RequestExecutor
+import info.bvlion.wearlink.request.HttpRequester
 import info.bvlion.wearlink.request.WearMobileConnector
 import info.bvlion.wearlink.shortcut.RequestShortcuts
 import info.bvlion.wearlink.sync.Sync
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.json.JSONArray
+import java.util.Date
 
 class MobileMainViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
-  private val requestExecutor = RequestExecutor(application)
+  private val requester = HttpRequester()
   private val wearConnector = WearMobileConnector(application)
 
   private val _savedRequest = MutableStateFlow<String?>("")
@@ -155,10 +160,36 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
 
   fun sendRequest(request: RequestParams, getString: (Int) -> String) {
     _loading.value = true
+    val start = System.currentTimeMillis()
     viewModelScope.launch(Dispatchers.IO) {
-      requestExecutor.execute(request, getString)
+      val response = try {
+        requester.execute(request)
+      } catch (e: Exception) {
+        val localNetworkPermissionGuidance = if (
+          Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
+          ContextCompat.checkSelfPermission(
+            getApplication<Application>(),
+            Manifest.permission.ACCESS_LOCAL_NETWORK
+          ) != PackageManager.PERMISSION_GRANTED
+        ) {
+          "\n${getString(info.bvlion.wearlink.shared.R.string.local_network_permission_guidance)}"
+        } else {
+          ""
+        }
+        ResponseParams(
+          request.title,
+          -1,
+          System.currentTimeMillis() - start,
+          "",
+          "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}" +
+            localNetworkPermissionGuidance,
+          Date().time,
+          true
+        )
+      }
       _loading.value = false
       showSnackbar(getString(R.string.request_sent))
+      saveResponses(response)
     }
   }
 
@@ -169,7 +200,6 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       return
     }
     RequestShortcuts.requestPin(context, request)
-    showSnackbar(getString(R.string.request_edit_add_shortcut_requested))
   }
 
   private suspend fun saveResponses(response: ResponseParams) {
