@@ -58,6 +58,42 @@ internal suspend fun awaitAtLeast(
   listOf(resultDeferred, timerDeferred).awaitAll().filterIsInstance<ResponseParams>().first()
 }
 
+/**
+ * Resolves the request, runs [executeHttp] only when it is found, waits for the slower of
+ * [executeHttp] and [minimumLoadingMillis], saves the resulting response via [saveResponse], and
+ * returns the terminal [ShortcutExecuteState]. Kept free of Android dependencies so the whole
+ * flow can be unit tested with fake [executeHttp]/[saveResponse] implementations.
+ */
+internal suspend fun runShortcutExecution(
+  requestId: String?,
+  savedRequestJson: String?,
+  minimumLoadingMillis: Long = MINIMUM_LOADING_MILLIS,
+  onLoading: (RequestParams) -> Unit = {},
+  executeHttp: suspend (RequestParams) -> ResponseParams,
+  saveResponse: suspend (ResponseParams) -> Unit
+): ShortcutExecuteState {
+  val request = resolveRequest(requestId, savedRequestJson)
+    ?: return ShortcutExecuteState.RequestNotFound
+
+  onLoading(request)
+
+  val response = awaitAtLeast(minimumLoadingMillis) { executeHttp(request) }
+  saveResponse(response)
+  return outcomeFor(response)
+}
+
+/** Guards a single logical execution against being started more than once, e.g. on Activity recreation. */
+internal class SingleExecutionGuard {
+  private var started = false
+
+  @Synchronized
+  fun tryStart(): Boolean {
+    if (started) return false
+    started = true
+    return true
+  }
+}
+
 class ShortcutExecuteViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
   private val requester = HttpRequester()
@@ -65,52 +101,49 @@ class ShortcutExecuteViewModel(application: Application) : AndroidViewModel(appl
   private val _state = MutableStateFlow<ShortcutExecuteState>(ShortcutExecuteState.Loading())
   val state = _state.asStateFlow()
 
-  private var started = false
+  private val executionGuard = SingleExecutionGuard()
 
   fun execute(requestId: String?, getString: (Int) -> String) {
-    if (started) return
-    started = true
+    if (!executionGuard.tryStart()) return
 
     viewModelScope.launch(Dispatchers.IO) {
-      val request = resolveRequest(requestId, dataStore.getSavedRequest.first())
-      if (request == null) {
-        _state.value = ShortcutExecuteState.RequestNotFound
-        return@launch
+      val result = runShortcutExecution(
+        requestId = requestId,
+        savedRequestJson = dataStore.getSavedRequest.first(),
+        onLoading = { _state.value = ShortcutExecuteState.Loading(it.title) },
+        executeHttp = { request -> executeHttpRequest(request, getString) },
+        saveResponse = { saveResponse(it) }
+      )
+      _state.value = result
+    }
+  }
+
+  private suspend fun executeHttpRequest(request: RequestParams, getString: (Int) -> String): ResponseParams {
+    val start = System.currentTimeMillis()
+    return try {
+      requester.execute(request)
+    } catch (e: Exception) {
+      val localNetworkPermissionGuidance = if (
+        Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
+        ContextCompat.checkSelfPermission(
+          getApplication(),
+          Manifest.permission.ACCESS_LOCAL_NETWORK
+        ) != PackageManager.PERMISSION_GRANTED
+      ) {
+        "\n${getString(info.bvlion.wearlink.shared.R.string.local_network_permission_guidance)}"
+      } else {
+        ""
       }
-
-      _state.value = ShortcutExecuteState.Loading(request.title)
-
-      val response = awaitAtLeast(MINIMUM_LOADING_MILLIS) {
-        val start = System.currentTimeMillis()
-        try {
-          requester.execute(request)
-        } catch (e: Exception) {
-          val localNetworkPermissionGuidance = if (
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
-            ContextCompat.checkSelfPermission(
-              getApplication(),
-              Manifest.permission.ACCESS_LOCAL_NETWORK
-            ) != PackageManager.PERMISSION_GRANTED
-          ) {
-            "\n${getString(info.bvlion.wearlink.shared.R.string.local_network_permission_guidance)}"
-          } else {
-            ""
-          }
-          ResponseParams(
-            request.title,
-            -1,
-            System.currentTimeMillis() - start,
-            "",
-            "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}" +
-              localNetworkPermissionGuidance,
-            Date().time,
-            true
-          )
-        }
-      }
-
-      saveResponse(response)
-      _state.value = outcomeFor(response)
+      ResponseParams(
+        request.title,
+        -1,
+        System.currentTimeMillis() - start,
+        "",
+        "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}" +
+          localNetworkPermissionGuidance,
+        Date().time,
+        true
+      )
     }
   }
 

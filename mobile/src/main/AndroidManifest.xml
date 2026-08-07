@@ -36,7 +36,7 @@
 
         <activity
             android:name="info.bvlion.wearlink.shortcut.ShortcutExecuteActivity"
-            android:exported="true"
+            android:exported="false"
             android:taskAffinity=""
             android:excludeFromRecents="true"
             android:launchMode="singleTask"

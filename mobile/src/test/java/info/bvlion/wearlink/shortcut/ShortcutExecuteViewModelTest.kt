@@ -7,6 +7,7 @@ import info.bvlion.wearlink.data.ResponseParams
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.runBlocking
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Test
@@ -95,5 +96,94 @@ class ShortcutExecuteViewModelTest {
     val actual = awaitAtLeast(10L) { expected }
 
     assertEquals(expected, actual)
+  }
+
+  @Test
+  fun runShortcutExecutionDoesNotCallHttpForBlankIdTest() = runBlocking {
+    val savedJson = listOf(request).toRequestParamsJson()
+    var httpCalls = 0
+    var saveCalls = 0
+
+    val result = runShortcutExecution(
+      requestId = "",
+      savedRequestJson = savedJson,
+      minimumLoadingMillis = 0L,
+      executeHttp = { httpCalls++; response(200) },
+      saveResponse = { saveCalls++ },
+    )
+
+    assertEquals(ShortcutExecuteState.RequestNotFound, result)
+    assertEquals(0, httpCalls)
+    assertEquals(0, saveCalls)
+  }
+
+  @Test
+  fun runShortcutExecutionDoesNotCallHttpForUnknownIdTest() = runBlocking {
+    val savedJson = listOf(request).toRequestParamsJson()
+    var httpCalls = 0
+    var saveCalls = 0
+
+    val result = runShortcutExecution(
+      requestId = "unknown-id",
+      savedRequestJson = savedJson,
+      minimumLoadingMillis = 0L,
+      executeHttp = { httpCalls++; response(200) },
+      saveResponse = { saveCalls++ },
+    )
+
+    assertEquals(ShortcutExecuteState.RequestNotFound, result)
+    assertEquals(0, httpCalls)
+    assertEquals(0, saveCalls)
+  }
+
+  @Test
+  fun runShortcutExecutionSucceedsAndSavesResponseOnceOnHttpSuccessTest() = runBlocking {
+    val savedJson = listOf(request).toRequestParamsJson()
+    var httpCalls = 0
+    var saveCalls = 0
+    var savedResponse: ResponseParams? = null
+
+    val result = runShortcutExecution(
+      requestId = request.id,
+      savedRequestJson = savedJson,
+      minimumLoadingMillis = 0L,
+      executeHttp = { httpCalls++; response(200) },
+      saveResponse = { saveCalls++; savedResponse = it },
+    )
+
+    assertEquals(ShortcutExecuteState.Success(request.title), result)
+    assertEquals(1, httpCalls)
+    assertEquals(1, saveCalls)
+    assertEquals(200, savedResponse?.responseCode)
+  }
+
+  @Test
+  fun runShortcutExecutionFailsAndSavesResponseOnceOnHttpFailureTest() = runBlocking {
+    val savedJson = listOf(request).toRequestParamsJson()
+    var httpCalls = 0
+    var saveCalls = 0
+    var savedResponse: ResponseParams? = null
+
+    val result = runShortcutExecution(
+      requestId = request.id,
+      savedRequestJson = savedJson,
+      minimumLoadingMillis = 0L,
+      executeHttp = { httpCalls++; response(500) },
+      saveResponse = { saveCalls++; savedResponse = it },
+    )
+
+    assertEquals(ShortcutExecuteState.Failure(request.title), result)
+    assertEquals(1, httpCalls)
+    assertEquals(1, saveCalls)
+    assertEquals(500, savedResponse?.responseCode)
+  }
+
+  @Test
+  fun singleExecutionGuardAllowsOnlyTheFirstStartTest() {
+    val guard = SingleExecutionGuard()
+
+    assertTrue(guard.tryStart())
+    assertFalse(guard.tryStart())
+    assertFalse(guard.tryStart())
   }
 }
