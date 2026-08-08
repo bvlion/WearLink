@@ -7,6 +7,7 @@ import android.os.Build
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.RequestParams.Companion.findById
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
@@ -40,7 +41,18 @@ class ShortcutExecuteViewModel(application: Application) : AndroidViewModel(appl
   private val _state = MutableStateFlow<ShortcutExecuteState>(ShortcutExecuteState.Loading())
   val state = _state.asStateFlow()
 
+  private val _viewMode = MutableStateFlow(AppConstants.ViewMode.DEFAULT)
+  val viewMode = _viewMode.asStateFlow()
+
   private var started = false
+
+  init {
+    viewModelScope.launch {
+      dataStore.getViewType.collect { type ->
+        _viewMode.value = AppConstants.ViewMode.entries.first { it.type == type }
+      }
+    }
+  }
 
   fun execute(requestId: String?, getString: (Int) -> String) {
     if (started) return

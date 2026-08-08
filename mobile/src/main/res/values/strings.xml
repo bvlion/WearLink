@@ -97,6 +97,5 @@
   <string name="shortcut_request_deleted">Requestが削除されています</string>
   <string name="shortcut_request_success">「%s」を送信しました</string>
   <string name="shortcut_request_failure">「%s」の送信に失敗しました</string>
-  <string name="shortcut_execute_message">「%s」を送信しています…</string>
-  <string name="shortcut_execute_message_generic">送信しています…</string>
+  <string name="shortcut_execute_sending">送信中…</string>
 </resources>

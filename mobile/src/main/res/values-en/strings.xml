@@ -97,6 +97,5 @@
   <string name="shortcut_request_deleted">The request has been deleted</string>
   <string name="shortcut_request_success">Sent "%s"</string>
   <string name="shortcut_request_failure">Failed to send "%s"</string>
-  <string name="shortcut_execute_message">Sending "%s"…</string>
-  <string name="shortcut_execute_message_generic">Sending…</string>
+  <string name="shortcut_execute_sending">Sending…</string>
 </resources>
