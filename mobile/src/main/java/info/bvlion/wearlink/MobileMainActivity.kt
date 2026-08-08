@@ -224,7 +224,11 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       editRequestIndex.intValue = -1
                       viewModel.deleteRequest(it, getString)
                       bottomMenuIndex.intValue = 0
-                    }
+                    },
+                    addShortcut = { request ->
+                      viewModel.addShortcut(request, getString)
+                    },
+                    defaultId = editRequest.value?.id
                   )
                 }
                 MainAnimatedVisibility(bottomMenuIndex.intValue == 2) {

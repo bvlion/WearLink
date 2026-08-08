@@ -16,12 +16,16 @@ import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.ErrorDetail
 import info.bvlion.wearlink.data.RequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
+import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
 import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.HttpRequester
 import info.bvlion.wearlink.request.WearMobileConnector
+import info.bvlion.wearlink.shortcut.RequestShortcuts
 import info.bvlion.wearlink.sync.Sync
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
@@ -58,7 +62,11 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
         _savedRequest.value = value
-        Sync.requestsSyncToWear(dataStore, wearConnector)
+        if (value != null && value.needsRequestIdMigration()) {
+          dataStore.saveRequest(value.parseRequestParams().deduplicateIds().toRequestParamsJson())
+        } else {
+          Sync.requestsSyncToWear(dataStore, wearConnector)
+        }
       }
     }
     viewModelScope.launch(Dispatchers.IO) {
@@ -113,6 +121,9 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
         .map { it.toJsonString() }
         .let { JSONArray(it).toString() }
         .let { dataStore.saveRequest(it) }
+      if (savedIndex >= 0) {
+        RequestShortcuts.updateLabel(getApplication(), request)
+      }
     }
     getString?.invoke(
       if (savedIndex >= 0)
@@ -126,14 +137,22 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun deleteRequest(deleteIndex: Int, getString: (Int) -> String) {
     viewModelScope.launch {
       savedRequest.value?.run {
-        parseRequestParams()
-          .toMutableList()
+        val requests = parseRequestParams().toMutableList()
+        val deletedRequest = requests.getOrNull(deleteIndex)
+        requests
           .apply {
             removeAt(deleteIndex)
           }
           .map { it.toJsonString() }
           .let { JSONArray(it).toString() }
           .let { dataStore.saveRequest(it) }
+        deletedRequest?.let {
+          RequestShortcuts.disable(
+            getApplication(),
+            it.id,
+            getString(R.string.shortcut_request_deleted)
+          )
+        }
       }
     }
     showSnackbar(getString(R.string.request_deleted))
@@ -172,6 +191,15 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       showSnackbar(getString(R.string.request_sent))
       saveResponses(response)
     }
+  }
+
+  fun addShortcut(request: RequestParams, getString: (Int) -> String) {
+    val context = getApplication<Application>()
+    if (!RequestShortcuts.isSupported(context)) {
+      showSnackbar(getString(R.string.request_edit_add_shortcut_unsupported))
+      return
+    }
+    RequestShortcuts.requestPin(context, request)
   }
 
   private suspend fun saveResponses(response: ResponseParams) {
