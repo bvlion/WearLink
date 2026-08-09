@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -35,6 +36,7 @@ class ShortcutExecuteActivity : ComponentActivity() {
   private val viewModel by viewModels<ShortcutExecuteViewModel>()
 
   override fun onCreate(savedInstanceState: Bundle?) {
+    enableEdgeToEdge()
     super.onCreate(savedInstanceState)
 
     val requestId = intent.getStringExtra(RequestShortcuts.EXTRA_REQUEST_ID)

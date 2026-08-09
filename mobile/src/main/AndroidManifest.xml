@@ -41,7 +41,7 @@
             android:excludeFromRecents="true"
             android:launchMode="singleTask"
             android:noHistory="true"
-            android:theme="@android:style/Theme.Translucent.NoTitleBar" />
+            android:theme="@style/Theme.ShortcutExecute" />
 
         <activity
             android:name="info.bvlion.wearlink.sync.SyncActivity"
