@@ -2,7 +2,6 @@ package info.bvlion.wearlink.request
 
 import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
-import info.bvlion.wearlink.data.ResponseParams
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import okhttp3.Headers.Companion.toHeaders
@@ -11,16 +10,11 @@ import okhttp3.OkHttpClient
 import okhttp3.Request
 import okhttp3.RequestBody.Companion.toRequestBody
 import org.json.JSONObject
-import java.util.Date
 
 class HttpRequester {
   private val client = OkHttpClient()
 
-  suspend fun execute(
-    params: RequestParams,
-    isMobile: Boolean = true
-  ): ResponseParams = withContext(Dispatchers.IO) {
-    val start = System.currentTimeMillis()
+  suspend fun execute(params: RequestParams): HttpResult = withContext(Dispatchers.IO) {
     val isRequestBodyPermitted = params.method != Constant.HttpMethod.GET
 
     val request = Request.Builder()
@@ -69,15 +63,17 @@ class HttpRequester {
         headerJson.put(it.first, it.second)
       }
 
-      return@withContext ResponseParams(
-        params.title,
+      return@withContext HttpResult(
         res.code,
-        System.currentTimeMillis() - start,
         headerJson.toString(),
-        res.body?.string() ?: "",
-        Date().time,
-        isMobile
+        res.body?.string() ?: ""
       )
     }
   }
 }
+
+data class HttpResult(
+  val responseCode: Int,
+  val header: String,
+  val body: String
+)

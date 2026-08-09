@@ -9,11 +9,10 @@ import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
-class HttpRequestExecutionTest {
+class RequestExecutionTest {
   private val requester = HttpRequester()
 
-  // OkHttpがURLとして解釈できない値を渡すことで、DNS解決や通信待ちに依存せず
-  // Request構築時点で確実かつ即座に例外を発生させる。
+  // OkHttpがRequest構築時点で例外を投げる不正な値。DNS解決や通信待ちに依存せず決定的に失敗させる。
   private val invalidRequest = RequestParams(
     "invalid_url_test",
     "invalid-url",
@@ -30,8 +29,9 @@ class HttpRequestExecutionTest {
   }
 
   @Test
-  fun executeCatchingReturnsErrorResponseOnException() = runBlocking {
-    val actual = requester.executeCatching(
+  fun returnsErrorResponseOnException() = runBlocking {
+    val actual = executeRequest(
+      requester,
       invalidRequest,
       isMobile = true,
       hasLocalNetworkPermission = true,
@@ -45,8 +45,9 @@ class HttpRequestExecutionTest {
   }
 
   @Test
-  fun executeCatchingPreservesIsMobileFalseForWear() = runBlocking {
-    val actual = requester.executeCatching(
+  fun preservesIsMobileFalseForWear() = runBlocking {
+    val actual = executeRequest(
+      requester,
       invalidRequest,
       isMobile = false,
       hasLocalNetworkPermission = true,
@@ -57,8 +58,9 @@ class HttpRequestExecutionTest {
   }
 
   @Test
-  fun executeCatchingDoesNotAppendGuidanceWhenPermissionGranted() = runBlocking {
-    val actual = requester.executeCatching(
+  fun doesNotAppendGuidanceWhenPermissionGranted() = runBlocking {
+    val actual = executeRequest(
+      requester,
       invalidRequest,
       isMobile = true,
       hasLocalNetworkPermission = true,
@@ -69,8 +71,9 @@ class HttpRequestExecutionTest {
   }
 
   @Test
-  fun executeCatchingAppendsGuidanceWhenLocalNetworkPermissionMissing() = runBlocking {
-    val actual = requester.executeCatching(
+  fun appendsGuidanceWhenLocalNetworkPermissionMissing() = runBlocking {
+    val actual = executeRequest(
+      requester,
       invalidRequest,
       isMobile = true,
       hasLocalNetworkPermission = false,

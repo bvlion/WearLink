@@ -20,7 +20,7 @@ import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.HttpRequester
 import info.bvlion.wearlink.request.WearMobileConnector
-import info.bvlion.wearlink.request.executeCatching
+import info.bvlion.wearlink.request.executeRequest
 import info.bvlion.wearlink.request.hasLocalNetworkAccessPermission
 import info.bvlion.wearlink.shortcut.RequestShortcuts
 import info.bvlion.wearlink.sync.Sync
@@ -157,7 +157,8 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun sendRequest(request: RequestParams, getString: (Int) -> String) {
     _loading.value = true
     viewModelScope.launch(Dispatchers.IO) {
-      val response = requester.executeCatching(
+      val response = executeRequest(
+        requester,
         request,
         isMobile = true,
         hasLocalNetworkPermission = getApplication<Application>().hasLocalNetworkAccessPermission(),

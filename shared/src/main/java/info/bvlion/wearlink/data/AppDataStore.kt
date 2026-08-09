@@ -33,11 +33,6 @@ class AppDataStore(context: Context) {
     it[SAVED_RESPONSE_KEY] = response
   }
 
-  /**
-   * 保存済みResponse履歴へ1件追加し、送信日時の降順でソートして保存する。
-   * 読み取りから書き込みまでを`edit`の1トランザクション内で完結させることで、
-   * 複数経路からほぼ同時に呼び出された場合でも互いの追加を失わないようにする。
-   */
   suspend fun appendResponse(response: ResponseParams) = settingsDataStore.edit { pref ->
     val current = pref[SAVED_RESPONSE_KEY] ?: ""
     val savedList = if (current.isBlank()) {

@@ -7,7 +7,7 @@ import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParam
 import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.request.HttpRequester
-import info.bvlion.wearlink.request.executeCatching
+import info.bvlion.wearlink.request.executeRequest
 import info.bvlion.wearlink.request.hasLocalNetworkAccessPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
@@ -33,7 +33,8 @@ class HttpExecuteViewModel(application: Application) : AndroidViewModel(applicat
     val request = param.parseRequestParam()
     viewModelScope.launch(Dispatchers.IO) {
       val networkDeferred = async(Dispatchers.IO) {
-        requester.executeCatching(
+        executeRequest(
+          requester,
           request,
           isMobile = false,
           hasLocalNetworkPermission = getApplication<Application>().hasLocalNetworkAccessPermission(),
