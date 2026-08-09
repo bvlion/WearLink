@@ -26,9 +26,21 @@ import org.json.JSONArray
 import java.util.Date
 
 sealed interface ShortcutExecuteState {
-  data class Loading(val title: String? = null) : ShortcutExecuteState
-  data class Success(val title: String) : ShortcutExecuteState
-  data class Failure(val title: String) : ShortcutExecuteState
+  val title: String?
+    get() = null
+
+  data class Loading(
+    override val title: String? = null
+  ) : ShortcutExecuteState
+
+  data class Success(
+    override val title: String
+  ) : ShortcutExecuteState
+
+  data class Failure(
+    override val title: String
+  ) : ShortcutExecuteState
+
   data object RequestNotFound : ShortcutExecuteState
 }
 

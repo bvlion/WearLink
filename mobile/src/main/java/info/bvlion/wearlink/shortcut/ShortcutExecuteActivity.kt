@@ -6,6 +6,8 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
+import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
@@ -21,8 +23,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -48,15 +52,17 @@ class ShortcutExecuteActivity : ComponentActivity() {
       val isSystemInDarkTheme = isSystemInDarkTheme()
       val isDarkMode = AppConstants.isDarkMode(viewMode, isSystemInDarkTheme)
 
+      val contentAlpha = remember { Animatable(1f) }
+
       WearLinkTheme(isDarkMode) {
         Box(
           modifier = Modifier
             .fillMaxSize()
+            .alpha(contentAlpha.value)
             .background(Color.Black.copy(alpha = 0.35f)),
           contentAlignment = Alignment.Center
         ) {
-          val loadingState = state as? ShortcutExecuteState.Loading
-          if (loadingState != null) {
+          state.title?.let { title ->
             Card(
               modifier = Modifier.padding(horizontal = 48.dp),
               colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
@@ -70,17 +76,15 @@ class ShortcutExecuteActivity : ComponentActivity() {
                   strokeWidth = 3.dp,
                   color = MaterialTheme.colorScheme.primary
                 )
-                loadingState.title?.let {
-                  Text(
-                    text = it,
-                    style = MaterialTheme.typography.titleSmall,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    textAlign = TextAlign.Center,
-                    maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
-                    modifier = Modifier.padding(top = 12.dp)
-                  )
-                }
+                Text(
+                  text = title,
+                  style = MaterialTheme.typography.titleSmall,
+                  color = MaterialTheme.colorScheme.onSurface,
+                  textAlign = TextAlign.Center,
+                  maxLines = 2,
+                  overflow = TextOverflow.Ellipsis,
+                  modifier = Modifier.padding(top = 12.dp)
+                )
                 Text(
                   text = stringResource(R.string.shortcut_execute_sending),
                   style = MaterialTheme.typography.bodySmall,
@@ -100,7 +104,12 @@ class ShortcutExecuteActivity : ComponentActivity() {
           ShortcutExecuteState.RequestNotFound -> getString(R.string.shortcut_request_not_found)
           is ShortcutExecuteState.Loading -> null
         }
+
         if (message != null) {
+          contentAlpha.animateTo(
+            targetValue = 0f,
+            animationSpec = tween(durationMillis = 250)
+          )
           finish()
           Toast.makeText(this@ShortcutExecuteActivity, message, Toast.LENGTH_SHORT).show()
         }
