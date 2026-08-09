@@ -8,6 +8,7 @@ import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParam
 import info.bvlion.wearlink.request.HttpRequester
 import info.bvlion.wearlink.request.executeRequest
 import info.bvlion.wearlink.request.hasLocalNetworkAccessPermission
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
 import kotlinx.coroutines.delay
@@ -15,7 +16,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 
-private const val MINIMUM_LOADING_MILLIS = 2000L
+private val MINIMUM_LOADING_DURATION = 2.seconds
 
 class HttpExecuteViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
@@ -41,7 +42,7 @@ class HttpExecuteViewModel(application: Application) : AndroidViewModel(applicat
           getString = getString
         )
       }
-      delay(MINIMUM_LOADING_MILLIS)
+      delay(MINIMUM_LOADING_DURATION)
       val response = responseDeferred.await()
 
       dataStore.appendResponse(response)
