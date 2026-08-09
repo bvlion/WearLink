@@ -5,17 +5,17 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParam
-import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.request.HttpRequester
 import info.bvlion.wearlink.request.executeRequest
 import info.bvlion.wearlink.request.hasLocalNetworkAccessPermission
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+
+private const val MINIMUM_LOADING_MILLIS = 2000L
 
 class HttpExecuteViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
@@ -32,7 +32,7 @@ class HttpExecuteViewModel(application: Application) : AndroidViewModel(applicat
 
     val request = param.parseRequestParam()
     viewModelScope.launch(Dispatchers.IO) {
-      val networkDeferred = async(Dispatchers.IO) {
+      val responseDeferred = async {
         executeRequest(
           requester,
           request,
@@ -41,13 +41,8 @@ class HttpExecuteViewModel(application: Application) : AndroidViewModel(applicat
           getString = getString
         )
       }
-      val timerDeferred = async(Dispatchers.IO) {
-        delay(2000)
-      }
-
-      val response = listOf(networkDeferred, timerDeferred).awaitAll()
-        .filterIsInstance<ResponseParams>()
-        .first()
+      delay(MINIMUM_LOADING_MILLIS)
+      val response = responseDeferred.await()
 
       dataStore.appendResponse(response)
       _isSent.value = true
