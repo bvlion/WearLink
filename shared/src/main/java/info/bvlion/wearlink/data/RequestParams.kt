@@ -4,6 +4,7 @@ import android.os.Parcelable
 import kotlinx.parcelize.Parcelize
 import org.json.JSONArray
 import org.json.JSONObject
+import java.util.UUID
 
 @Parcelize
 data class RequestParams(
@@ -15,6 +16,7 @@ data class RequestParams(
   val parameters: String = "",
   val watchSync: Boolean = false,
   val watchfaceShortcut: Boolean = false,
+  val id: String = UUID.randomUUID().toString(),
 ): Parcelable {
   fun toJsonString(): String = JSONObject().apply {
     put(TITLE, title)
@@ -25,6 +27,7 @@ data class RequestParams(
     put(PARAMETERS, parameters)
     put(WATCH_SYNC, watchSync)
     put(WATCH_FACE_SHORTCUT, watchfaceShortcut)
+    put(ID, id)
   }.toString()
 
   companion object {
@@ -36,12 +39,38 @@ data class RequestParams(
     private const val PARAMETERS = "parameters"
     private const val WATCH_SYNC = "watchSync"
     private const val WATCH_FACE_SHORTCUT = "watchfaceShortcut"
+    private const val ID = "id"
     private const val EMPTY_JSON_ARRAY = "[]"
 
     fun List<RequestParams>.toRequestParamsJson(): String =
       JSONArray(map { it.toJsonString() }).toString()
 
+    fun List<RequestParams>.findById(id: String): RequestParams? = find { it.id == id }
+
+    fun List<RequestParams>.deduplicateIds(): List<RequestParams> {
+      val seenIds = mutableSetOf<String>()
+      return map { request ->
+        if (seenIds.add(request.id)) {
+          request
+        } else {
+          request.copy(id = UUID.randomUUID().toString())
+        }
+      }
+    }
+
     fun String.normalizeRequestParamsJson(): String = if (isBlank()) EMPTY_JSON_ARRAY else this
+
+    fun String.needsRequestIdMigration(): Boolean {
+      val array = JSONArray(normalizeRequestParamsJson())
+      val seenIds = mutableSetOf<String>()
+      for (i in 0 until array.length()) {
+        val id = JSONObject(array[i].toString()).optString(ID, "")
+        if (id.isBlank() || !seenIds.add(id)) {
+          return true
+        }
+      }
+      return false
+    }
 
     fun String.parseRequestParams(): List<RequestParams> {
       val list = mutableListOf<RequestParams>()
@@ -62,7 +91,8 @@ data class RequestParams(
           it.getString(HEADERS),
           it.getString(PARAMETERS),
           it.getBoolean(WATCH_SYNC),
-          it.optBoolean(WATCH_FACE_SHORTCUT)
+          it.optBoolean(WATCH_FACE_SHORTCUT),
+          it.optString(ID, "").ifBlank { UUID.randomUUID().toString() }
         )
       }
   }
