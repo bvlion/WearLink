@@ -1,11 +1,7 @@
 package info.bvlion.wearlink
 
-import android.Manifest
 import android.app.Application
 import android.content.ClipData
-import android.content.pm.PackageManager
-import android.os.Build
-import androidx.core.content.ContextCompat
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
@@ -20,17 +16,17 @@ import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
-import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.HttpRequester
 import info.bvlion.wearlink.request.WearMobileConnector
+import info.bvlion.wearlink.request.executeCatching
+import info.bvlion.wearlink.request.hasLocalNetworkAccessPermission
 import info.bvlion.wearlink.shortcut.RequestShortcuts
 import info.bvlion.wearlink.sync.Sync
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import org.json.JSONArray
-import java.util.Date
 
 class MobileMainViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
@@ -90,7 +86,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun saveWearResponses(responses: String) {
     viewModelScope.launch(Dispatchers.IO) {
       responses.parseResponseParams().forEach {
-        saveResponses(it)
+        dataStore.appendResponse(it)
       }
       wearConnector.sendMessageToWear(WearMobileConnector.WEAR_SAVED_RESPONSE_PATH)
     }
@@ -160,36 +156,16 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
 
   fun sendRequest(request: RequestParams, getString: (Int) -> String) {
     _loading.value = true
-    val start = System.currentTimeMillis()
     viewModelScope.launch(Dispatchers.IO) {
-      val response = try {
-        requester.execute(request)
-      } catch (e: Exception) {
-        val localNetworkPermissionGuidance = if (
-          Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN &&
-          ContextCompat.checkSelfPermission(
-            getApplication<Application>(),
-            Manifest.permission.ACCESS_LOCAL_NETWORK
-          ) != PackageManager.PERMISSION_GRANTED
-        ) {
-          "\n${getString(info.bvlion.wearlink.shared.R.string.local_network_permission_guidance)}"
-        } else {
-          ""
-        }
-        ResponseParams(
-          request.title,
-          -1,
-          System.currentTimeMillis() - start,
-          "",
-          "${getString(info.bvlion.wearlink.shared.R.string.request_error)}\n${e.message}" +
-            localNetworkPermissionGuidance,
-          Date().time,
-          true
-        )
-      }
+      val response = requester.executeCatching(
+        request,
+        isMobile = true,
+        hasLocalNetworkPermission = getApplication<Application>().hasLocalNetworkAccessPermission(),
+        getString = getString
+      )
       _loading.value = false
       showSnackbar(getString(R.string.request_sent))
-      saveResponses(response)
+      dataStore.appendResponse(response)
     }
   }
 
@@ -200,20 +176,6 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       return
     }
     RequestShortcuts.requestPin(context, request)
-  }
-
-  private suspend fun saveResponses(response: ResponseParams) {
-    val savedList = if (savedResponse.value.isBlank()) {
-      mutableListOf()
-    } else {
-      savedResponse.value.parseResponseParams().toMutableList()
-    }
-    savedList
-      .apply { add(response) }
-      .sortedByDescending { it.sendDateTime }
-      .map { it.toJsonString() }
-      .let { JSONArray(it).toString() }
-      .let { dataStore.saveResponse(it) }
   }
 
   fun copyToClipboard(isRequestCopy: Boolean, getString: (Int) -> String) {
