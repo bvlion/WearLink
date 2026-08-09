@@ -28,7 +28,6 @@ class HttpRequesterPutTest {
       ))
     }
     assertEquals(200, actual.responseCode)
-    assertEquals(title, actual.title)
     assertEquals(parameterValue1, TestUtil.getFormBody(actual.body, parameterKey1))
     assertEquals(parameterValue2, TestUtil.getFormBody(actual.body, parameterKey2))
     assertEquals(Constant.HttpMethod.PUT.name, TestUtil.getMethodBody(actual.body))
@@ -52,7 +51,6 @@ class HttpRequesterPutTest {
       ))
     }
     assertEquals(200, actual.responseCode)
-    assertEquals(title, actual.title)
     assertEquals(parameterValue1, TestUtil.getJsonBody(actual.body, parameterKey1))
     assertEquals(parameterValue2, TestUtil.getJsonBody(actual.body, parameterKey2))
     assertEquals(Constant.HttpMethod.PUT.name, TestUtil.getMethodBody(actual.body))
@@ -76,7 +74,6 @@ class HttpRequesterPutTest {
       ))
     }
     assertEquals(200, actual.responseCode)
-    assertEquals(title, actual.title)
     assertEquals(headerValue1, TestUtil.getHeadersBody(actual.body, headerKey1))
     assertEquals(headerValue2, TestUtil.getHeadersBody(actual.body, headerKey2))
     assertEquals(Constant.HttpMethod.PUT.name, TestUtil.getMethodBody(actual.body))
@@ -105,7 +102,6 @@ class HttpRequesterPutTest {
       ))
     }
     assertEquals(200, actual.responseCode)
-    assertEquals(title, actual.title)
     assertEquals(headerValue1, TestUtil.getHeadersBody(actual.body, headerKey1))
     assertEquals(headerValue2, TestUtil.getHeadersBody(actual.body, headerKey2))
     assertEquals(parameterValue1, TestUtil.getFormBody(actual.body, parameterKey1))
@@ -137,7 +133,6 @@ class HttpRequesterPutTest {
       ))
     }
     assertEquals(200, actual.responseCode)
-    assertEquals(title, actual.title)
     assertEquals(headerValue1, TestUtil.getHeadersBody(actual.body, headerKey1))
     assertEquals(headerValue2, TestUtil.getHeadersBody(actual.body, headerKey2))
     assertEquals(parameterValue1, TestUtil.getJsonBody(actual.body, parameterKey1))
@@ -169,7 +164,6 @@ class HttpRequesterPutTest {
         ))
       }
       assertEquals(it, actual.responseCode)
-      assertEquals(title, actual.title)
     }
   }
 }

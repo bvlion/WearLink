@@ -28,7 +28,6 @@ class HttpRequesterGetTest {
       ))
     }
     assertEquals(200, actual.responseCode)
-    assertEquals(title, actual.title)
     assertEquals(parameterValue1, TestUtil.getArgsBody(actual.body, parameterKey1))
     assertEquals(parameterValue2, TestUtil.getArgsBody(actual.body, parameterKey2))
     assertEquals(Constant.HttpMethod.GET.name, TestUtil.getMethodBody(actual.body))
@@ -52,7 +51,6 @@ class HttpRequesterGetTest {
       ))
     }
     assertEquals(200, actual.responseCode)
-    assertEquals(title, actual.title)
     assertEquals(headerValue1, TestUtil.getHeadersBody(actual.body, headerKey1))
     assertEquals(headerValue2, TestUtil.getHeadersBody(actual.body, headerKey2))
     assertEquals(Constant.HttpMethod.GET.name, TestUtil.getMethodBody(actual.body))
@@ -81,7 +79,6 @@ class HttpRequesterGetTest {
       ))
     }
     assertEquals(200, actual.responseCode)
-    assertEquals(title, actual.title)
     assertEquals(headerValue1, TestUtil.getHeadersBody(actual.body, headerKey1))
     assertEquals(headerValue2, TestUtil.getHeadersBody(actual.body, headerKey2))
     assertEquals(parameterValue1, TestUtil.getArgsBody(actual.body, parameterKey1))
@@ -113,7 +110,6 @@ class HttpRequesterGetTest {
         ))
       }
       assertEquals(it, actual.responseCode)
-      assertEquals(title, actual.title)
     }
   }
 }

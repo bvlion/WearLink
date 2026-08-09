@@ -7,9 +7,11 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.map
+import org.json.JSONArray
 
 class AppDataStore(context: Context) {
   private val Context.dataStore: DataStore<Preferences> by preferencesDataStore("settings")
@@ -29,6 +31,20 @@ class AppDataStore(context: Context) {
 
   suspend fun saveResponse(response: String) = settingsDataStore.edit {
     it[SAVED_RESPONSE_KEY] = response
+  }
+
+  suspend fun appendResponse(response: ResponseParams) = settingsDataStore.edit { pref ->
+    val current = pref[SAVED_RESPONSE_KEY] ?: ""
+    val savedList = if (current.isBlank()) {
+      mutableListOf()
+    } else {
+      current.parseResponseParams().toMutableList()
+    }
+    pref[SAVED_RESPONSE_KEY] = savedList
+      .apply { add(response) }
+      .sortedByDescending { it.sendDateTime }
+      .map { it.toJsonString() }
+      .let { JSONArray(it).toString() }
   }
 
   val getViewType: Flow<Int> = settingsDataStore.data.map { it[VIEW_TYPE_KEY] ?: 0 }
