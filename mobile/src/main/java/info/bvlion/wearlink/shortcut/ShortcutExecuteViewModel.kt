@@ -7,13 +7,12 @@ import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.RequestParams.Companion.findById
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
-import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.request.HttpRequester
 import info.bvlion.wearlink.request.executeRequest
 import info.bvlion.wearlink.request.hasLocalNetworkAccessPermission
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -39,7 +38,7 @@ sealed interface ShortcutExecuteState {
   data object RequestNotFound : ShortcutExecuteState
 }
 
-private const val MINIMUM_LOADING_MILLIS = 2000L
+private val MINIMUM_LOADING_DURATION = 2.seconds
 
 class ShortcutExecuteViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
@@ -80,7 +79,7 @@ class ShortcutExecuteViewModel(application: Application) : AndroidViewModel(appl
 
       _state.value = ShortcutExecuteState.Loading(request.title)
 
-      val networkDeferred = async(Dispatchers.IO) {
+      val responseDeferred = async {
         executeRequest(
           requester,
           request,
@@ -89,13 +88,8 @@ class ShortcutExecuteViewModel(application: Application) : AndroidViewModel(appl
           getString = getString
         )
       }
-      val timerDeferred = async(Dispatchers.IO) {
-        delay(MINIMUM_LOADING_MILLIS)
-      }
-
-      val response = listOf(networkDeferred, timerDeferred).awaitAll()
-        .filterIsInstance<ResponseParams>()
-        .first()
+      delay(MINIMUM_LOADING_DURATION)
+      val response = responseDeferred.await()
 
       dataStore.appendResponse(response)
 
