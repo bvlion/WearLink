@@ -19,6 +19,6 @@ class ExampleInstrumentedTest {
     fun useAppContext() {
         // Context of the app under test.
         val appContext = InstrumentationRegistry.getInstrumentation().targetContext
-        assertEquals("info.bvlion.wearlink", appContext.packageName)
+        assertEquals("net.ambitious.android.httprequesttile.debug", appContext.packageName)
     }
 }

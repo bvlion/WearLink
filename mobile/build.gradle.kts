@@ -12,7 +12,7 @@ android {
   compileSdk = providers.gradleProperty("COMPILE_SDK").get().toInt()
 
   defaultConfig {
-    applicationId = "info.bvlion.wearlink"
+    applicationId = "net.ambitious.android.httprequesttile"
     minSdk = providers.gradleProperty("MIN_SDK").get().toInt()
     targetSdk = providers.gradleProperty("TARGET_SDK").get().toInt()
     versionCode = 100000000 + providers.gradleProperty("VERSION_CODE").get().toInt()

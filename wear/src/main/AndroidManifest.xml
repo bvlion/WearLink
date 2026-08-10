@@ -20,7 +20,7 @@
     <activity
       android:name="info.bvlion.wearlink.WearMainActivity"
       android:exported="true"
-      android:taskAffinity="info.bvlion.wearlink.singleTop"
+      android:taskAffinity="net.ambitious.android.httprequesttile.singleTop"
       android:theme="@style/Theme.App.Starting">
       <intent-filter>
         <action android:name="android.intent.action.MAIN" />
@@ -75,6 +75,12 @@
         android:name="androidx.wear.tiles.PREVIEW"
         android:resource="@drawable/tile_sample" />
     </service>
+
+    <!-- applicationId移行前にPinされたTileのComponentName解決用。Tile一覧には出さないためintent-filterは持たせない -->
+    <service
+      android:name="net.ambitious.android.httprequesttile.service.MainTileService"
+      android:exported="true"
+      android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER" />
 
     <service
         android:label="@string/complication_description"
