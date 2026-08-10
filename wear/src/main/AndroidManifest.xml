@@ -76,6 +76,12 @@
         android:resource="@drawable/tile_sample" />
     </service>
 
+    <!-- applicationId移行前にPinされたTileのComponentName解決用。Tile一覧には出さないためintent-filterは持たせない -->
+    <service
+      android:name="net.ambitious.android.httprequesttile.service.MainTileService"
+      android:exported="true"
+      android:permission="com.google.android.wearable.permission.BIND_TILE_PROVIDER" />
+
     <service
         android:label="@string/complication_description"
         android:name="info.bvlion.wearlink.service.ComplicationService"

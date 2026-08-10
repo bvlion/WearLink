@@ -25,7 +25,7 @@ import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalHorologistApi::class)
 @SuppressLint("WearRecents")
-class MainTileService : SuspendingTileService() {
+open class MainTileService : SuspendingTileService() {
   private val dataStore by lazy { AppDataStore.getDataStore(this) }
 
   private val savedRequest = MutableStateFlow<String?>("")
