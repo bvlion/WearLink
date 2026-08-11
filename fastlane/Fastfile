@@ -41,14 +41,16 @@ platform :android do
       track_promote_to: 'production',
       skip_upload_metadata: true,
       skip_upload_images: true,
-      skip_upload_screenshots: true
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true
     )
     upload_to_play_store(
       track: 'wear:internal',
       track_promote_to: 'wear:production',
       skip_upload_metadata: true,
       skip_upload_images: true,
-      skip_upload_screenshots: true
+      skip_upload_screenshots: true,
+      skip_upload_changelogs: true
     )
   end
 
