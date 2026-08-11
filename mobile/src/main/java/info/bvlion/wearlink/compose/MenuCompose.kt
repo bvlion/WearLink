@@ -31,6 +31,7 @@ import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ContactMail
 import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Description
 import androidx.compose.material.icons.filled.Download
 import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Reviews
@@ -189,6 +190,10 @@ fun MenuList(
 
     MenuRow(stringResource(R.string.menu_title_feedback), Icons.Filled.ContactMail) {
       context.startActivity(Intent(Intent.ACTION_VIEW, AppConstants.INQUIRY_URL.toUri()))
+    }
+
+    MenuRow(stringResource(R.string.menu_title_privacy_policy), Icons.Filled.Description) {
+      context.startActivity(Intent(Intent.ACTION_VIEW, AppConstants.PRIVACY_POLICY_URL.toUri()))
     }
 
     Row(

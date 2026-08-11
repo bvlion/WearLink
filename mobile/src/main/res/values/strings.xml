@@ -37,6 +37,7 @@
   <string name="menu_title_delete_execution_history">実行履歴を削除</string>
   <string name="menu_title_review">応援レビューを書く</string>
   <string name="menu_title_feedback">フィードバックを送る</string>
+  <string name="menu_title_privacy_policy">プライバシーポリシー</string>
   <string name="menu_title_version">バージョン: %s</string>
 
   <!-- request edit -->
