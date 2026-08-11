@@ -8,8 +8,8 @@ http request from Wear OS
 
 ## 配信環境
 
-* v タグを切ることで本番デプロイが行われる
-* alpha タグを切ることでテストデプロイが行われる
+* `v*` タグをpushすると、mobile / Wear OSのRelease AABをビルドし、Google Playの内部テストへ配布する
+* `release*` タグをpushすると、直近の内部テストArtifactを製品版へ昇格する
 
 ## キー管理
 各ファイル Notion にて管理中
@@ -18,5 +18,16 @@ http request from Wear OS
 
 mobile と wear を分けるために 1 億の位を分けている
 
-- 100000000: mobile
-- 200000000: wear
+- mobile: `100000000 + VERSION_CODE`
+- wear: `200000000 + VERSION_CODE`
+
+## release workflowに必要なGitHub Actions Secrets
+
+値そのものはリポジトリへ含めず、GitHub Actions Secretsで管理する。
+
+- `RELEASE_JKS`
+- `KEYSTORE_ALIAS`
+- `KEYSTORE_PASSWORD`
+- `RELEASE_GOOGLE_SERVICES_JSON`
+- `GOOGLE_PLAY_SERVICE_JSON`
+- `SLACK_WEBHOOK_URL`
