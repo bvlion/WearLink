@@ -28,7 +28,8 @@
   <string name="view_mode_dark">ダーク</string>
   <string name="view_mode_light">ライト</string>
   <string name="menu_title_sync_with_wearable">ウェアラブルと同期</string>
-  <string name="local_network_access">ローカルネットワークアクセス</string>
+  <string name="local_network_access">LAN内のURLへのアクセス</string>
+  <string name="local_network_access_description">LAN内のURLへRequestを送るため、Androidの「付近のデバイス」への許可が必要です。WearLinkは位置情報や端末間の距離を取得しません。</string>
   <string name="local_network_access_grant">許可する</string>
   <string name="local_network_access_granted">許可済み</string>
   <string name="menu_title_export_request">Request をエクスポート</string>

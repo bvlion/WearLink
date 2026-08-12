@@ -133,6 +133,10 @@ fun MenuList(
         Column(modifier = Modifier.padding(16.dp)) {
           Text(text = stringResource(R.string.local_network_access))
           Text(
+            text = stringResource(R.string.local_network_access_description),
+            style = MaterialTheme.typography.bodySmall
+          )
+          Text(
             text = stringResource(
               if (isLocalNetworkPermissionGranted) {
                 R.string.local_network_access_granted
@@ -140,7 +144,8 @@ fun MenuList(
                 R.string.local_network_access_grant
               }
             ),
-            style = MaterialTheme.typography.bodySmall
+            style = MaterialTheme.typography.bodySmall,
+            fontWeight = FontWeight.Bold
           )
         }
       }
