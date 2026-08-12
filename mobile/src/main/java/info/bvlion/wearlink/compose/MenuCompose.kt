@@ -116,12 +116,19 @@ fun MenuList(
     }
 
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+      val shouldShowLocalNetworkAccessDialogState = rememberSaveable { mutableStateOf(false) }
+      if (shouldShowLocalNetworkAccessDialogState.value) {
+        LocalNetworkAccessDialog(
+          onDismiss = { shouldShowLocalNetworkAccessDialogState.value = false },
+          onConfirm = { requestLocalNetworkPermission() }
+        )
+      }
       Row(
         modifier = Modifier
           .fillMaxWidth()
           .clickable(
             enabled = !isLocalNetworkPermissionGranted,
-            onClick = requestLocalNetworkPermission
+            onClick = { shouldShowLocalNetworkAccessDialogState.value = true }
           ),
         verticalAlignment = Alignment.CenterVertically
       ) {
@@ -132,10 +139,6 @@ fun MenuList(
         )
         Column(modifier = Modifier.padding(16.dp)) {
           Text(text = stringResource(R.string.local_network_access))
-          Text(
-            text = stringResource(R.string.local_network_access_description),
-            style = MaterialTheme.typography.bodySmall
-          )
           Text(
             text = stringResource(
               if (isLocalNetworkPermissionGranted) {
@@ -232,6 +235,26 @@ private fun MenuRow(title: String, icon: ImageVector, click: () -> Unit) {
     )
     Text(text = title, modifier = Modifier.padding(16.dp))
   }
+}
+
+@Composable
+private fun LocalNetworkAccessDialog(onDismiss: () -> Unit, onConfirm: () -> Unit) {
+  AlertDialog(
+    onDismissRequest = onDismiss,
+    title = { Text(stringResource(R.string.local_network_access)) },
+    text = { Text(stringResource(R.string.local_network_access_description)) },
+    dismissButton = {
+      TextButton(onClick = onDismiss) {
+        Text(stringResource(R.string.local_network_access_not_now))
+      }
+    },
+    confirmButton = {
+      TextButton(onClick = {
+        onDismiss()
+        onConfirm()
+      }) { Text(stringResource(R.string.local_network_access_grant)) }
+    }
+  )
 }
 
 @Composable
