@@ -9,6 +9,10 @@ on:
       - '.github/workflows/privacy-policy.yaml'
   workflow_dispatch:
 
+concurrency:
+  group: privacy-policy-deploy
+  cancel-in-progress: true
+
 permissions:
   contents: write
 
