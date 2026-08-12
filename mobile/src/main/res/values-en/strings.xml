@@ -28,9 +28,11 @@
   <string name="view_mode_dark">Dark</string>
   <string name="view_mode_light">Light</string>
   <string name="menu_title_sync_with_wearable">Sync with Wearable</string>
-  <string name="local_network_access">Local network access</string>
+  <string name="local_network_access">Access to LAN URLs</string>
+  <string name="local_network_access_description">Sending requests to a URL on your LAN requires Android\'s “Nearby devices” permission. If you only use URLs on the internet, you can use the app without granting this permission. WearLink does not access your location or the distance to other devices.</string>
   <string name="local_network_access_grant">Allow</string>
   <string name="local_network_access_granted">Allowed</string>
+  <string name="local_network_access_not_now">Not now</string>
   <string name="menu_title_export_request">Export Request</string>
   <string name="menu_title_import_request">Import Request</string>
   <string name="menu_title_export_execution_history">Export Execution History</string>

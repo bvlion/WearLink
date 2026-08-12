@@ -2,5 +2,5 @@
   <!-- 共通 -->
   <string name="app_name">WearLink</string>
   <string name="request_error">A communication error occurred</string>
-  <string name="local_network_permission_guidance">To connect to a URL on your local network, allow local network access from the app settings</string>
+  <string name="local_network_permission_guidance">To connect to a URL on your LAN, allow “Nearby devices” from the app settings</string>
 </resources>

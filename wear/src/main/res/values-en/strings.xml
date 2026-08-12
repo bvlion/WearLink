@@ -1,9 +1,12 @@
 <resources>
   <string name="main_launched_mobile">Opened the app on your phone</string>
   <string name="main_launch_mobile">Open the app on your phone</string>
-  <string name="local_network_access">Local network access</string>
+  <string name="local_network_access">Access to LAN URLs</string>
+  <string name="local_network_access_description">Sending requests to a URL on your LAN requires Android\'s “Nearby devices” permission. If you only use URLs on the internet, you can use the app without granting this permission. WearLink does not access your location or the distance to other devices.</string>
   <string name="local_network_access_grant">Allow</string>
   <string name="local_network_access_granted">Allowed</string>
+  <string name="local_network_access_back">Back</string>
+  <string name="menu_title_version">Version: %s</string>
   <string name="tile_description">Access your favorite actions</string>
 
   <!-- execute -->
