@@ -23,7 +23,7 @@ class RequestExecutionTest {
   private val getString: (Int) -> String = {
     when (it) {
       R.string.request_error -> "通信エラーが発生しました"
-      R.string.local_network_permission_guidance -> "ローカルネットワークアクセスを許可してください"
+      R.string.local_network_permission_guidance -> "「付近のデバイス」を許可してください"
       else -> ""
     }
   }
