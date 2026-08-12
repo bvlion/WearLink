@@ -231,6 +231,7 @@ private fun LocalNetworkAccessExplanation(
 }
 
 @Preview(
+  apiLevel = 37,
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
   locale = "ja",
@@ -242,6 +243,7 @@ fun WearAppJaNotGrantedPreview() {
 }
 
 @Preview(
+  apiLevel = 37,
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
   locale = "ja",
@@ -253,6 +255,7 @@ fun WearAppJaGrantedPreview() {
 }
 
 @Preview(
+  apiLevel = 37,
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
   locale = "en",
@@ -264,6 +267,7 @@ fun WearAppEnNotGrantedPreview() {
 }
 
 @Preview(
+  apiLevel = 37,
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
   locale = "en",
