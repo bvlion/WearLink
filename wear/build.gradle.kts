@@ -12,7 +12,7 @@ android {
   compileSdk = providers.gradleProperty("WEAR_COMPILE_SDK").get().toInt()
 
   defaultConfig {
-    applicationId = "net.ambitious.android.httprequesttile"
+    applicationId = "net.ambitious.android.wearlink"
     minSdk = providers.gradleProperty("WEAR_MIN_SDK").get().toInt()
     targetSdk = providers.gradleProperty("WEAR_TARGET_SDK").get().toInt()
     versionCode = 200000000 + providers.gradleProperty("VERSION_CODE").get().toInt()
