@@ -36,9 +36,6 @@ dependencies {
   implementation(libs.datastore.preferences)
   implementation(platform(libs.androidx.compose.bom))
 
-  implementation(platform(libs.firebase.bom))
-  implementation(libs.firebase.crashlytics)
-
   add("kotlinCompilerPluginClasspath", libs.kotlin.parcelize.compiler)
 
   testImplementation(libs.junit)
