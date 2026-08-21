@@ -6,7 +6,7 @@ import android.graphics.Color
 import androidx.activity.SystemBarStyle
 
 object AppConstants {
-  const val INQUIRY_URL = "https://forms.gle/LV4HMAfwb9JxwfRG8"
+  const val INQUIRY_URL = "https://contact.ambitious-i.net/wearlink"
   const val PRIVACY_POLICY_URL = "https://bvlion.github.io/WearLink/privacy_policy.html"
 
   enum class ViewMode(val type: Int) {
