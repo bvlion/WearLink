@@ -7,7 +7,9 @@ import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.normalizeRequestParamsJson
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParam
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.removeById
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
+import info.bvlion.wearlink.data.RequestParams.Companion.upsertById
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -384,5 +386,99 @@ class RequestParamsTest {
     val reloaded = moved.toRequestParamsJson().parseRequestParams()
 
     assertEquals(moved, reloaded)
+  }
+
+  @Test
+  fun upsertByIdReplacesMatchingRequestInPlaceTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val edited = second.copy(title = "second-edited")
+
+    val updated = listOf(first, second, third).upsertById(edited)
+
+    assertEquals(listOf(first, edited, third), updated)
+  }
+
+  @Test
+  fun upsertByIdPrependsWhenIdNotFoundTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val newRequest = reorderRequest("new")
+
+    val updated = listOf(first, second).upsertById(newRequest)
+
+    assertEquals(listOf(newRequest, first, second), updated)
+  }
+
+  @Test
+  fun upsertByIdClearsWatchfaceShortcutOnOtherRequestsTest() {
+    val first = reorderRequest("first").copy(watchfaceShortcut = true)
+    val second = reorderRequest("second")
+    val editedSecond = second.copy(watchfaceShortcut = true, title = "second-shortcut")
+
+    val updated = listOf(first, second).upsertById(editedSecond)
+
+    assertEquals(listOf(first.copy(watchfaceShortcut = false), editedSecond), updated)
+  }
+
+  @Test
+  fun upsertByIdWithoutWatchfaceShortcutLeavesOtherShortcutFlagsUntouchedTest() {
+    val first = reorderRequest("first").copy(watchfaceShortcut = true)
+    val second = reorderRequest("second")
+    val editedSecond = second.copy(title = "second-edited")
+
+    val updated = listOf(first, second).upsertById(editedSecond)
+
+    assertEquals(listOf(first, editedSecond), updated)
+  }
+
+  @Test
+  fun removeByIdRemovesOnlyMatchingRequestTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+
+    val updated = listOf(first, second, third).removeById(second.id)
+
+    assertEquals(listOf(first, third), updated)
+  }
+
+  @Test
+  fun removeByIdWithUnknownIdIsNoOpTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+
+    val updated = listOf(first, second).removeById("unknown-id")
+
+    assertEquals(listOf(first, second), updated)
+  }
+
+  // Regression test for a race where a stale UI-held index/list, captured before a reorder,
+  // could be written back to DataStore and undo the reorder or edit the wrong Request.
+  // upsertById/removeById must locate the target purely by ID against the *current* list
+  // (e.g. the one already reordered by moveById), never by a stale positional index.
+  @Test
+  fun upsertByIdAfterMoveByIdUpdatesCorrectRequestAndKeepsReorderedPositionTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val reordered = listOf(first, second, third).moveById(first.id, 1) // -> [second, first, third]
+
+    val updated = reordered.upsertById(first.copy(watchSync = true))
+
+    assertEquals(listOf(second, first.copy(watchSync = true), third), updated)
+  }
+
+  @Test
+  fun removeByIdAfterMoveByIdDeletesCorrectRequestAndKeepsReorderedOrderTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val reordered = listOf(first, second, third).moveById(first.id, 1) // -> [second, first, third]
+
+    val updated = reordered.removeById(second.id)
+
+    assertEquals(listOf(first, third), updated)
   }
 }

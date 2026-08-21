@@ -57,6 +57,22 @@ data class RequestParams(
       }
     }
 
+    fun List<RequestParams>.upsertById(request: RequestParams): List<RequestParams> {
+      val cleared = if (request.watchfaceShortcut) {
+        map { it.copy(watchfaceShortcut = false) }
+      } else {
+        this
+      }
+      val index = cleared.indexOfFirst { it.id == request.id }
+      return if (index >= 0) {
+        cleared.toMutableList().apply { set(index, request) }
+      } else {
+        listOf(request) + cleared
+      }
+    }
+
+    fun List<RequestParams>.removeById(id: String): List<RequestParams> = filterNot { it.id == id }
+
     fun List<RequestParams>.deduplicateIds(): List<RequestParams> {
       val seenIds = mutableSetOf<String>()
       return map { request ->

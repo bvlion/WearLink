@@ -26,7 +26,6 @@ import info.bvlion.wearlink.shortcut.RequestShortcuts
 import info.bvlion.wearlink.sync.Sync
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
-import org.json.JSONArray
 
 class MobileMainViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
@@ -100,25 +99,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
     getString: ((Int, String) -> String)?
   ) {
     viewModelScope.launch(Dispatchers.IO) {
-        (savedRequest.value?.parseRequestParams()?.toMutableList() ?: mutableListOf())
-        .map {
-          if (request.watchfaceShortcut) {
-            it.copy(watchfaceShortcut = false)
-          } else {
-            it
-          }
-        }
-        .toMutableList()
-        .apply {
-          if (savedIndex >= 0) {
-            set(savedIndex, request)
-          } else {
-            add(0, request)
-          }
-        }
-        .map { it.toJsonString() }
-        .let { JSONArray(it).toString() }
-        .let { dataStore.saveRequest(it) }
+      dataStore.upsertRequest(request)
       if (savedIndex >= 0) {
         RequestShortcuts.updateLabel(getApplication(), request)
       }
@@ -138,26 +119,14 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
     }
   }
 
-  fun deleteRequest(deleteIndex: Int, getString: (Int) -> String) {
+  fun deleteRequest(id: String, getString: (Int) -> String) {
     viewModelScope.launch {
-      savedRequest.value?.run {
-        val requests = parseRequestParams().toMutableList()
-        val deletedRequest = requests.getOrNull(deleteIndex)
-        requests
-          .apply {
-            removeAt(deleteIndex)
-          }
-          .map { it.toJsonString() }
-          .let { JSONArray(it).toString() }
-          .let { dataStore.saveRequest(it) }
-        deletedRequest?.let {
-          RequestShortcuts.disable(
-            getApplication(),
-            it.id,
-            getString(R.string.shortcut_request_deleted)
-          )
-        }
-      }
+      dataStore.deleteRequestById(id)
+      RequestShortcuts.disable(
+        getApplication(),
+        id,
+        getString(R.string.shortcut_request_deleted)
+      )
     }
     showSnackbar(getString(R.string.request_deleted))
   }

@@ -68,7 +68,7 @@ fun RequestCreate(
   bottomPadding: Dp = 0.dp,
   save: (Int, RequestParams) -> Unit = { _, _ -> },
   cancel: () -> Unit = {},
-  delete: (Int) -> Unit = {},
+  delete: (String) -> Unit = {},
   addShortcut: (RequestParams) -> Unit = {},
   defaultId: String? = null,
 ) {
@@ -455,7 +455,7 @@ fun RequestCreate(
 
     if (showDeleteDialog.value) {
       DeleteConfirmDialog(title.value, { showDeleteDialog.value = false }) {
-        delete(savedIndex)
+        delete(requestId)
       }
     }
   }

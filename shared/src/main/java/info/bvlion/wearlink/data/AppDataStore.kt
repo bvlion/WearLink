@@ -9,7 +9,9 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.removeById
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
+import info.bvlion.wearlink.data.RequestParams.Companion.upsertById
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -31,6 +33,17 @@ class AppDataStore(context: Context) {
   suspend fun moveRequest(id: String, offset: Int) = settingsDataStore.edit { pref ->
     pref[SAVED_REQUEST_KEY]?.let { current ->
       pref[SAVED_REQUEST_KEY] = current.parseRequestParams().moveById(id, offset).toRequestParamsJson()
+    }
+  }
+
+  suspend fun upsertRequest(request: RequestParams) = settingsDataStore.edit { pref ->
+    val current = pref[SAVED_REQUEST_KEY]?.parseRequestParams() ?: emptyList()
+    pref[SAVED_REQUEST_KEY] = current.upsertById(request).toRequestParamsJson()
+  }
+
+  suspend fun deleteRequestById(id: String) = settingsDataStore.edit { pref ->
+    pref[SAVED_REQUEST_KEY]?.let { current ->
+      pref[SAVED_REQUEST_KEY] = current.parseRequestParams().removeById(id).toRequestParamsJson()
     }
   }
 
