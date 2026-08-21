@@ -47,6 +47,7 @@ import info.bvlion.wearlink.ui.theme.noRippleClickable
 
 @Composable
 private fun SavedRequest(
+  modifier: Modifier = Modifier,
   addBottomPadding: Dp = 0.dp,
   requestParams: RequestParams,
   watchSync: (RequestParams) -> Unit,
@@ -58,7 +59,7 @@ private fun SavedRequest(
   }
 
   Card(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxWidth()
       .padding(8.dp, 8.dp, 8.dp, 8.dp + addBottomPadding)
       .clickable { edit(requestParams) },
@@ -122,6 +123,7 @@ private fun SavedRequest(
 
 @Composable
 private fun SavedRequestReorderItem(
+  modifier: Modifier = Modifier,
   addBottomPadding: Dp = 0.dp,
   requestParams: RequestParams,
   canMoveUp: Boolean,
@@ -130,7 +132,7 @@ private fun SavedRequestReorderItem(
   moveDown: () -> Unit,
 ) {
   Card(
-    modifier = Modifier
+    modifier = modifier
       .fillMaxWidth()
       .padding(8.dp, 8.dp, 8.dp, 8.dp + addBottomPadding),
     elevation = CardDefaults.cardElevation(2.dp),
@@ -223,6 +225,7 @@ fun SavedRequestList(
         itemsIndexed(requests, key = { _, requestParams -> requestParams.id }) { index, requestParams ->
           if (reorderMode) {
             SavedRequestReorderItem(
+              modifier = Modifier.animateItem(),
               addBottomPadding = if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
               requestParams = requestParams,
               canMoveUp = index != 0,
@@ -232,6 +235,7 @@ fun SavedRequestList(
             )
           } else {
             SavedRequest(
+              modifier = Modifier.animateItem(),
               addBottomPadding = if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
               requestParams = requestParams,
               watchSync = { watchSync(index, it) },

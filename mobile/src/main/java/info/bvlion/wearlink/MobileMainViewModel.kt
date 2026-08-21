@@ -13,7 +13,6 @@ import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.ErrorDetail
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
-import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
@@ -58,10 +57,12 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   init {
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
-        _savedRequest.value = value
         if (value != null && value.needsRequestIdMigration()) {
+          // Migration must complete before publishing this value, otherwise the UI could
+          // briefly observe duplicate/blank Request IDs and crash on LazyColumn item keys.
           dataStore.saveRequest(value.parseRequestParams().deduplicateIds().toRequestParamsJson())
         } else {
+          _savedRequest.value = value
           Sync.requestsSyncToWear(dataStore, wearConnector)
         }
       }
@@ -133,11 +134,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
 
   fun moveRequest(id: String, offset: Int) {
     viewModelScope.launch(Dispatchers.IO) {
-      savedRequest.value
-        ?.parseRequestParams()
-        ?.moveById(id, offset)
-        ?.toRequestParamsJson()
-        ?.let { dataStore.saveRequest(it) }
+      dataStore.moveRequest(id, offset)
     }
   }
 

@@ -358,6 +358,22 @@ class RequestParamsTest {
   }
 
   @Test
+  fun moveByIdChangesRelativeOrderOfWatchSyncTargetsWhenSyncedItemsAreSwappedTest() {
+    val syncedFirst = reorderRequest("synced-first", watchSync = true)
+    val syncedSecond = reorderRequest("synced-second", watchSync = true)
+    val unsynced = reorderRequest("unsynced")
+    val requests = listOf(syncedFirst, syncedSecond, unsynced)
+
+    val moved = requests.moveById(syncedSecond.id, -1)
+
+    // Mirrors Sync.kt's `filter { it.watchSync || it.watchfaceShortcut }` extraction of Wear OS sync targets.
+    assertEquals(
+      listOf(syncedSecond, syncedFirst),
+      moved.filter { it.watchSync || it.watchfaceShortcut }
+    )
+  }
+
+  @Test
   fun moveByIdOrderSurvivesJsonRoundTripTest() {
     val first = reorderRequest("first")
     val second = reorderRequest("second")

@@ -7,6 +7,9 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import info.bvlion.wearlink.data.RequestParams.Companion.moveById
+import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
@@ -23,6 +26,12 @@ class AppDataStore(context: Context) {
 
   suspend fun saveRequest(request: String) = settingsDataStore.edit {
     it[SAVED_REQUEST_KEY] = request
+  }
+
+  suspend fun moveRequest(id: String, offset: Int) = settingsDataStore.edit { pref ->
+    pref[SAVED_REQUEST_KEY]?.let { current ->
+      pref[SAVED_REQUEST_KEY] = current.parseRequestParams().moveById(id, offset).toRequestParamsJson()
+    }
   }
 
   val getSavedResponse: Flow<String> = settingsDataStore.data.map { pref ->
