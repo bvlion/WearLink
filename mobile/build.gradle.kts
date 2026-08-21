@@ -3,8 +3,6 @@ import org.jetbrains.kotlin.gradle.dsl.JvmTarget
 plugins {
   alias(libs.plugins.android.application)
   alias(libs.plugins.kotlin.compose)
-  alias(libs.plugins.google.services)
-  alias(libs.plugins.firebase.crashlytics.gradle)
 }
 
 android {
@@ -68,8 +66,6 @@ dependencies {
   implementation(libs.androidx.core.ktx)
   implementation(libs.androidx.work.runtime.ktx)
   implementation(libs.play.services.wearable)
-  implementation(platform(libs.firebase.bom))
-  implementation(libs.firebase.crashlytics)
   implementation(libs.androidx.lifecycle.runtime.ktx)
   implementation(platform(libs.androidx.compose.bom))
   implementation(libs.datastore.preferences)

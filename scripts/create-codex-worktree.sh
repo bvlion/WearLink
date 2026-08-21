@@ -44,14 +44,6 @@ primary_worktree=$(
 
 worktree_root="$(dirname "$primary_worktree")/WearLink-worktrees"
 target_worktree="${worktree_root}/issue-${issue_number}"
-source_secret_files=(
-  "mobile/src/debug/google-services.json"
-  "wear/src/debug/google-services.json"
-)
-
-for secret_file in "${source_secret_files[@]}"; do
-  [[ -f "${source_worktree}/${secret_file}" ]] || die "コピー元の秘密ファイルがありません: ${source_worktree}/${secret_file}"
-done
 
 git -C "$source_worktree" fetch origin
 git -C "$source_worktree" rev-parse --verify --quiet "refs/remotes/origin/main^{commit}" >/dev/null ||
@@ -149,19 +141,9 @@ if git -C "$target_worktree" rev-parse --abbrev-ref --symbolic-full-name '@{upst
   die "作成したIssueブランチにupstreamが設定されています: ${branch_name}"
 fi
 
-for secret_file in "${source_secret_files[@]}"; do
-  mkdir -p "$(dirname "${target_worktree}/${secret_file}")"
-  cp "${source_worktree}/${secret_file}" "${target_worktree}/${secret_file}"
-done
-
 if [[ -f "${target_worktree}/.gitmodules" ]]; then
   git -C "$target_worktree" submodule update --init --recursive
 fi
-
-for secret_file in "${source_secret_files[@]}"; do
-  git -C "$target_worktree" check-ignore --quiet "$secret_file" ||
-    die "コピーした秘密ファイルがGitの追跡対象外になっていません: ${secret_file}"
-done
 
 worktree_status=$(git -C "$target_worktree" status --porcelain --untracked-files=all)
 [[ -z "$worktree_status" ]] || die "作成したworktreeに未追跡または変更済みのファイルがあります。"
