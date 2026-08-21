@@ -17,11 +17,21 @@ import androidx.compose.material3.Checkbox
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.KeyboardArrowDown
+import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.SwapVert
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -37,7 +47,6 @@ import info.bvlion.wearlink.ui.theme.noRippleClickable
 
 @Composable
 private fun SavedRequest(
-  addTopPadding: Dp = 0.dp,
   addBottomPadding: Dp = 0.dp,
   requestParams: RequestParams,
   watchSync: (RequestParams) -> Unit,
@@ -51,7 +60,7 @@ private fun SavedRequest(
   Card(
     modifier = Modifier
       .fillMaxWidth()
-      .padding(8.dp, 8.dp + addTopPadding, 8.dp, 8.dp + addBottomPadding)
+      .padding(8.dp, 8.dp, 8.dp, 8.dp + addBottomPadding)
       .clickable { edit(requestParams) },
     elevation = CardDefaults.cardElevation(2.dp),
   ) {
@@ -112,6 +121,52 @@ private fun SavedRequest(
 }
 
 @Composable
+private fun SavedRequestReorderItem(
+  addBottomPadding: Dp = 0.dp,
+  requestParams: RequestParams,
+  canMoveUp: Boolean,
+  canMoveDown: Boolean,
+  moveUp: () -> Unit,
+  moveDown: () -> Unit,
+) {
+  Card(
+    modifier = Modifier
+      .fillMaxWidth()
+      .padding(8.dp, 8.dp, 8.dp, 8.dp + addBottomPadding),
+    elevation = CardDefaults.cardElevation(2.dp),
+  ) {
+    Row(
+      modifier = Modifier.fillMaxWidth().padding(start = 16.dp),
+      verticalAlignment = Alignment.CenterVertically,
+      horizontalArrangement = Arrangement.SpaceBetween
+    ) {
+      Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
+        if (requestParams.watchSync) {
+          Icon(
+            Icons.Filled.Sync,
+            contentDescription = stringResource(R.string.saved_request_sync_wearlable),
+            modifier = Modifier.padding(end = 8.dp)
+          )
+        }
+        Text(text = requestParams.title, fontSize = 18.sp)
+      }
+      IconButton(onClick = moveUp, enabled = canMoveUp) {
+        Icon(
+          Icons.Filled.KeyboardArrowUp,
+          contentDescription = stringResource(R.string.saved_request_reorder_move_up)
+        )
+      }
+      IconButton(onClick = moveDown, enabled = canMoveDown) {
+        Icon(
+          Icons.Filled.KeyboardArrowDown,
+          contentDescription = stringResource(R.string.saved_request_reorder_move_down)
+        )
+      }
+    }
+  }
+}
+
+@Composable
 fun SavedRequestList(
   requests: List<RequestParams>,
   newCreateClick: () -> Unit = {},
@@ -120,6 +175,8 @@ fun SavedRequestList(
   watchSync: (Int, RequestParams) -> Unit = { _, _ -> },
   edit: (Int, RequestParams) -> Unit = { _, _ -> },
   send: (RequestParams) -> Unit = {},
+  moveUp: (RequestParams) -> Unit = {},
+  moveDown: (RequestParams) -> Unit = {},
 ) = when {
   requests.isEmpty() -> Column(
     Modifier.fillMaxSize().padding(bottom = 24.dp + bottomPadding),
@@ -141,16 +198,49 @@ fun SavedRequestList(
       Text(text = stringResource(R.string.saved_request_empty_create_button))
     }
   }
-  else -> LazyColumn(Modifier.fillMaxWidth()) {
-    itemsIndexed(requests) { index, requestParams ->
-      SavedRequest(
-        if (index == 0) topPadding else 0.dp,
-        if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
-        requestParams,
-        watchSync = { watchSync(index, it) },
-        edit = { edit(index, it) },
-        send = send
-      )
+  else -> {
+    var reorderMode by rememberSaveable { mutableStateOf(false) }
+
+    Column(Modifier.fillMaxSize().padding(top = topPadding)) {
+      Row(
+        modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
+        horizontalArrangement = Arrangement.End
+      ) {
+        TextButton(onClick = { reorderMode = !reorderMode }) {
+          Icon(
+            if (reorderMode) Icons.Filled.Check else Icons.Filled.SwapVert,
+            contentDescription = null,
+            modifier = Modifier.padding(end = 4.dp)
+          )
+          Text(
+            text = stringResource(
+              if (reorderMode) R.string.saved_request_reorder_done else R.string.saved_request_reorder_start
+            )
+          )
+        }
+      }
+      LazyColumn(Modifier.fillMaxWidth().weight(1f)) {
+        itemsIndexed(requests, key = { _, requestParams -> requestParams.id }) { index, requestParams ->
+          if (reorderMode) {
+            SavedRequestReorderItem(
+              addBottomPadding = if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
+              requestParams = requestParams,
+              canMoveUp = index != 0,
+              canMoveDown = index != requests.lastIndex,
+              moveUp = { moveUp(requestParams) },
+              moveDown = { moveDown(requestParams) },
+            )
+          } else {
+            SavedRequest(
+              addBottomPadding = if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
+              requestParams = requestParams,
+              watchSync = { watchSync(index, it) },
+              edit = { edit(index, it) },
+              send = send
+            )
+          }
+        }
+      }
     }
   }
 }

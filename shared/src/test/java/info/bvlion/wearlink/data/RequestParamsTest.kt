@@ -2,6 +2,7 @@ package info.bvlion.wearlink.data
 
 import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
 import info.bvlion.wearlink.data.RequestParams.Companion.findById
+import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.normalizeRequestParamsJson
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParam
@@ -240,5 +241,132 @@ class RequestParamsTest {
   @Test
   fun findByIdReturnsNullForUnknownIdTest() {
     assertNull(listOf(watchSyncRequest).findById("unknown-id"))
+  }
+
+  private fun reorderRequest(title: String, watchSync: Boolean = false) = RequestParams(
+    title = title,
+    url = "https://example.com/${title}",
+    method = Constant.HttpMethod.GET,
+    bodyType = Constant.BodyType.QUERY,
+    watchSync = watchSync,
+  )
+
+  @Test
+  fun moveByIdMovesMiddleItemUpTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(second.id, -1)
+
+    assertEquals(listOf(second, first, third), moved)
+  }
+
+  @Test
+  fun moveByIdMovesMiddleItemDownTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(second.id, 1)
+
+    assertEquals(listOf(first, third, second), moved)
+  }
+
+  @Test
+  fun moveByIdMovesFirstItemDownToMiddleTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(first.id, 1)
+
+    assertEquals(listOf(second, first, third), moved)
+  }
+
+  @Test
+  fun moveByIdMovesLastItemUpToMiddleTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(third.id, -1)
+
+    assertEquals(listOf(first, third, second), moved)
+  }
+
+  @Test
+  fun moveByIdOnFirstItemUpIsNoOpTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val requests = listOf(first, second)
+
+    val moved = requests.moveById(first.id, -1)
+
+    assertEquals(requests, moved)
+  }
+
+  @Test
+  fun moveByIdOnLastItemDownIsNoOpTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val requests = listOf(first, second)
+
+    val moved = requests.moveById(second.id, 1)
+
+    assertEquals(requests, moved)
+  }
+
+  @Test
+  fun moveByIdWithUnknownIdIsNoOpTest() {
+    val requests = listOf(reorderRequest("first"), reorderRequest("second"))
+
+    val moved = requests.moveById("unknown-id", 1)
+
+    assertEquals(requests, moved)
+  }
+
+  @Test
+  fun moveByIdPreservesIdsAndContentTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(third.id, -1)
+
+    assertEquals(requests.map { it.id }.toSet(), moved.map { it.id }.toSet())
+    moved.forEach { movedRequest ->
+      assertEquals(requests.findById(movedRequest.id), movedRequest)
+    }
+  }
+
+  @Test
+  fun moveByIdPreservesRelativeOrderOfWatchSyncFilteredSubsetTest() {
+    val syncedFirst = reorderRequest("synced-first", watchSync = true)
+    val unsynced = reorderRequest("unsynced")
+    val syncedSecond = reorderRequest("synced-second", watchSync = true)
+    val requests = listOf(syncedFirst, unsynced, syncedSecond)
+
+    val moved = requests.moveById(unsynced.id, -1)
+
+    assertEquals(listOf(syncedFirst, syncedSecond), moved.filter { it.watchSync })
+  }
+
+  @Test
+  fun moveByIdOrderSurvivesJsonRoundTripTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(third.id, -1)
+    val reloaded = moved.toRequestParamsJson().parseRequestParams()
+
+    assertEquals(moved, reloaded)
   }
 }

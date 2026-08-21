@@ -13,6 +13,7 @@ import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.ErrorDetail
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
+import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
@@ -128,6 +129,16 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
         R.string.request_created,
       request.title
     )?.let { showSnackbar(it) }
+  }
+
+  fun moveRequest(id: String, offset: Int) {
+    viewModelScope.launch(Dispatchers.IO) {
+      savedRequest.value
+        ?.parseRequestParams()
+        ?.moveById(id, offset)
+        ?.toRequestParamsJson()
+        ?.let { dataStore.saveRequest(it) }
+    }
   }
 
   fun deleteRequest(deleteIndex: Int, getString: (Int) -> String) {

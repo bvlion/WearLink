@@ -186,7 +186,9 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       editRequest.value = request
                       bottomMenuIndex.intValue = 1
                     },
-                    send = { request -> viewModel.sendRequest(request, getString) }
+                    send = { request -> viewModel.sendRequest(request, getString) },
+                    moveUp = { request -> viewModel.moveRequest(request.id, -1) },
+                    moveDown = { request -> viewModel.moveRequest(request.id, 1) }
                   )
                   if (loading.value) {
                     LoadingCompose()

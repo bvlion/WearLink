@@ -80,6 +80,10 @@
   <string name="saved_request_send_icon_tint">Send Button</string>
   <string name="saved_request_empty_message">No saved requests</string>
   <string name="saved_request_empty_create_button">Create a new request</string>
+  <string name="saved_request_reorder_start">Reorder</string>
+  <string name="saved_request_reorder_done">Done</string>
+  <string name="saved_request_reorder_move_up">Move up</string>
+  <string name="saved_request_reorder_move_down">Move down</string>
 
   <!-- activity action -->
   <string name="request_created">%s Created</string>

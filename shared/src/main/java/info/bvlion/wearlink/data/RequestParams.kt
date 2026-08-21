@@ -47,6 +47,16 @@ data class RequestParams(
 
     fun List<RequestParams>.findById(id: String): RequestParams? = find { it.id == id }
 
+    fun List<RequestParams>.moveById(id: String, offset: Int): List<RequestParams> {
+      val currentIndex = indexOfFirst { it.id == id }
+      if (currentIndex < 0) return this
+      val targetIndex = (currentIndex + offset).coerceIn(0, lastIndex)
+      if (targetIndex == currentIndex) return this
+      return toMutableList().apply {
+        add(targetIndex, removeAt(currentIndex))
+      }
+    }
+
     fun List<RequestParams>.deduplicateIds(): List<RequestParams> {
       val seenIds = mutableSetOf<String>()
       return map { request ->
