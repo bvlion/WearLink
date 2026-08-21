@@ -2,6 +2,7 @@ package info.bvlion.wearlink.data
 
 import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
 import info.bvlion.wearlink.data.RequestParams.Companion.findById
+import info.bvlion.wearlink.data.RequestParams.Companion.isWatchSyncChangeAllowed
 import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.normalizeRequestParamsJson
@@ -480,5 +481,67 @@ class RequestParamsTest {
     val updated = reordered.removeById(second.id)
 
     assertEquals(listOf(first, third), updated)
+  }
+
+  @Test
+  fun isWatchSyncChangeAllowedTrueWhenTurningOnBelowLimitTest() {
+    val synced = reorderRequest("synced", watchSync = true)
+    val target = reorderRequest("target")
+    val requests = listOf(synced, target)
+
+    assertTrue(requests.isWatchSyncChangeAllowed(target.copy(watchSync = true), maxSyncCount = 2))
+  }
+
+  @Test
+  fun isWatchSyncChangeAllowedFalseWhenTurningOnDifferentRequestAtLimitTest() {
+    val syncedA = reorderRequest("synced-a", watchSync = true)
+    val syncedB = reorderRequest("synced-b", watchSync = true)
+    val target = reorderRequest("target")
+    val requests = listOf(syncedA, syncedB, target)
+
+    assertFalse(requests.isWatchSyncChangeAllowed(target.copy(watchSync = true), maxSyncCount = 2))
+  }
+
+  @Test
+  fun isWatchSyncChangeAllowedTrueForPlainEditOfAlreadySyncedRequestAtLimitTest() {
+    val syncedA = reorderRequest("synced-a", watchSync = true)
+    val syncedB = reorderRequest("synced-b", watchSync = true)
+    val requests = listOf(syncedA, syncedB)
+    val editedA = syncedA.copy(title = "synced-a-renamed") // watchSync stays true
+
+    assertTrue(requests.isWatchSyncChangeAllowed(editedA, maxSyncCount = 2))
+  }
+
+  @Test
+  fun isWatchSyncChangeAllowedTrueWhenTurningOffAtLimitTest() {
+    val syncedA = reorderRequest("synced-a", watchSync = true)
+    val syncedB = reorderRequest("synced-b", watchSync = true)
+    val requests = listOf(syncedA, syncedB)
+
+    assertTrue(requests.isWatchSyncChangeAllowed(syncedA.copy(watchSync = false), maxSyncCount = 2))
+  }
+
+  // Regression test for a race where two rapid watchSync toggles, both evaluated against the
+  // same stale snapshot, could both pass the limit check and push the synced count over
+  // MAX_SYNC_COUNT. AppDataStore.upsertRequest evaluates isWatchSyncChangeAllowed against the
+  // list already updated by any prior DataStore edit{} transaction (DataStore serializes
+  // concurrent edit{} calls), which this test simulates by re-evaluating against the list
+  // returned from the first accepted upsertById before checking the second toggle.
+  @Test
+  fun isWatchSyncChangeAllowedSequentialTogglesNeverExceedLimitTest() {
+    val maxSyncCount = 2
+    val syncedA = reorderRequest("synced-a", watchSync = true)
+    val unsyncedB = reorderRequest("unsynced-b")
+    val unsyncedC = reorderRequest("unsynced-c")
+    val requests = listOf(syncedA, unsyncedB, unsyncedC)
+
+    val turnOnB = unsyncedB.copy(watchSync = true)
+    assertTrue(requests.isWatchSyncChangeAllowed(turnOnB, maxSyncCount))
+    val afterB = requests.upsertById(turnOnB)
+
+    val turnOnC = unsyncedC.copy(watchSync = true)
+    assertFalse(afterB.isWatchSyncChangeAllowed(turnOnC, maxSyncCount))
+
+    assertEquals(maxSyncCount, afterB.count { it.watchSync })
   }
 }

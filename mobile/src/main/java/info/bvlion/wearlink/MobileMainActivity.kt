@@ -96,6 +96,9 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val closeLabel = stringResource(R.string.close)
 
       val getString = { id: Int -> getString(id) }
+      val syncErrorTitle = stringResource(R.string.sync_wearable_error_title)
+      val syncErrorDescription =
+        stringResource(R.string.sync_wearable_error_description, Constant.MAX_SYNC_COUNT)
       val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
       ) {
@@ -153,9 +156,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
             content = {
               Box(modifier = Modifier.fillMaxSize()) {
                 MainAnimatedVisibility(bottomMenuIndex.intValue == 0) {
-                  val syncErrorTitle = stringResource(R.string.sync_wearable_error_title)
-                  val syncErrorDescription =
-                    stringResource(R.string.sync_wearable_error_description, Constant.MAX_SYNC_COUNT)
                   SavedRequestList(
                     requests = if (savedRequests.value == null) {
                       emptyList()
@@ -172,14 +172,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     topPadding = it.calculateTopPadding(),
                     bottomPadding = it.calculateBottomPadding(),
                     watchSync = { index, request ->
-                      if (
-                        (savedRequests.value?.parseRequestParams()?.filter { it.watchSync }?.size ?: 0) >=
-                        Constant.MAX_SYNC_COUNT && request.watchSync
-                      ) {
-                        viewModel.showWatchSyncError(syncErrorTitle, syncErrorDescription)
-                      } else {
-                        viewModel.saveRequest(index, request, null)
-                      }
+                      viewModel.saveRequest(index, request, syncErrorTitle, syncErrorDescription, null)
                     },
                     edit = { index, request ->
                       editRequestIndex.intValue = index
@@ -216,7 +209,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     save = { index, request ->
                       editRequest.value = null
                       editRequestIndex.intValue = -1
-                      viewModel.saveRequest(index, request) { resId, title ->
+                      viewModel.saveRequest(index, request, syncErrorTitle, syncErrorDescription) { resId, title ->
                         getString(resId, title)
                       }
                       bottomMenuIndex.intValue = 0

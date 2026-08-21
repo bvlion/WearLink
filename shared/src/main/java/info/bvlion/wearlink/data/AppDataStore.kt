@@ -7,6 +7,7 @@ import androidx.datastore.preferences.core.edit
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
+import info.bvlion.wearlink.data.RequestParams.Companion.isWatchSyncChangeAllowed
 import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.removeById
@@ -36,9 +37,17 @@ class AppDataStore(context: Context) {
     }
   }
 
-  suspend fun upsertRequest(request: RequestParams) = settingsDataStore.edit { pref ->
-    val current = pref[SAVED_REQUEST_KEY]?.parseRequestParams() ?: emptyList()
-    pref[SAVED_REQUEST_KEY] = current.upsertById(request).toRequestParamsJson()
+  suspend fun upsertRequest(request: RequestParams): Boolean {
+    var accepted = true
+    settingsDataStore.edit { pref ->
+      val current = pref[SAVED_REQUEST_KEY]?.parseRequestParams() ?: emptyList()
+      if (!current.isWatchSyncChangeAllowed(request, Constant.MAX_SYNC_COUNT)) {
+        accepted = false
+        return@edit
+      }
+      pref[SAVED_REQUEST_KEY] = current.upsertById(request).toRequestParamsJson()
+    }
+    return accepted
   }
 
   suspend fun deleteRequestById(id: String) = settingsDataStore.edit { pref ->

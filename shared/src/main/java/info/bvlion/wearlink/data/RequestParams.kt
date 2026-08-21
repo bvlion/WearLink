@@ -73,6 +73,12 @@ data class RequestParams(
 
     fun List<RequestParams>.removeById(id: String): List<RequestParams> = filterNot { it.id == id }
 
+    fun List<RequestParams>.isWatchSyncChangeAllowed(request: RequestParams, maxSyncCount: Int): Boolean {
+      val wasSynced = findById(request.id)?.watchSync == true
+      if (!request.watchSync || wasSynced) return true
+      return count { it.id != request.id && it.watchSync } < maxSyncCount
+    }
+
     fun List<RequestParams>.deduplicateIds(): List<RequestParams> {
       val seenIds = mutableSetOf<String>()
       return map { request ->

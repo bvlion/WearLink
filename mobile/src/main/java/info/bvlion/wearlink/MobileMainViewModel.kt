@@ -96,21 +96,26 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun saveRequest(
     savedIndex: Int,
     request: RequestParams,
+    syncErrorTitle: String,
+    syncErrorDescription: String,
     getString: ((Int, String) -> String)?
   ) {
     viewModelScope.launch(Dispatchers.IO) {
-      dataStore.upsertRequest(request)
-      if (savedIndex >= 0) {
-        RequestShortcuts.updateLabel(getApplication(), request)
+      if (dataStore.upsertRequest(request)) {
+        if (savedIndex >= 0) {
+          RequestShortcuts.updateLabel(getApplication(), request)
+        }
+        getString?.invoke(
+          if (savedIndex >= 0)
+            R.string.request_updated
+          else
+            R.string.request_created,
+          request.title
+        )?.let { showSnackbar(it) }
+      } else {
+        showWatchSyncError(syncErrorTitle, syncErrorDescription)
       }
     }
-    getString?.invoke(
-      if (savedIndex >= 0)
-        R.string.request_updated
-      else
-        R.string.request_created,
-      request.title
-    )?.let { showSnackbar(it) }
   }
 
   fun moveRequest(id: String, offset: Int) {
