@@ -64,7 +64,7 @@ import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
-import info.bvlion.wearlink.data.ResponseParams.Companion.findBySendDateTime
+import info.bvlion.wearlink.data.ResponseParams.Companion.findBySelectionKey
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.WearMobileConnector
@@ -99,7 +99,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val reorderDraft = rememberSaveable { mutableStateOf(arrayListOf<RequestParams>()) }
       val reorderInitialIds = rememberSaveable { mutableStateOf(arrayListOf<String>()) }
       val showReorderDiscardDialog = rememberSaveable { mutableStateOf(false) }
-      val selectedResponseSendDateTime = rememberSaveable { mutableStateOf<Long?>(null) }
+      val selectedResponseKey = rememberSaveable { mutableStateOf<String?>(null) }
 
       val snackbarHostState = remember { SnackbarHostState() }
       val closeLabel = stringResource(R.string.close)
@@ -119,12 +119,16 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
           }
         } ?: emptyList()
       }
-      val responseHistory = if (savedResponses.value.isEmpty()) {
-        emptyList()
-      } else {
-        savedResponses.value.parseResponseParams()
+      // History表示中か、Activity再生成直後の選択復元が必要な場合だけ履歴JSONをparseする
+      val needsResponseHistory = bottomMenuIndex.intValue == 2 || selectedResponseKey.value != null
+      val responseHistory = remember(savedResponses.value, needsResponseHistory) {
+        if (needsResponseHistory && savedResponses.value.isNotEmpty()) {
+          savedResponses.value.parseResponseParams()
+        } else {
+          emptyList()
+        }
       }
-      val response = responseHistory.findBySendDateTime(selectedResponseSendDateTime.value)
+      val response = responseHistory.findBySelectionKey(selectedResponseKey.value)
       val discardReorder = {
         reorderMode.value = false
         reorderDraft.value = arrayListOf()
@@ -173,7 +177,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
             discardReorder()
           }
         } else if (response != null) {
-          selectedResponseSendDateTime.value = null
+          selectedResponseKey.value = null
         } else if (bottomMenuIndex.intValue > 1) {
           bottomMenuIndex.intValue = 0
         }
@@ -307,7 +311,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     it.calculateTopPadding(),
                     it.calculateBottomPadding()
                   ) {
-                    selectedResponseSendDateTime.value = it.sendDateTime
+                    selectedResponseKey.value = it.selectionKey()
                   }
                 }
                 MainAnimatedVisibility(bottomMenuIndex.intValue == 3) {
@@ -368,7 +372,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     editRequest.value = null
                     editRequestIndex.intValue = -1
                   }
-                  selectedResponseSendDateTime.value = null
+                  selectedResponseKey.value = null
                 }
               }
             }
@@ -387,7 +391,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 
           response?.let {
             ModalBottomSheet(
-              onDismissRequest = { selectedResponseSendDateTime.value = null },
+              onDismissRequest = { selectedResponseKey.value = null },
               sheetState = sheetState,
               shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             ) {
