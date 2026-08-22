@@ -32,9 +32,7 @@ dependencies {
   implementation(libs.kotlinx.coroutines.core)
   implementation(libs.kotlinx.coroutines.play.services)
   implementation(libs.kotlin.parcelize.runtime)
-  implementation(libs.androidx.ui)
   implementation(libs.datastore.preferences)
-  implementation(platform(libs.androidx.compose.bom))
 
   add("kotlinCompilerPluginClasspath", libs.kotlin.parcelize.compiler)
 
