@@ -1,11 +1,8 @@
 package info.bvlion.wearlink.data
 
-import android.os.Parcelable
-import kotlinx.parcelize.Parcelize
 import org.json.JSONArray
 import org.json.JSONObject
 
-@Parcelize
 data class ResponseParams(
   val title: String,
   val responseCode: Int,
@@ -14,7 +11,7 @@ data class ResponseParams(
   val body: String,
   val sendDateTime: Long,
   val isMobile: Boolean
-) : Parcelable {
+) {
   fun toJsonString(): String = JSONObject().apply {
     put(TITLE, title)
     put(RESPONSE_CODE, responseCode)
@@ -52,5 +49,8 @@ data class ResponseParams(
       }
       return list
     }
+
+    fun List<ResponseParams>.findBySendDateTime(sendDateTime: Long?): ResponseParams? =
+      sendDateTime?.let { key -> find { it.sendDateTime == key } }
   }
 }

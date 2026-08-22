@@ -64,7 +64,7 @@ import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
-import info.bvlion.wearlink.data.ResponseParams
+import info.bvlion.wearlink.data.ResponseParams.Companion.findBySendDateTime
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.WearMobileConnector
@@ -99,7 +99,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val reorderDraft = rememberSaveable { mutableStateOf(arrayListOf<RequestParams>()) }
       val reorderInitialIds = rememberSaveable { mutableStateOf(arrayListOf<String>()) }
       val showReorderDiscardDialog = rememberSaveable { mutableStateOf(false) }
-      val response = rememberSaveable { mutableStateOf<ResponseParams?>(null) }
+      val selectedResponseSendDateTime = rememberSaveable { mutableStateOf<Long?>(null) }
 
       val snackbarHostState = remember { SnackbarHostState() }
       val closeLabel = stringResource(R.string.close)
@@ -119,6 +119,12 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
           }
         } ?: emptyList()
       }
+      val responseHistory = if (savedResponses.value.isEmpty()) {
+        emptyList()
+      } else {
+        savedResponses.value.parseResponseParams()
+      }
+      val response = responseHistory.findBySendDateTime(selectedResponseSendDateTime.value)
       val discardReorder = {
         reorderMode.value = false
         reorderDraft.value = arrayListOf()
@@ -159,15 +165,15 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
         )
       }
 
-      BackHandler(reorderMode.value || response.value != null || bottomMenuIndex.intValue > 1) {
+      BackHandler(reorderMode.value || response != null || bottomMenuIndex.intValue > 1) {
         if (reorderMode.value) {
           if (hasReorderChanges) {
             showReorderDiscardDialog.value = true
           } else {
             discardReorder()
           }
-        } else if (response.value != null) {
-          response.value = null
+        } else if (response != null) {
+          selectedResponseSendDateTime.value = null
         } else if (bottomMenuIndex.intValue > 1) {
           bottomMenuIndex.intValue = 0
         }
@@ -297,15 +303,11 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                 }
                 MainAnimatedVisibility(bottomMenuIndex.intValue == 2) {
                   RequestHistoryList(
-                    if (savedResponses.value.isEmpty()) {
-                      emptyList()
-                    } else {
-                      savedResponses.value.parseResponseParams()
-                    },
+                    responseHistory,
                     it.calculateTopPadding(),
                     it.calculateBottomPadding()
                   ) {
-                    response.value = it
+                    selectedResponseSendDateTime.value = it.sendDateTime
                   }
                 }
                 MainAnimatedVisibility(bottomMenuIndex.intValue == 3) {
@@ -366,7 +368,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     editRequest.value = null
                     editRequestIndex.intValue = -1
                   }
-                  response.value = null
+                  selectedResponseSendDateTime.value = null
                 }
               }
             }
@@ -375,17 +377,17 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
           val sheetState = rememberModalBottomSheetState(
             skipPartiallyExpanded = true
           )
-          LaunchedEffect(response.value) {
-            if (response.value != null) {
+          LaunchedEffect(response) {
+            if (response != null) {
               sheetState.expand()
             } else {
               sheetState.hide()
             }
           }
 
-          response.value?.let {
+          response?.let {
             ModalBottomSheet(
-              onDismissRequest = { response.value = null },
+              onDismissRequest = { selectedResponseSendDateTime.value = null },
               sheetState = sheetState,
               shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             ) {
