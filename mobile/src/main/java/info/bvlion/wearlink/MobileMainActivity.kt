@@ -172,14 +172,17 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
         )
       }
 
-      BackHandler(reorderMode.value || response != null || bottomMenuIndex.intValue > 1) {
+      // responseが解決済みかではなく、selection key自体の有無で詳細表示中/復元待ちを判定する。
+      // response == nullを条件にすると、Activity再生成直後でResponse履歴の復元待ちの間にBackすると
+      // keyが残ったままHomeへ遷移し、履歴復元後にBottomSheetがHome上へ再表示されてしまう
+      BackHandler(reorderMode.value || selectedResponseKey.value != null || bottomMenuIndex.intValue > 1) {
         if (reorderMode.value) {
           if (hasReorderChanges) {
             showReorderDiscardDialog.value = true
           } else {
             discardReorder()
           }
-        } else if (response != null) {
+        } else if (selectedResponseKey.value != null) {
           selectedResponseKey.value = null
         } else if (bottomMenuIndex.intValue > 1) {
           bottomMenuIndex.intValue = 0
