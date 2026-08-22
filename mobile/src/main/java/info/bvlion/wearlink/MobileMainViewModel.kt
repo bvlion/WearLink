@@ -155,7 +155,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun addShortcut(request: RequestParams, getString: (Int) -> String) {
     val context = getApplication<Application>()
     if (!RequestShortcuts.isSupported(context)) {
-      showSnackbar(getString(R.string.request_edit_add_shortcut_unsupported))
+      showSnackbar(getString(R.string.saved_request_menu_add_shortcut_unsupported))
       return
     }
     RequestShortcuts.requestPin(context, request)

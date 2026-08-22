@@ -2,35 +2,37 @@ package info.bvlion.wearlink.compose
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
-import androidx.compose.material3.Checkbox
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
 import androidx.compose.material.icons.automirrored.filled.Send
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.material.icons.filled.Sync
-import androidx.compose.material.icons.filled.SwapVert
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.MaterialTheme
+import androidx.compose.material.icons.filled.Watch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -43,26 +45,43 @@ import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
-import info.bvlion.wearlink.ui.theme.noRippleClickable
+
+@Composable
+private fun StatusBadge(text: String, modifier: Modifier = Modifier) {
+  Card(
+    modifier = modifier,
+    colors = CardDefaults.cardColors().copy(
+      contentColor = MaterialTheme.colorScheme.primary,
+      containerColor = MaterialTheme.colorScheme.primaryContainer
+    )
+  ) {
+    Text(
+      text = text,
+      fontSize = 12.sp,
+      modifier = Modifier.padding(horizontal = 10.dp, vertical = 4.dp)
+    )
+  }
+}
 
 @Composable
 private fun SavedRequest(
   modifier: Modifier = Modifier,
+  addTopPadding: Dp = 0.dp,
   addBottomPadding: Dp = 0.dp,
   requestParams: RequestParams,
-  watchSync: (RequestParams) -> Unit,
   edit: (RequestParams) -> Unit = {},
   send: (RequestParams) -> Unit = {},
+  toggleTile: (RequestParams) -> Unit = {},
+  toggleWatchface: (RequestParams) -> Unit = {},
+  addShortcut: (RequestParams) -> Unit = {},
+  startReorder: () -> Unit = {},
 ) {
-  val toggleCheck = {
-    watchSync(requestParams.copy(watchSync = !requestParams.watchSync))
-  }
+  var menuExpanded by remember { mutableStateOf(false) }
 
   Card(
     modifier = modifier
       .fillMaxWidth()
-      .padding(8.dp, 8.dp, 8.dp, 8.dp + addBottomPadding)
-      .clickable { edit(requestParams) },
+      .padding(8.dp, 8.dp + addTopPadding, 8.dp, 8.dp + addBottomPadding),
     elevation = CardDefaults.cardElevation(2.dp),
   ) {
     Row(
@@ -70,51 +89,93 @@ private fun SavedRequest(
       verticalAlignment = Alignment.CenterVertically,
       horizontalArrangement = Arrangement.SpaceBetween
     ) {
-      Column {
-        Row(
-          verticalAlignment = Alignment.CenterVertically,
-          modifier = Modifier
-            .noRippleClickable { toggleCheck() }
-            .padding(end = 16.dp)
-        ) {
-          Checkbox(checked = requestParams.watchSync, onCheckedChange = { toggleCheck() })
-          Text(text = stringResource(R.string.saved_request_sync_wearlable), fontSize = 12.sp)
-        }
-        Text(
-          text = requestParams.title,
-          fontSize = 18.sp,
-          modifier = Modifier.padding(
-            start = 16.dp,
-            bottom = if (requestParams.watchfaceShortcut) {
-              0.dp
-            } else {
-              20.dp
-            }
-          )
-        )
-        if (requestParams.watchfaceShortcut) {
-          Card(
-            modifier = Modifier.padding(top = 12.dp, start = 8.dp, bottom = 16.dp),
-            colors = CardDefaults.cardColors().copy(
-              contentColor = MaterialTheme.colorScheme.primary,
-              containerColor = MaterialTheme.colorScheme.primaryContainer)
+      Column(
+        modifier = Modifier
+          .weight(1f)
+          .clickable { edit(requestParams) }
+          .padding(vertical = 16.dp, horizontal = 16.dp)
+      ) {
+        Text(text = requestParams.title, fontSize = 18.sp)
+        if (requestParams.watchSync || requestParams.watchfaceShortcut) {
+          Row(
+            horizontalArrangement = Arrangement.spacedBy(8.dp),
+            modifier = Modifier.padding(top = 8.dp)
           ) {
-            Text(
-              text = stringResource(R.string.saved_request_set_watchface),
-              fontSize = 14.sp,
-              modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp)
-            )
+            if (requestParams.watchSync) {
+              StatusBadge(stringResource(R.string.saved_request_tile_status))
+            }
+            if (requestParams.watchfaceShortcut) {
+              StatusBadge(stringResource(R.string.saved_request_watchface_status))
+            }
           }
         }
       }
-      IconButton(
-        onClick = { send(requestParams) },
-        modifier = Modifier.padding(24.dp)
-      ) {
+      Box {
+        IconButton(onClick = { menuExpanded = true }) {
+          Icon(
+            Icons.Filled.MoreVert,
+            contentDescription = stringResource(R.string.saved_request_menu_button)
+          )
+        }
+        DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
+          DropdownMenuItem(
+            text = {
+              Text(
+                stringResource(
+                  if (requestParams.watchSync) {
+                    R.string.saved_request_menu_hide_from_tile
+                  } else {
+                    R.string.saved_request_menu_show_on_tile
+                  }
+                )
+              )
+            },
+            leadingIcon = { Icon(Icons.Filled.Sync, contentDescription = null) },
+            onClick = {
+              menuExpanded = false
+              toggleTile(requestParams)
+            }
+          )
+          DropdownMenuItem(
+            text = {
+              Text(
+                stringResource(
+                  if (requestParams.watchfaceShortcut) {
+                    R.string.saved_request_menu_hide_from_watchface
+                  } else {
+                    R.string.saved_request_menu_show_on_watchface
+                  }
+                )
+              )
+            },
+            leadingIcon = { Icon(Icons.Filled.Watch, contentDescription = null) },
+            onClick = {
+              menuExpanded = false
+              toggleWatchface(requestParams)
+            }
+          )
+          DropdownMenuItem(
+            text = { Text(stringResource(R.string.saved_request_menu_add_shortcut)) },
+            leadingIcon = { Icon(Icons.AutoMirrored.Filled.AddToHomeScreen, contentDescription = null) },
+            onClick = {
+              menuExpanded = false
+              addShortcut(requestParams)
+            }
+          )
+          HorizontalDivider()
+          DropdownMenuItem(
+            text = { Text(stringResource(R.string.saved_request_menu_reorder)) },
+            onClick = {
+              menuExpanded = false
+              startReorder()
+            }
+          )
+        }
+      }
+      IconButton(onClick = { send(requestParams) }) {
         Icon(
           Icons.AutoMirrored.Filled.Send,
-          contentDescription = stringResource(R.string.saved_request_send_icon_tint),
-          modifier = Modifier.height(80.dp).width(80.dp)
+          contentDescription = stringResource(R.string.saved_request_send_icon_tint)
         )
       }
     }
@@ -124,6 +185,7 @@ private fun SavedRequest(
 @Composable
 private fun SavedRequestReorderItem(
   modifier: Modifier = Modifier,
+  addTopPadding: Dp = 0.dp,
   addBottomPadding: Dp = 0.dp,
   requestParams: RequestParams,
   canMoveUp: Boolean,
@@ -134,7 +196,7 @@ private fun SavedRequestReorderItem(
   Card(
     modifier = modifier
       .fillMaxWidth()
-      .padding(8.dp, 8.dp, 8.dp, 8.dp + addBottomPadding),
+      .padding(8.dp, 8.dp + addTopPadding, 8.dp, 8.dp + addBottomPadding),
     elevation = CardDefaults.cardElevation(2.dp),
   ) {
     Row(
@@ -146,7 +208,7 @@ private fun SavedRequestReorderItem(
         if (requestParams.watchSync) {
           Icon(
             Icons.Filled.Sync,
-            contentDescription = stringResource(R.string.saved_request_sync_wearlable),
+            contentDescription = stringResource(R.string.saved_request_tile_status),
             modifier = Modifier.padding(end = 8.dp)
           )
         }
@@ -171,12 +233,16 @@ private fun SavedRequestReorderItem(
 @Composable
 fun SavedRequestList(
   requests: List<RequestParams>,
+  reorderMode: Boolean = false,
   newCreateClick: () -> Unit = {},
   topPadding: Dp = 8.dp,
   bottomPadding: Dp = 0.dp,
-  watchSync: (Int, RequestParams) -> Unit = { _, _ -> },
   edit: (Int, RequestParams) -> Unit = { _, _ -> },
   send: (RequestParams) -> Unit = {},
+  toggleTile: (Int, RequestParams) -> Unit = { _, _ -> },
+  toggleWatchface: (Int, RequestParams) -> Unit = { _, _ -> },
+  addShortcut: (RequestParams) -> Unit = {},
+  startReorder: () -> Unit = {},
   moveUp: (RequestParams) -> Unit = {},
   moveDown: (RequestParams) -> Unit = {},
 ) = when {
@@ -200,50 +266,32 @@ fun SavedRequestList(
       Text(text = stringResource(R.string.saved_request_empty_create_button))
     }
   }
-  else -> {
-    var reorderMode by rememberSaveable { mutableStateOf(false) }
-
-    Column(Modifier.fillMaxSize().padding(top = topPadding)) {
-      Row(
-        modifier = Modifier.fillMaxWidth().padding(end = 8.dp),
-        horizontalArrangement = Arrangement.End
-      ) {
-        TextButton(onClick = { reorderMode = !reorderMode }) {
-          Icon(
-            if (reorderMode) Icons.Filled.Check else Icons.Filled.SwapVert,
-            contentDescription = null,
-            modifier = Modifier.padding(end = 4.dp)
-          )
-          Text(
-            text = stringResource(
-              if (reorderMode) R.string.saved_request_reorder_done else R.string.saved_request_reorder_start
-            )
-          )
-        }
-      }
-      LazyColumn(Modifier.fillMaxWidth().weight(1f)) {
-        itemsIndexed(requests, key = { _, requestParams -> requestParams.id }) { index, requestParams ->
-          if (reorderMode) {
-            SavedRequestReorderItem(
-              modifier = Modifier.animateItem(),
-              addBottomPadding = if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
-              requestParams = requestParams,
-              canMoveUp = index != 0,
-              canMoveDown = index != requests.lastIndex,
-              moveUp = { moveUp(requestParams) },
-              moveDown = { moveDown(requestParams) },
-            )
-          } else {
-            SavedRequest(
-              modifier = Modifier.animateItem(),
-              addBottomPadding = if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
-              requestParams = requestParams,
-              watchSync = { watchSync(index, it) },
-              edit = { edit(index, it) },
-              send = send
-            )
-          }
-        }
+  else -> LazyColumn(Modifier.fillMaxWidth()) {
+    itemsIndexed(requests, key = { _, requestParams -> requestParams.id }) { index, requestParams ->
+      if (reorderMode) {
+        SavedRequestReorderItem(
+          modifier = Modifier.animateItem(),
+          addTopPadding = if (index == 0) topPadding else 0.dp,
+          addBottomPadding = if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
+          requestParams = requestParams,
+          canMoveUp = index != 0,
+          canMoveDown = index != requests.lastIndex,
+          moveUp = { moveUp(requestParams) },
+          moveDown = { moveDown(requestParams) },
+        )
+      } else {
+        SavedRequest(
+          modifier = Modifier.animateItem(),
+          addTopPadding = if (index == 0) topPadding else 0.dp,
+          addBottomPadding = if (index == requests.lastIndex) 8.dp + bottomPadding else 0.dp,
+          requestParams = requestParams,
+          edit = { edit(index, it) },
+          send = send,
+          toggleTile = { toggleTile(index, it) },
+          toggleWatchface = { toggleWatchface(index, it) },
+          addShortcut = addShortcut,
+          startReorder = startReorder,
+        )
       }
     }
   }

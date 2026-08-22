@@ -26,18 +26,15 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.TextField
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Error
-import androidx.compose.material3.Checkbox
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MenuAnchorType
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -49,7 +46,6 @@ import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
-import info.bvlion.wearlink.ui.theme.noRippleClickable
 import java.util.UUID
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -69,7 +65,6 @@ fun RequestCreate(
   save: (Int, RequestParams) -> Unit = { _, _ -> },
   cancel: () -> Unit = {},
   delete: (String) -> Unit = {},
-  addShortcut: (RequestParams) -> Unit = {},
   defaultId: String? = null,
 ) {
   val title = rememberSaveable { mutableStateOf(defaultTitle) }
@@ -86,7 +81,6 @@ fun RequestCreate(
 
   val header = rememberSaveable { mutableStateOf(defaultHeader) }
   val body = rememberSaveable { mutableStateOf(defaultBody) }
-  val watchfaceShortcut = rememberSaveable { mutableStateOf(defaultWatchfaceShortcut) }
 
   val requestId = rememberSaveable { defaultId ?: UUID.randomUUID().toString() }
 
@@ -98,12 +92,6 @@ fun RequestCreate(
     update()
     editCheck.value = true
   }
-  val toggleCheck = {
-    updateEditCheck {
-      watchfaceShortcut.value = !watchfaceShortcut.value
-    }
-  }
-
 
   BackHandler {
     if (editCheck.value) {
@@ -308,26 +296,6 @@ fun RequestCreate(
         .fillMaxWidth()
     )
 
-    // ウォッチフェイスショートカットのチェックボックス
-    Row(
-      verticalAlignment = Alignment.CenterVertically,
-      modifier = Modifier
-        .fillMaxWidth()
-        .noRippleClickable { toggleCheck() }
-        .padding(start = 8.dp, end = 16.dp, bottom = 8.dp)
-    ) {
-      Checkbox(
-        checked = watchfaceShortcut.value,
-        onCheckedChange = {
-          toggleCheck()
-        }
-      )
-      Text(
-        text = stringResource(R.string.request_edit_watchface_shortcut),
-        fontSize = 14.sp
-      )
-    }
-
     Button(
       onClick = {
         if (title.value.isEmpty()) {
@@ -350,7 +318,7 @@ fun RequestCreate(
             headers = header.value,
             parameters = body.value,
             watchSync = defaultWatchSync,
-            watchfaceShortcut = watchfaceShortcut.value,
+            watchfaceShortcut = defaultWatchfaceShortcut,
             id = requestId,
           )
         )
@@ -362,45 +330,6 @@ fun RequestCreate(
       enabled = title.value.isNotEmpty() && URLUtil.isValidUrl(url.value)
     ) {
       Text(text = if (savedIndex > -1) stringResource(R.string.update) else stringResource(R.string.create))
-    }
-
-    if (savedIndex > -1) {
-      val canAddShortcut = !editCheck.value && title.value.isNotEmpty() && URLUtil.isValidUrl(url.value)
-
-      OutlinedButton(
-        onClick = {
-          addShortcut(
-            RequestParams(
-              title = title.value,
-              url = url.value,
-              method = selectedMethod.value,
-              bodyType = selectedBodyType.value,
-              headers = header.value,
-              parameters = body.value,
-              watchSync = defaultWatchSync,
-              watchfaceShortcut = watchfaceShortcut.value,
-              id = requestId,
-            )
-          )
-        },
-        modifier = Modifier
-          .fillMaxWidth()
-          .padding(16.dp, 0.dp)
-          .height(44.dp),
-        enabled = canAddShortcut,
-      ) {
-        Icon(Icons.AutoMirrored.Filled.AddToHomeScreen, contentDescription = stringResource(R.string.request_edit_add_shortcut))
-        Text(text = stringResource(R.string.request_edit_add_shortcut), modifier = Modifier.padding(start = 8.dp))
-      }
-      if (!canAddShortcut) {
-        Text(
-          text = stringResource(R.string.request_edit_add_shortcut_unsaved),
-          modifier = Modifier.padding(start = 32.dp, end = 16.dp, top = 4.dp),
-          color = MaterialTheme.colorScheme.error,
-          fontSize = 12.sp,
-          fontWeight = FontWeight.Bold
-        )
-      }
     }
 
     Row(

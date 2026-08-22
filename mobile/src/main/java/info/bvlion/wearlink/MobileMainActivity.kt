@@ -51,6 +51,7 @@ import info.bvlion.wearlink.compose.ErrorDialogCompose
 import info.bvlion.wearlink.compose.LoadingCompose
 import info.bvlion.wearlink.compose.MenuBottomNavigation
 import info.bvlion.wearlink.compose.MenuList
+import info.bvlion.wearlink.compose.ReorderDoneBar
 import info.bvlion.wearlink.compose.RequestCreate
 import info.bvlion.wearlink.compose.RequestHistoryDetailContent
 import info.bvlion.wearlink.compose.RequestHistoryList
@@ -90,6 +91,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val bottomMenuIndex = rememberSaveable { mutableIntStateOf(0) }
       val editRequest = rememberSaveable { mutableStateOf<RequestParams?>(null) }
       val editRequestIndex = rememberSaveable { mutableIntStateOf(-1) }
+      val reorderMode = rememberSaveable { mutableStateOf(false) }
       val response = remember { mutableStateOf<ResponseParams?>(null) }
 
       val snackbarHostState = remember { SnackbarHostState() }
@@ -168,18 +170,36 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                         }
                       } ?: emptyList()
                     },
+                    reorderMode = reorderMode.value,
                     newCreateClick = { bottomMenuIndex.intValue = 1 },
                     topPadding = it.calculateTopPadding(),
                     bottomPadding = it.calculateBottomPadding(),
-                    watchSync = { index, request ->
-                      viewModel.saveRequest(index, request, syncErrorTitle, syncErrorDescription, null)
-                    },
                     edit = { index, request ->
                       editRequestIndex.intValue = index
                       editRequest.value = request
                       bottomMenuIndex.intValue = 1
                     },
                     send = { request -> viewModel.sendRequest(request, getString) },
+                    toggleTile = { index, request ->
+                      viewModel.saveRequest(
+                        index,
+                        request.copy(watchSync = !request.watchSync),
+                        syncErrorTitle,
+                        syncErrorDescription,
+                        null
+                      )
+                    },
+                    toggleWatchface = { index, request ->
+                      viewModel.saveRequest(
+                        index,
+                        request.copy(watchfaceShortcut = !request.watchfaceShortcut),
+                        syncErrorTitle,
+                        syncErrorDescription,
+                        null
+                      )
+                    },
+                    addShortcut = { request -> viewModel.addShortcut(request, getString) },
+                    startReorder = { reorderMode.value = true },
                     moveUp = { request -> viewModel.moveRequest(request.id, -1) },
                     moveDown = { request -> viewModel.moveRequest(request.id, 1) }
                   )
@@ -219,9 +239,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       editRequestIndex.intValue = -1
                       viewModel.deleteRequest(it, getString)
                       bottomMenuIndex.intValue = 0
-                    },
-                    addShortcut = { request ->
-                      viewModel.addShortcut(request, getString)
                     },
                     defaultId = editRequest.value?.id
                   )
@@ -280,12 +297,16 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
               }
             },
             bottomBar = {
-              MenuBottomNavigation(bottomMenuIndex) {
-                if (it != 1) {
-                  editRequest.value = null
-                  editRequestIndex.intValue = -1
+              if (reorderMode.value) {
+                ReorderDoneBar { reorderMode.value = false }
+              } else {
+                MenuBottomNavigation(bottomMenuIndex) {
+                  if (it != 1) {
+                    editRequest.value = null
+                    editRequestIndex.intValue = -1
+                  }
+                  response.value = null
                 }
-                response.value = null
               }
             }
           )

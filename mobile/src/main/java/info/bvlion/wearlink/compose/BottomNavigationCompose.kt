@@ -1,6 +1,7 @@
 package info.bvlion.wearlink.compose
 
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.HistoryEdu
 import androidx.compose.material.icons.filled.Home
@@ -39,6 +40,18 @@ fun MenuBottomNavigation(
   }
 }
 
+@Composable
+fun ReorderDoneBar(onDone: () -> Unit) {
+  NavigationBar {
+    NavigationBarItem(
+      icon = { Icon(Icons.Filled.Check, contentDescription = null) },
+      label = { Text(stringResource(R.string.saved_request_reorder_done)) },
+      selected = true,
+      onClick = onDone
+    )
+  }
+}
+
 private sealed class BottomItem(val titleResId: Int, val icon: ImageVector) {
   data object Home : BottomItem(R.string.bottom_nav_home, Icons.Filled.Home)
   data object Edit : BottomItem(R.string.bottom_nav_edit, Icons.Filled.Edit)
@@ -51,5 +64,13 @@ private sealed class BottomItem(val titleResId: Int, val icon: ImageVector) {
 private fun BottomNavigationPreview() {
   WearLinkTheme {
     MenuBottomNavigation(remember { mutableIntStateOf(1) }) {}
+  }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun ReorderDoneBarPreview() {
+  WearLinkTheme {
+    ReorderDoneBar {}
   }
 }

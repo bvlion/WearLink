@@ -435,6 +435,49 @@ class RequestParamsTest {
   }
 
   @Test
+  fun upsertByIdTurnsTileDisplayOnTest() {
+    val requestParams = reorderRequest("tile-target")
+    val turnedOn = requestParams.copy(watchSync = true)
+
+    val updated = listOf(requestParams).upsertById(turnedOn)
+
+    assertEquals(true, updated.single().watchSync)
+  }
+
+  @Test
+  fun upsertByIdTurnsTileDisplayOffTest() {
+    val requestParams = reorderRequest("tile-target", watchSync = true)
+    val turnedOff = requestParams.copy(watchSync = false)
+
+    val updated = listOf(requestParams).upsertById(turnedOff)
+
+    assertEquals(false, updated.single().watchSync)
+  }
+
+  @Test
+  fun upsertByIdTurnsWatchfaceDisplayOffWithoutAffectingOtherRequestsTest() {
+    val target = reorderRequest("watchface-target").copy(watchfaceShortcut = true)
+    val other = reorderRequest("other")
+    val turnedOff = target.copy(watchfaceShortcut = false)
+
+    val updated = listOf(target, other).upsertById(turnedOff)
+
+    assertEquals(listOf(turnedOff, other), updated)
+  }
+
+  @Test
+  fun upsertByIdPreservesTileAndWatchfaceStateOnPlainContentEditTest() {
+    val requestParams = reorderRequest("edited").copy(watchSync = true, watchfaceShortcut = true)
+    val contentOnlyEdit = requestParams.copy(title = "renamed", url = "https://example.com/renamed")
+
+    val updated = listOf(requestParams).upsertById(contentOnlyEdit)
+
+    assertEquals(true, updated.single().watchSync)
+    assertEquals(true, updated.single().watchfaceShortcut)
+    assertEquals("renamed", updated.single().title)
+  }
+
+  @Test
   fun removeByIdRemovesOnlyMatchingRequestTest() {
     val first = reorderRequest("first")
     val second = reorderRequest("second")
