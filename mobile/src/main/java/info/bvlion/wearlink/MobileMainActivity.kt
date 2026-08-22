@@ -99,7 +99,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val reorderDraft = rememberSaveable { mutableStateOf(arrayListOf<RequestParams>()) }
       val reorderInitialIds = rememberSaveable { mutableStateOf(arrayListOf<String>()) }
       val showReorderDiscardDialog = rememberSaveable { mutableStateOf(false) }
-      val response = remember { mutableStateOf<ResponseParams?>(null) }
+      val response = rememberSaveable { mutableStateOf<ResponseParams?>(null) }
 
       val snackbarHostState = remember { SnackbarHostState() }
       val closeLabel = stringResource(R.string.close)
