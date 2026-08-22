@@ -77,6 +77,7 @@
   <string name="saved_request_empty_message">保存されたリクエストがありません</string>
   <string name="saved_request_empty_create_button">新規リクエストを作成する</string>
   <string name="saved_request_menu_button">管理メニュー</string>
+  <string name="saved_request_menu_edit">編集する</string>
   <string name="saved_request_menu_show_on_tile">タイルに表示する</string>
   <string name="saved_request_menu_hide_from_tile">タイルから外す</string>
   <string name="saved_request_menu_show_on_watchface">ウォッチフェイスに表示する</string>

@@ -369,7 +369,7 @@ class RequestParamsTest {
 
     val moved = requests.moveById(syncedSecond.id, -1)
 
-    // Mirrors Sync.kt's `filter { it.watchSync || it.watchfaceShortcut }` extraction of Wear OS sync targets.
+    // Wear OS同期対象の抽出順も並び替え後の順序になることを確認する
     assertEquals(
       listOf(syncedSecond, syncedFirst),
       moved.filter { it.watchSync || it.watchfaceShortcut }
@@ -498,16 +498,13 @@ class RequestParamsTest {
     assertEquals(listOf(first, second), updated)
   }
 
-  // Regression test for a race where a stale UI-held index/list, captured before a reorder,
-  // could be written back to DataStore and undo the reorder or edit the wrong Request.
-  // upsertById/removeById must locate the target purely by ID against the *current* list
-  // (e.g. the one already reordered by moveById), never by a stale positional index.
+  // 並び替え前の古いindexや一覧ではなく、現在の一覧からIDで対象を特定する
   @Test
   fun upsertByIdAfterMoveByIdUpdatesCorrectRequestAndKeepsReorderedPositionTest() {
     val first = reorderRequest("first")
     val second = reorderRequest("second")
     val third = reorderRequest("third")
-    val reordered = listOf(first, second, third).moveById(first.id, 1) // -> [second, first, third]
+    val reordered = listOf(first, second, third).moveById(first.id, 1)
 
     val updated = reordered.upsertById(first.copy(watchSync = true))
 
@@ -519,7 +516,7 @@ class RequestParamsTest {
     val first = reorderRequest("first")
     val second = reorderRequest("second")
     val third = reorderRequest("third")
-    val reordered = listOf(first, second, third).moveById(first.id, 1) // -> [second, first, third]
+    val reordered = listOf(first, second, third).moveById(first.id, 1)
 
     val updated = reordered.removeById(second.id)
 
@@ -550,7 +547,7 @@ class RequestParamsTest {
     val syncedA = reorderRequest("synced-a", watchSync = true)
     val syncedB = reorderRequest("synced-b", watchSync = true)
     val requests = listOf(syncedA, syncedB)
-    val editedA = syncedA.copy(title = "synced-a-renamed") // watchSync stays true
+    val editedA = syncedA.copy(title = "synced-a-renamed")
 
     assertTrue(requests.isWatchSyncChangeAllowed(editedA, maxSyncCount = 2))
   }
@@ -564,12 +561,7 @@ class RequestParamsTest {
     assertTrue(requests.isWatchSyncChangeAllowed(syncedA.copy(watchSync = false), maxSyncCount = 2))
   }
 
-  // Regression test for a race where two rapid watchSync toggles, both evaluated against the
-  // same stale snapshot, could both pass the limit check and push the synced count over
-  // MAX_SYNC_COUNT. AppDataStore.upsertRequest evaluates isWatchSyncChangeAllowed against the
-  // list already updated by any prior DataStore edit{} transaction (DataStore serializes
-  // concurrent edit{} calls), which this test simulates by re-evaluating against the list
-  // returned from the first accepted upsertById before checking the second toggle.
+  // DataStore transactionごとに最新一覧で上限を判定する必要がある
   @Test
   fun isWatchSyncChangeAllowedSequentialTogglesNeverExceedLimitTest() {
     val maxSyncCount = 2

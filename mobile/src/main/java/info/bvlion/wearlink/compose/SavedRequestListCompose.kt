@@ -1,6 +1,5 @@
 package info.bvlion.wearlink.compose
 
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,10 +23,11 @@ import androidx.compose.material3.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.AddToHomeScreen
 import androidx.compose.material.icons.automirrored.filled.Send
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
-import androidx.compose.material.icons.filled.Sync
+import androidx.compose.material.icons.filled.ViewCarousel
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -78,6 +78,9 @@ private fun SavedRequest(
 ) {
   var menuExpanded by remember { mutableStateOf(false) }
 
+  val hasStatus = requestParams.watchSync || requestParams.watchfaceShortcut
+  val titleVerticalPadding = if (hasStatus) 16.dp else 20.dp
+
   Card(
     modifier = modifier
       .fillMaxWidth()
@@ -92,11 +95,10 @@ private fun SavedRequest(
       Column(
         modifier = Modifier
           .weight(1f)
-          .clickable { edit(requestParams) }
-          .padding(vertical = 16.dp, horizontal = 16.dp)
+          .padding(vertical = titleVerticalPadding, horizontal = 16.dp)
       ) {
         Text(text = requestParams.title, fontSize = 18.sp)
-        if (requestParams.watchSync || requestParams.watchfaceShortcut) {
+        if (hasStatus) {
           Row(
             horizontalArrangement = Arrangement.spacedBy(8.dp),
             modifier = Modifier.padding(top = 8.dp)
@@ -119,6 +121,14 @@ private fun SavedRequest(
         }
         DropdownMenu(expanded = menuExpanded, onDismissRequest = { menuExpanded = false }) {
           DropdownMenuItem(
+            text = { Text(stringResource(R.string.saved_request_menu_edit)) },
+            leadingIcon = { Icon(Icons.Filled.Edit, contentDescription = null) },
+            onClick = {
+              menuExpanded = false
+              edit(requestParams)
+            }
+          )
+          DropdownMenuItem(
             text = {
               Text(
                 stringResource(
@@ -130,7 +140,7 @@ private fun SavedRequest(
                 )
               )
             },
-            leadingIcon = { Icon(Icons.Filled.Sync, contentDescription = null) },
+            leadingIcon = { Icon(Icons.Filled.ViewCarousel, contentDescription = null) },
             onClick = {
               menuExpanded = false
               toggleTile(requestParams)
@@ -172,7 +182,10 @@ private fun SavedRequest(
           )
         }
       }
-      IconButton(onClick = { send(requestParams) }) {
+      IconButton(
+        onClick = { send(requestParams) },
+        modifier = Modifier.padding(end = 8.dp)
+      ) {
         Icon(
           Icons.AutoMirrored.Filled.Send,
           contentDescription = stringResource(R.string.saved_request_send_icon_tint)
@@ -207,7 +220,7 @@ private fun SavedRequestReorderItem(
       Row(verticalAlignment = Alignment.CenterVertically, modifier = Modifier.weight(1f)) {
         if (requestParams.watchSync) {
           Icon(
-            Icons.Filled.Sync,
+            Icons.Filled.ViewCarousel,
             contentDescription = stringResource(R.string.saved_request_tile_status),
             modifier = Modifier.padding(end = 8.dp)
           )
@@ -311,18 +324,25 @@ fun SavedRequestListHasItemPreview() {
   WearLinkTheme {
     SavedRequestList(listOf(
       RequestParams(
-        "ぐーぐる",
+        "状態なし",
         "https://www.google.com/",
         Constant.HttpMethod.GET,
         Constant.BodyType.QUERY,
-        watchfaceShortcut = true
       ),
       RequestParams(
-        "ぐーぐる",
+        "タイルのみ",
         "https://www.google.com/",
         Constant.HttpMethod.GET,
         Constant.BodyType.QUERY,
         watchSync = true
+      ),
+      RequestParams(
+        "タイル + ウォッチフェイス",
+        "https://www.google.com/",
+        Constant.HttpMethod.GET,
+        Constant.BodyType.QUERY,
+        watchSync = true,
+        watchfaceShortcut = true
       )
     ))
   }

@@ -134,8 +134,10 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
         )
       }
 
-      BackHandler(response.value != null || bottomMenuIndex.intValue > 1) {
-        if (response.value != null) {
+      BackHandler(reorderMode.value || response.value != null || bottomMenuIndex.intValue > 1) {
+        if (reorderMode.value) {
+          reorderMode.value = false
+        } else if (response.value != null) {
           response.value = null
         } else if (bottomMenuIndex.intValue > 1) {
           bottomMenuIndex.intValue = 0
@@ -183,19 +185,21 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     toggleTile = { index, request ->
                       viewModel.saveRequest(
                         index,
-                        request.copy(watchSync = !request.watchSync),
+                        request,
                         syncErrorTitle,
                         syncErrorDescription,
-                        null
+                        null,
+                        shouldToggleWatchSync = true,
                       )
                     },
                     toggleWatchface = { index, request ->
                       viewModel.saveRequest(
                         index,
-                        request.copy(watchfaceShortcut = !request.watchfaceShortcut),
+                        request,
                         syncErrorTitle,
                         syncErrorDescription,
-                        null
+                        null,
+                        shouldToggleWatchfaceShortcut = true,
                       )
                     },
                     addShortcut = { request -> viewModel.addShortcut(request, getString) },
@@ -229,9 +233,13 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     save = { index, request ->
                       editRequest.value = null
                       editRequestIndex.intValue = -1
-                      viewModel.saveRequest(index, request, syncErrorTitle, syncErrorDescription) { resId, title ->
-                        getString(resId, title)
-                      }
+                      viewModel.saveRequest(
+                        index,
+                        request,
+                        syncErrorTitle,
+                        syncErrorDescription,
+                        getString = { resId, title -> getString(resId, title) }
+                      )
                       bottomMenuIndex.intValue = 0
                     },
                     delete = {

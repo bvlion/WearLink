@@ -57,8 +57,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
         if (value != null && value.needsRequestIdMigration()) {
-          // Migration must complete before publishing this value, otherwise the UI could
-          // briefly observe duplicate/blank Request IDs and crash on LazyColumn item keys.
+          // LazyColumnのキー重複を防ぐため、IDマイグレーション完了前の値はUIに公開しない
           dataStore.saveRequest(value.parseRequestParams().deduplicateIds().toRequestParamsJson())
         } else {
           _savedRequest.value = value
@@ -98,10 +97,12 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
     request: RequestParams,
     syncErrorTitle: String,
     syncErrorDescription: String,
-    getString: ((Int, String) -> String)?
+    getString: ((Int, String) -> String)?,
+    shouldToggleWatchSync: Boolean = false,
+    shouldToggleWatchfaceShortcut: Boolean = false,
   ) {
     viewModelScope.launch(Dispatchers.IO) {
-      if (dataStore.upsertRequest(request)) {
+      if (dataStore.upsertRequest(request, shouldToggleWatchSync, shouldToggleWatchfaceShortcut)) {
         if (savedIndex >= 0) {
           RequestShortcuts.updateLabel(getApplication(), request)
         }

@@ -37,15 +37,32 @@ class AppDataStore(context: Context) {
     }
   }
 
-  suspend fun upsertRequest(request: RequestParams): Boolean {
+  suspend fun upsertRequest(
+    request: RequestParams,
+    shouldToggleWatchSync: Boolean = false,
+    shouldToggleWatchfaceShortcut: Boolean = false,
+  ): Boolean {
     var accepted = true
     settingsDataStore.edit { pref ->
       val current = pref[SAVED_REQUEST_KEY]?.parseRequestParams() ?: emptyList()
-      if (!current.isWatchSyncChangeAllowed(request, Constant.MAX_SYNC_COUNT)) {
+      val currentRequest = current.find { it.id == request.id }
+      val requestToSave = if (currentRequest != null) {
+        request.copy(
+          watchSync = if (shouldToggleWatchSync) !currentRequest.watchSync else currentRequest.watchSync,
+          watchfaceShortcut = if (shouldToggleWatchfaceShortcut) {
+            !currentRequest.watchfaceShortcut
+          } else {
+            currentRequest.watchfaceShortcut
+          },
+        )
+      } else {
+        request
+      }
+      if (!current.isWatchSyncChangeAllowed(requestToSave, Constant.MAX_SYNC_COUNT)) {
         accepted = false
         return@edit
       }
-      pref[SAVED_REQUEST_KEY] = current.upsertById(request).toRequestParamsJson()
+      pref[SAVED_REQUEST_KEY] = current.upsertById(requestToSave).toRequestParamsJson()
     }
     return accepted
   }
