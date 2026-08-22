@@ -64,7 +64,7 @@ import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
-import info.bvlion.wearlink.data.ResponseParams
+import info.bvlion.wearlink.data.ResponseParams.Companion.findBySelectionKey
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
 import info.bvlion.wearlink.mobile.R
 import info.bvlion.wearlink.request.WearMobileConnector
@@ -99,7 +99,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val reorderDraft = rememberSaveable { mutableStateOf(arrayListOf<RequestParams>()) }
       val reorderInitialIds = rememberSaveable { mutableStateOf(arrayListOf<String>()) }
       val showReorderDiscardDialog = rememberSaveable { mutableStateOf(false) }
-      val response = remember { mutableStateOf<ResponseParams?>(null) }
+      val selectedResponseKey = rememberSaveable { mutableStateOf<String?>(null) }
 
       val snackbarHostState = remember { SnackbarHostState() }
       val closeLabel = stringResource(R.string.close)
@@ -118,6 +118,19 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
             it.parseRequestParams()
           }
         } ?: emptyList()
+      }
+      // History表示中か、Activity再生成直後の選択復元が必要な場合だけ履歴JSONをparseする
+      val needsResponseHistory = bottomMenuIndex.intValue == 2 || selectedResponseKey.value != null
+      val responseHistory = remember(savedResponses.value, needsResponseHistory) {
+        if (needsResponseHistory && savedResponses.value.isNotEmpty()) {
+          savedResponses.value.parseResponseParams()
+        } else {
+          emptyList()
+        }
+      }
+      // digest計算を伴うためrecomposition毎の再検索を避け、履歴/キーが変わったときだけ解決する
+      val response = remember(responseHistory, selectedResponseKey.value) {
+        responseHistory.findBySelectionKey(selectedResponseKey.value)
       }
       val discardReorder = {
         reorderMode.value = false
@@ -159,15 +172,18 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
         )
       }
 
-      BackHandler(reorderMode.value || response.value != null || bottomMenuIndex.intValue > 1) {
+      // responseが解決済みかではなく、selection key自体の有無で詳細表示中/復元待ちを判定する。
+      // response == nullを条件にすると、Activity再生成直後でResponse履歴の復元待ちの間にBackすると
+      // keyが残ったままHomeへ遷移し、履歴復元後にBottomSheetがHome上へ再表示されてしまう
+      BackHandler(reorderMode.value || selectedResponseKey.value != null || bottomMenuIndex.intValue > 1) {
         if (reorderMode.value) {
           if (hasReorderChanges) {
             showReorderDiscardDialog.value = true
           } else {
             discardReorder()
           }
-        } else if (response.value != null) {
-          response.value = null
+        } else if (selectedResponseKey.value != null) {
+          selectedResponseKey.value = null
         } else if (bottomMenuIndex.intValue > 1) {
           bottomMenuIndex.intValue = 0
         }
@@ -297,15 +313,11 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                 }
                 MainAnimatedVisibility(bottomMenuIndex.intValue == 2) {
                   RequestHistoryList(
-                    if (savedResponses.value.isEmpty()) {
-                      emptyList()
-                    } else {
-                      savedResponses.value.parseResponseParams()
-                    },
+                    responseHistory,
                     it.calculateTopPadding(),
                     it.calculateBottomPadding()
                   ) {
-                    response.value = it
+                    selectedResponseKey.value = it.selectionKey()
                   }
                 }
                 MainAnimatedVisibility(bottomMenuIndex.intValue == 3) {
@@ -366,7 +378,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     editRequest.value = null
                     editRequestIndex.intValue = -1
                   }
-                  response.value = null
+                  selectedResponseKey.value = null
                 }
               }
             }
@@ -375,17 +387,17 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
           val sheetState = rememberModalBottomSheetState(
             skipPartiallyExpanded = true
           )
-          LaunchedEffect(response.value) {
-            if (response.value != null) {
+          LaunchedEffect(response) {
+            if (response != null) {
               sheetState.expand()
             } else {
               sheetState.hide()
             }
           }
 
-          response.value?.let {
+          response?.let {
             ModalBottomSheet(
-              onDismissRequest = { response.value = null },
+              onDismissRequest = { selectedResponseKey.value = null },
               sheetState = sheetState,
               shape = RoundedCornerShape(topStart = 16.dp, topEnd = 16.dp),
             ) {
