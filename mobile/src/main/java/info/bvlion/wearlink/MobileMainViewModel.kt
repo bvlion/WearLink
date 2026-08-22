@@ -94,7 +94,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   }
 
   fun saveRequest(
-    savedIndex: Int,
+    isUpdate: Boolean,
     request: RequestParams,
     tileLimitErrorTitle: String,
     tileLimitErrorDescription: String,
@@ -104,11 +104,11 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   ) {
     viewModelScope.launch(Dispatchers.IO) {
       if (dataStore.upsertRequest(request, shouldToggleWatchSync, shouldToggleWatchfaceShortcut)) {
-        if (savedIndex >= 0) {
+        if (isUpdate) {
           RequestShortcuts.updateLabel(getApplication(), request)
         }
         getString?.invoke(
-          if (savedIndex >= 0)
+          if (isUpdate)
             R.string.request_updated
           else
             R.string.request_created,
