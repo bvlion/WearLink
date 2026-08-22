@@ -27,7 +27,7 @@
   <string name="view_mode_default">Default</string>
   <string name="view_mode_dark">Dark</string>
   <string name="view_mode_light">Light</string>
-  <string name="menu_title_sync_with_wearable">Sync with Wearable</string>
+  <string name="menu_title_sync_with_wear_os">Sync with Wear OS</string>
   <string name="local_network_access">Access to LAN URLs</string>
   <string name="local_network_access_description">Sending requests to a URL on your LAN requires Android\'s “Nearby devices” permission. If you only use URLs on the internet, you can use the app without granting this permission. WearLink does not access your location or the distance to other devices.</string>
   <string name="local_network_access_grant">Allow</string>
@@ -61,7 +61,7 @@
 
   <!-- request history -->
   <string name="request_history_from_mobile">Sent from Mobile</string>
-  <string name="request_history_from_wearlable">Sent from Wearable</string>
+  <string name="request_history_from_wear_os">Sent from Wear OS</string>
   <string name="request_history_card_response">Response: %s</string>
   <string name="request_history_empty">No request history</string>
   <string name="request_history_bottom_sheet_response_code">Response Code:</string>
@@ -86,6 +86,10 @@
   <string name="saved_request_menu_add_shortcut_unsupported">This device does not support adding to the Home screen</string>
   <string name="saved_request_menu_reorder">Reorder list</string>
   <string name="saved_request_reorder_done">Done</string>
+  <string name="saved_request_reorder_discard_title">Discard reorder changes?</string>
+  <string name="saved_request_reorder_discard_description">Your reordered list will not be saved.</string>
+  <string name="saved_request_reorder_continue">Keep editing</string>
+  <string name="saved_request_reorder_discard">Discard</string>
   <string name="saved_request_reorder_move_up">Move up</string>
   <string name="saved_request_reorder_move_down">Move down</string>
 
@@ -98,10 +102,10 @@
   <string name="copied_clipboard_error">No data available for export</string>
   <string name="request_imported">Imported</string>
   <string name="execute_history_deleted">Execution history deleted</string>
-  <string name="sync_wearable">Synced with wearable</string>
-  <string name="sync_wearable_error">Wearable not found</string>
-  <string name="sync_wearable_error_title">Wearable Sync Error</string>
-  <string name="sync_wearable_error_description">Up to %s connections can be synced.\nPlease uncheck another synced connection.</string>
+  <string name="sync_wear_os">Synced with Wear OS</string>
+  <string name="sync_wear_os_error">Wear OS device not found</string>
+  <string name="tile_limit_error_title">Can\'t show on tile</string>
+  <string name="tile_limit_error_description">You can show up to %s requests on the tile.\nRemove another request from the tile before adding this one.</string>
 
   <!-- shortcut -->
   <string name="shortcut_request_not_found">The request was not found</string>

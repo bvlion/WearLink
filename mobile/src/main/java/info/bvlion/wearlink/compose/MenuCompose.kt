@@ -111,7 +111,7 @@ fun MenuList(
       }
     }
 
-    MenuRow(stringResource(R.string.menu_title_sync_with_wearable), Icons.Filled.Sync) {
+    MenuRow(stringResource(R.string.menu_title_sync_with_wear_os), Icons.Filled.Sync) {
       syncWatch()
     }
 

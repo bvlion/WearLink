@@ -21,6 +21,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
@@ -29,6 +30,8 @@ import androidx.compose.material3.SnackbarDuration
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
+import androidx.compose.material3.Text
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -51,7 +54,7 @@ import info.bvlion.wearlink.compose.ErrorDialogCompose
 import info.bvlion.wearlink.compose.LoadingCompose
 import info.bvlion.wearlink.compose.MenuBottomNavigation
 import info.bvlion.wearlink.compose.MenuList
-import info.bvlion.wearlink.compose.ReorderDoneBar
+import info.bvlion.wearlink.compose.ReorderActionBar
 import info.bvlion.wearlink.compose.RequestCreate
 import info.bvlion.wearlink.compose.RequestHistoryDetailContent
 import info.bvlion.wearlink.compose.RequestHistoryList
@@ -59,6 +62,7 @@ import info.bvlion.wearlink.compose.SavedRequestList
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.ResponseParams
 import info.bvlion.wearlink.data.ResponseParams.Companion.parseResponseParams
@@ -92,15 +96,36 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val editRequest = rememberSaveable { mutableStateOf<RequestParams?>(null) }
       val editRequestIndex = rememberSaveable { mutableIntStateOf(-1) }
       val reorderMode = rememberSaveable { mutableStateOf(false) }
+      val reorderDraft = rememberSaveable { mutableStateOf(arrayListOf<RequestParams>()) }
+      val reorderInitialIds = rememberSaveable { mutableStateOf(arrayListOf<String>()) }
+      val showReorderDiscardDialog = rememberSaveable { mutableStateOf(false) }
       val response = remember { mutableStateOf<ResponseParams?>(null) }
 
       val snackbarHostState = remember { SnackbarHostState() }
       val closeLabel = stringResource(R.string.close)
 
       val getString = { id: Int -> getString(id) }
-      val syncErrorTitle = stringResource(R.string.sync_wearable_error_title)
-      val syncErrorDescription =
-        stringResource(R.string.sync_wearable_error_description, Constant.MAX_SYNC_COUNT)
+      val tileLimitErrorTitle = stringResource(R.string.tile_limit_error_title)
+      val tileLimitErrorDescription =
+        stringResource(R.string.tile_limit_error_description, Constant.MAX_SYNC_COUNT)
+      val savedRequestParams = if (savedRequests.value == null) {
+        emptyList()
+      } else {
+        savedRequests.value?.let {
+          if (it.isEmpty()) {
+            null // 起動時に入力画面が出ないようにする
+          } else {
+            it.parseRequestParams()
+          }
+        } ?: emptyList()
+      }
+      val discardReorder = {
+        reorderMode.value = false
+        reorderDraft.value = arrayListOf()
+        reorderInitialIds.value = arrayListOf()
+        showReorderDiscardDialog.value = false
+      }
+      val hasReorderChanges = reorderDraft.value.map { it.id } != reorderInitialIds.value
       val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
       ) {
@@ -136,7 +161,11 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 
       BackHandler(reorderMode.value || response.value != null || bottomMenuIndex.intValue > 1) {
         if (reorderMode.value) {
-          reorderMode.value = false
+          if (hasReorderChanges) {
+            showReorderDiscardDialog.value = true
+          } else {
+            discardReorder()
+          }
         } else if (response.value != null) {
           response.value = null
         } else if (bottomMenuIndex.intValue > 1) {
@@ -150,6 +179,23 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
             viewModel.dismissErrorDialog()
           }
         }
+        if (showReorderDiscardDialog.value) {
+          AlertDialog(
+            onDismissRequest = { showReorderDiscardDialog.value = false },
+            title = { Text(stringResource(R.string.saved_request_reorder_discard_title)) },
+            text = { Text(stringResource(R.string.saved_request_reorder_discard_description)) },
+            confirmButton = {
+              TextButton(onClick = discardReorder) {
+                Text(stringResource(R.string.saved_request_reorder_discard))
+              }
+            },
+            dismissButton = {
+              TextButton(onClick = { showReorderDiscardDialog.value = false }) {
+                Text(stringResource(R.string.saved_request_reorder_continue))
+              }
+            }
+          )
+        }
 
         Surface(
           modifier = Modifier.imePadding().fillMaxSize(),
@@ -161,17 +207,7 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
               Box(modifier = Modifier.fillMaxSize()) {
                 MainAnimatedVisibility(bottomMenuIndex.intValue == 0) {
                   SavedRequestList(
-                    requests = if (savedRequests.value == null) {
-                      emptyList()
-                    } else {
-                      savedRequests.value?.let {
-                        if (it.isEmpty()) {
-                          null // 起動時に入力画面が出ないようにする
-                        } else {
-                          it.parseRequestParams()
-                        }
-                      } ?: emptyList()
-                    },
+                    requests = if (reorderMode.value) reorderDraft.value else savedRequestParams,
                     reorderMode = reorderMode.value,
                     newCreateClick = { bottomMenuIndex.intValue = 1 },
                     topPadding = it.calculateTopPadding(),
@@ -186,8 +222,8 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       viewModel.saveRequest(
                         index,
                         request,
-                        syncErrorTitle,
-                        syncErrorDescription,
+                        tileLimitErrorTitle,
+                        tileLimitErrorDescription,
                         null,
                         shouldToggleWatchSync = true,
                       )
@@ -196,16 +232,24 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       viewModel.saveRequest(
                         index,
                         request,
-                        syncErrorTitle,
-                        syncErrorDescription,
+                        tileLimitErrorTitle,
+                        tileLimitErrorDescription,
                         null,
                         shouldToggleWatchfaceShortcut = true,
                       )
                     },
                     addShortcut = { request -> viewModel.addShortcut(request, getString) },
-                    startReorder = { reorderMode.value = true },
-                    moveUp = { request -> viewModel.moveRequest(request.id, -1) },
-                    moveDown = { request -> viewModel.moveRequest(request.id, 1) }
+                    startReorder = {
+                      reorderDraft.value = ArrayList(savedRequestParams)
+                      reorderInitialIds.value = ArrayList(savedRequestParams.map { it.id })
+                      reorderMode.value = true
+                    },
+                    moveUp = { request ->
+                      reorderDraft.value = ArrayList(reorderDraft.value.moveById(request.id, -1))
+                    },
+                    moveDown = { request ->
+                      reorderDraft.value = ArrayList(reorderDraft.value.moveById(request.id, 1))
+                    }
                   )
                   if (loading.value) {
                     LoadingCompose()
@@ -236,8 +280,8 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                       viewModel.saveRequest(
                         index,
                         request,
-                        syncErrorTitle,
-                        syncErrorDescription,
+                        tileLimitErrorTitle,
+                        tileLimitErrorDescription,
                         getString = { resId, title -> getString(resId, title) }
                       )
                       bottomMenuIndex.intValue = 0
@@ -306,7 +350,16 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
             },
             bottomBar = {
               if (reorderMode.value) {
-                ReorderDoneBar { reorderMode.value = false }
+                ReorderActionBar(
+                  onCancel = discardReorder,
+                  onDone = {
+                    if (hasReorderChanges) {
+                      viewModel.reorderRequests(reorderDraft.value.map { it.id }, discardReorder)
+                    } else {
+                      discardReorder()
+                    }
+                  }
+                )
               } else {
                 MenuBottomNavigation(bottomMenuIndex) {
                   if (it != 1) {

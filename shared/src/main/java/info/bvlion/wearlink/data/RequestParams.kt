@@ -57,6 +57,9 @@ data class RequestParams(
       }
     }
 
+    fun List<RequestParams>.reorderByIds(ids: List<String>): List<RequestParams> =
+      ids.mapNotNull { id -> findById(id) } + filterNot { it.id in ids }
+
     fun List<RequestParams>.upsertById(request: RequestParams): List<RequestParams> {
       val cleared = if (request.watchfaceShortcut) {
         map { it.copy(watchfaceShortcut = false) }

@@ -9,6 +9,7 @@ import info.bvlion.wearlink.data.RequestParams.Companion.normalizeRequestParamsJ
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParam
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.removeById
+import info.bvlion.wearlink.data.RequestParams.Companion.reorderByIds
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
 import info.bvlion.wearlink.data.RequestParams.Companion.upsertById
 import org.json.JSONArray
@@ -387,6 +388,29 @@ class RequestParamsTest {
     val reloaded = moved.toRequestParamsJson().parseRequestParams()
 
     assertEquals(moved, reloaded)
+  }
+
+  @Test
+  fun reorderByIdsUsesLatestContentAndKeepsAddedRequestsTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val added = reorderRequest("added")
+    val updatedSecond = second.copy(title = "updated-second")
+
+    val reordered = listOf(first, updatedSecond, added)
+      .reorderByIds(listOf(second.id, first.id, third.id))
+
+    assertEquals(listOf(updatedSecond, first, added), reordered)
+  }
+
+  @Test
+  fun reorderByIdsWithSameOrderKeepsRequestsUnchangedTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val requests = listOf(first, second)
+
+    assertEquals(requests, requests.reorderByIds(requests.map { it.id }))
   }
 
   @Test

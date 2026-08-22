@@ -5,6 +5,7 @@ import android.content.ClipData
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -95,8 +96,8 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun saveRequest(
     savedIndex: Int,
     request: RequestParams,
-    syncErrorTitle: String,
-    syncErrorDescription: String,
+    tileLimitErrorTitle: String,
+    tileLimitErrorDescription: String,
     getString: ((Int, String) -> String)?,
     shouldToggleWatchSync: Boolean = false,
     shouldToggleWatchfaceShortcut: Boolean = false,
@@ -114,14 +115,17 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
           request.title
         )?.let { showSnackbar(it) }
       } else {
-        showWatchSyncError(syncErrorTitle, syncErrorDescription)
+        showTileLimitError(tileLimitErrorTitle, tileLimitErrorDescription)
       }
     }
   }
 
-  fun moveRequest(id: String, offset: Int) {
+  fun reorderRequests(ids: List<String>, completed: () -> Unit) {
     viewModelScope.launch(Dispatchers.IO) {
-      dataStore.moveRequest(id, offset)
+      dataStore.reorderRequests(ids)
+      withContext(Dispatchers.Main) {
+        completed()
+      }
     }
   }
 
@@ -224,15 +228,15 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       wearConnector.sendMessageToWear(
         WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH,
         successProcess = {
-          showSnackbar(getString(R.string.sync_wearable))
+          showSnackbar(getString(R.string.sync_wear_os))
         }
       ) {
-        showSnackbar(getString(R.string.sync_wearable_error))
+        showSnackbar(getString(R.string.sync_wear_os_error))
       }
     }
   }
 
-  fun showWatchSyncError(title: String, message: String) {
+  fun showTileLimitError(title: String, message: String) {
     _errorDialog.value = ErrorDetail(title, message)
   }
 
