@@ -5,6 +5,7 @@ import android.content.ClipData
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -26,7 +27,6 @@ import info.bvlion.wearlink.shortcut.RequestShortcuts
 import info.bvlion.wearlink.sync.Sync
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
-import org.json.JSONArray
 
 class MobileMainViewModel(application: Application) : AndroidViewModel(application) {
   private val dataStore = AppDataStore.getDataStore(application)
@@ -57,10 +57,11 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   init {
     viewModelScope.launch(Dispatchers.IO) {
       dataStore.getSavedRequest.collect { value ->
-        _savedRequest.value = value
         if (value != null && value.needsRequestIdMigration()) {
+          // LazyColumnのキー重複を防ぐため、IDマイグレーション完了前の値はUIに公開しない
           dataStore.saveRequest(value.parseRequestParams().deduplicateIds().toRequestParamsJson())
         } else {
+          _savedRequest.value = value
           Sync.requestsSyncToWear(dataStore, wearConnector)
         }
       }
@@ -95,61 +96,47 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun saveRequest(
     savedIndex: Int,
     request: RequestParams,
-    getString: ((Int, String) -> String)?
+    tileLimitErrorTitle: String,
+    tileLimitErrorDescription: String,
+    getString: ((Int, String) -> String)?,
+    shouldToggleWatchSync: Boolean = false,
+    shouldToggleWatchfaceShortcut: Boolean = false,
   ) {
     viewModelScope.launch(Dispatchers.IO) {
-        (savedRequest.value?.parseRequestParams()?.toMutableList() ?: mutableListOf())
-        .map {
-          if (request.watchfaceShortcut) {
-            it.copy(watchfaceShortcut = false)
-          } else {
-            it
-          }
+      if (dataStore.upsertRequest(request, shouldToggleWatchSync, shouldToggleWatchfaceShortcut)) {
+        if (savedIndex >= 0) {
+          RequestShortcuts.updateLabel(getApplication(), request)
         }
-        .toMutableList()
-        .apply {
-          if (savedIndex >= 0) {
-            set(savedIndex, request)
-          } else {
-            add(0, request)
-          }
-        }
-        .map { it.toJsonString() }
-        .let { JSONArray(it).toString() }
-        .let { dataStore.saveRequest(it) }
-      if (savedIndex >= 0) {
-        RequestShortcuts.updateLabel(getApplication(), request)
+        getString?.invoke(
+          if (savedIndex >= 0)
+            R.string.request_updated
+          else
+            R.string.request_created,
+          request.title
+        )?.let { showSnackbar(it) }
+      } else {
+        showTileLimitError(tileLimitErrorTitle, tileLimitErrorDescription)
       }
     }
-    getString?.invoke(
-      if (savedIndex >= 0)
-        R.string.request_updated
-      else
-        R.string.request_created,
-      request.title
-    )?.let { showSnackbar(it) }
   }
 
-  fun deleteRequest(deleteIndex: Int, getString: (Int) -> String) {
-    viewModelScope.launch {
-      savedRequest.value?.run {
-        val requests = parseRequestParams().toMutableList()
-        val deletedRequest = requests.getOrNull(deleteIndex)
-        requests
-          .apply {
-            removeAt(deleteIndex)
-          }
-          .map { it.toJsonString() }
-          .let { JSONArray(it).toString() }
-          .let { dataStore.saveRequest(it) }
-        deletedRequest?.let {
-          RequestShortcuts.disable(
-            getApplication(),
-            it.id,
-            getString(R.string.shortcut_request_deleted)
-          )
-        }
+  fun reorderRequests(ids: List<String>, completed: () -> Unit) {
+    viewModelScope.launch(Dispatchers.IO) {
+      dataStore.reorderRequests(ids)
+      withContext(Dispatchers.Main) {
+        completed()
       }
+    }
+  }
+
+  fun deleteRequest(id: String, getString: (Int) -> String) {
+    viewModelScope.launch {
+      dataStore.deleteRequestById(id)
+      RequestShortcuts.disable(
+        getApplication(),
+        id,
+        getString(R.string.shortcut_request_deleted)
+      )
     }
     showSnackbar(getString(R.string.request_deleted))
   }
@@ -173,7 +160,7 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
   fun addShortcut(request: RequestParams, getString: (Int) -> String) {
     val context = getApplication<Application>()
     if (!RequestShortcuts.isSupported(context)) {
-      showSnackbar(getString(R.string.request_edit_add_shortcut_unsupported))
+      showSnackbar(getString(R.string.saved_request_menu_add_shortcut_unsupported))
       return
     }
     RequestShortcuts.requestPin(context, request)
@@ -241,15 +228,15 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       wearConnector.sendMessageToWear(
         WearMobileConnector.WEAR_REQUEST_RESPONSE_PATH,
         successProcess = {
-          showSnackbar(getString(R.string.sync_wearable))
+          showSnackbar(getString(R.string.sync_wear_os))
         }
       ) {
-        showSnackbar(getString(R.string.sync_wearable_error))
+        showSnackbar(getString(R.string.sync_wear_os_error))
       }
     }
   }
 
-  fun showWatchSyncError(title: String, message: String) {
+  fun showTileLimitError(title: String, message: String) {
     _errorDialog.value = ErrorDetail(title, message)
   }
 

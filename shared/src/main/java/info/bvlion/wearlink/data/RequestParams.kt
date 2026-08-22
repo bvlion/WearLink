@@ -47,6 +47,41 @@ data class RequestParams(
 
     fun List<RequestParams>.findById(id: String): RequestParams? = find { it.id == id }
 
+    fun List<RequestParams>.moveById(id: String, offset: Int): List<RequestParams> {
+      val currentIndex = indexOfFirst { it.id == id }
+      if (currentIndex < 0) return this
+      val targetIndex = (currentIndex + offset).coerceIn(0, lastIndex)
+      if (targetIndex == currentIndex) return this
+      return toMutableList().apply {
+        add(targetIndex, removeAt(currentIndex))
+      }
+    }
+
+    fun List<RequestParams>.reorderByIds(ids: List<String>): List<RequestParams> =
+      ids.mapNotNull { id -> findById(id) } + filterNot { it.id in ids }
+
+    fun List<RequestParams>.upsertById(request: RequestParams): List<RequestParams> {
+      val cleared = if (request.watchfaceShortcut) {
+        map { it.copy(watchfaceShortcut = false) }
+      } else {
+        this
+      }
+      val index = cleared.indexOfFirst { it.id == request.id }
+      return if (index >= 0) {
+        cleared.toMutableList().apply { set(index, request) }
+      } else {
+        listOf(request) + cleared
+      }
+    }
+
+    fun List<RequestParams>.removeById(id: String): List<RequestParams> = filterNot { it.id == id }
+
+    fun List<RequestParams>.isWatchSyncChangeAllowed(request: RequestParams, maxSyncCount: Int): Boolean {
+      val wasSynced = findById(request.id)?.watchSync == true
+      if (!request.watchSync || wasSynced) return true
+      return count { it.id != request.id && it.watchSync } < maxSyncCount
+    }
+
     fun List<RequestParams>.deduplicateIds(): List<RequestParams> {
       val seenIds = mutableSetOf<String>()
       return map { request ->

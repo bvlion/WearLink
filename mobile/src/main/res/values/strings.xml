@@ -27,7 +27,7 @@
   <string name="view_mode_default">デフォルト</string>
   <string name="view_mode_dark">ダーク</string>
   <string name="view_mode_light">ライト</string>
-  <string name="menu_title_sync_with_wearable">ウェアラブルと同期</string>
+  <string name="menu_title_sync_with_wear_os">Wear OSと同期</string>
   <string name="local_network_access">LAN内のURLへのアクセス</string>
   <string name="local_network_access_description">LAN内のURLへRequestを送る場合には、Androidの「付近のデバイス」への許可が必要です。インターネット上のURLだけを利用する場合、この権限は許可しなくても利用できます。WearLinkでは位置情報や端末間の距離を取得しません。</string>
   <string name="local_network_access_grant">許可する</string>
@@ -53,19 +53,15 @@
   <string name="request_edit_input_url_error_blank">URL を入力してください</string>
   <string name="request_edit_input_request_headers">Request Headers</string>
   <string name="request_edit_input_request_body">Request Body</string>
-  <string name="request_edit_watchface_shortcut">ウォッチフェイスのアクションに設定する</string>
   <string name="request_edit_interrupt_title">入力を中断しますか？</string>
   <string name="request_edit_interrupt_description">中断すると今の入力内容は破棄されます。</string>
   <string name="request_edit_interrupt_confirm">入力をやめる</string>
   <string name="request_edit_delete_title">削除しますか？</string>
   <string name="request_edit_delete_description">「%s」を削除します。\nこの操作は元に戻せません。</string>
-  <string name="request_edit_add_shortcut">ホーム画面に追加</string>
-  <string name="request_edit_add_shortcut_unsupported">この端末はホーム画面への追加に対応していません</string>
-  <string name="request_edit_add_shortcut_unsaved">変更を保存してからホーム画面へ追加してください</string>
 
   <!-- request history -->
   <string name="request_history_from_mobile">モバイルから送信</string>
-  <string name="request_history_from_wearlable">ウェアラブルから送信</string>
+  <string name="request_history_from_wear_os">Wear OSから送信</string>
   <string name="request_history_card_response">Response: %s</string>
   <string name="request_history_empty">送信履歴がありません</string>
   <string name="request_history_bottom_sheet_response_code">Response Code:</string>
@@ -75,11 +71,27 @@
   <string name="request_history_bottom_sheet_response_header">Response Header:</string>
 
   <!-- saved request -->
-  <string name="saved_request_sync_wearlable">ウェアラブルに同期</string>
-  <string name="saved_request_set_watchface">ウォッチフェイスに設定</string>
+  <string name="saved_request_tile_status">タイルに表示中</string>
+  <string name="saved_request_watchface_status">ウォッチフェイスに表示中</string>
   <string name="saved_request_send_icon_tint">送信ボタン</string>
   <string name="saved_request_empty_message">保存されたリクエストがありません</string>
   <string name="saved_request_empty_create_button">新規リクエストを作成する</string>
+  <string name="saved_request_menu_button">管理メニュー</string>
+  <string name="saved_request_menu_edit">編集する</string>
+  <string name="saved_request_menu_show_on_tile">タイルに表示する</string>
+  <string name="saved_request_menu_hide_from_tile">タイルから外す</string>
+  <string name="saved_request_menu_show_on_watchface">ウォッチフェイスに表示する</string>
+  <string name="saved_request_menu_hide_from_watchface">ウォッチフェイスから外す</string>
+  <string name="saved_request_menu_add_shortcut">ホーム画面にショートカットを追加する</string>
+  <string name="saved_request_menu_add_shortcut_unsupported">この端末はホーム画面への追加に対応していません</string>
+  <string name="saved_request_menu_reorder">一覧を並び替える</string>
+  <string name="saved_request_reorder_done">完了</string>
+  <string name="saved_request_reorder_discard_title">並び替えを破棄しますか？</string>
+  <string name="saved_request_reorder_discard_description">並び替えた内容は保存されません。</string>
+  <string name="saved_request_reorder_continue">続ける</string>
+  <string name="saved_request_reorder_discard">破棄する</string>
+  <string name="saved_request_reorder_move_up">上へ移動</string>
+  <string name="saved_request_reorder_move_down">下へ移動</string>
 
   <!-- activity action -->
   <string name="request_created">「%s」を作成しました</string>
@@ -90,10 +102,10 @@
   <string name="copied_clipboard_error">エクスポートするデータがありません</string>
   <string name="request_imported">インポートしました</string>
   <string name="execute_history_deleted">実行履歴を削除しました</string>
-  <string name="sync_wearable">ウェアラブルと同期しました</string>
-  <string name="sync_wearable_error">ウェアラブルが見つかりません</string>
-  <string name="sync_wearable_error_title">ウェアラブル同期エラー</string>
-  <string name="sync_wearable_error_description">同期できる通信は%sつまでです。\n別の同期されている通信のチェックを外してください。</string>
+  <string name="sync_wear_os">Wear OSと同期しました</string>
+  <string name="sync_wear_os_error">Wear OS端末が見つかりません</string>
+  <string name="tile_limit_error_title">タイルに表示できません</string>
+  <string name="tile_limit_error_description">タイルに表示できるRequestは%s件までです。\n別のRequestをタイルから外してから追加してください。</string>
 
   <!-- shortcut -->
   <string name="shortcut_request_not_found">対象のRequestが見つかりません</string>

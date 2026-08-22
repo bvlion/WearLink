@@ -2,11 +2,16 @@ package info.bvlion.wearlink.data
 
 import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
 import info.bvlion.wearlink.data.RequestParams.Companion.findById
+import info.bvlion.wearlink.data.RequestParams.Companion.isWatchSyncChangeAllowed
+import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.normalizeRequestParamsJson
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParam
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
+import info.bvlion.wearlink.data.RequestParams.Companion.removeById
+import info.bvlion.wearlink.data.RequestParams.Companion.reorderByIds
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
+import info.bvlion.wearlink.data.RequestParams.Companion.upsertById
 import org.json.JSONArray
 import org.json.JSONObject
 import org.junit.Assert.assertEquals
@@ -240,5 +245,362 @@ class RequestParamsTest {
   @Test
   fun findByIdReturnsNullForUnknownIdTest() {
     assertNull(listOf(watchSyncRequest).findById("unknown-id"))
+  }
+
+  private fun reorderRequest(title: String, watchSync: Boolean = false) = RequestParams(
+    title = title,
+    url = "https://example.com/${title}",
+    method = Constant.HttpMethod.GET,
+    bodyType = Constant.BodyType.QUERY,
+    watchSync = watchSync,
+  )
+
+  @Test
+  fun moveByIdMovesMiddleItemUpTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(second.id, -1)
+
+    assertEquals(listOf(second, first, third), moved)
+  }
+
+  @Test
+  fun moveByIdMovesMiddleItemDownTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(second.id, 1)
+
+    assertEquals(listOf(first, third, second), moved)
+  }
+
+  @Test
+  fun moveByIdMovesFirstItemDownToMiddleTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(first.id, 1)
+
+    assertEquals(listOf(second, first, third), moved)
+  }
+
+  @Test
+  fun moveByIdMovesLastItemUpToMiddleTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(third.id, -1)
+
+    assertEquals(listOf(first, third, second), moved)
+  }
+
+  @Test
+  fun moveByIdOnFirstItemUpIsNoOpTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val requests = listOf(first, second)
+
+    val moved = requests.moveById(first.id, -1)
+
+    assertEquals(requests, moved)
+  }
+
+  @Test
+  fun moveByIdOnLastItemDownIsNoOpTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val requests = listOf(first, second)
+
+    val moved = requests.moveById(second.id, 1)
+
+    assertEquals(requests, moved)
+  }
+
+  @Test
+  fun moveByIdWithUnknownIdIsNoOpTest() {
+    val requests = listOf(reorderRequest("first"), reorderRequest("second"))
+
+    val moved = requests.moveById("unknown-id", 1)
+
+    assertEquals(requests, moved)
+  }
+
+  @Test
+  fun moveByIdPreservesIdsAndContentTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(third.id, -1)
+
+    assertEquals(requests.map { it.id }.toSet(), moved.map { it.id }.toSet())
+    moved.forEach { movedRequest ->
+      assertEquals(requests.findById(movedRequest.id), movedRequest)
+    }
+  }
+
+  @Test
+  fun moveByIdPreservesRelativeOrderOfWatchSyncFilteredSubsetTest() {
+    val syncedFirst = reorderRequest("synced-first", watchSync = true)
+    val unsynced = reorderRequest("unsynced")
+    val syncedSecond = reorderRequest("synced-second", watchSync = true)
+    val requests = listOf(syncedFirst, unsynced, syncedSecond)
+
+    val moved = requests.moveById(unsynced.id, -1)
+
+    assertEquals(listOf(syncedFirst, syncedSecond), moved.filter { it.watchSync })
+  }
+
+  @Test
+  fun moveByIdChangesRelativeOrderOfWatchSyncTargetsWhenSyncedItemsAreSwappedTest() {
+    val syncedFirst = reorderRequest("synced-first", watchSync = true)
+    val syncedSecond = reorderRequest("synced-second", watchSync = true)
+    val unsynced = reorderRequest("unsynced")
+    val requests = listOf(syncedFirst, syncedSecond, unsynced)
+
+    val moved = requests.moveById(syncedSecond.id, -1)
+
+    // Wear OS同期対象の抽出順も並び替え後の順序になることを確認する
+    assertEquals(
+      listOf(syncedSecond, syncedFirst),
+      moved.filter { it.watchSync || it.watchfaceShortcut }
+    )
+  }
+
+  @Test
+  fun moveByIdOrderSurvivesJsonRoundTripTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val moved = requests.moveById(third.id, -1)
+    val reloaded = moved.toRequestParamsJson().parseRequestParams()
+
+    assertEquals(moved, reloaded)
+  }
+
+  @Test
+  fun reorderByIdsUsesLatestContentAndKeepsAddedRequestsTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val added = reorderRequest("added")
+    val updatedSecond = second.copy(title = "updated-second")
+
+    val reordered = listOf(first, updatedSecond, added)
+      .reorderByIds(listOf(second.id, first.id, third.id))
+
+    assertEquals(listOf(updatedSecond, first, added), reordered)
+  }
+
+  @Test
+  fun reorderByIdsWithSameOrderKeepsRequestsUnchangedTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val requests = listOf(first, second)
+
+    assertEquals(requests, requests.reorderByIds(requests.map { it.id }))
+  }
+
+  @Test
+  fun upsertByIdReplacesMatchingRequestInPlaceTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val edited = second.copy(title = "second-edited")
+
+    val updated = listOf(first, second, third).upsertById(edited)
+
+    assertEquals(listOf(first, edited, third), updated)
+  }
+
+  @Test
+  fun upsertByIdPrependsWhenIdNotFoundTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val newRequest = reorderRequest("new")
+
+    val updated = listOf(first, second).upsertById(newRequest)
+
+    assertEquals(listOf(newRequest, first, second), updated)
+  }
+
+  @Test
+  fun upsertByIdClearsWatchfaceShortcutOnOtherRequestsTest() {
+    val first = reorderRequest("first").copy(watchfaceShortcut = true)
+    val second = reorderRequest("second")
+    val editedSecond = second.copy(watchfaceShortcut = true, title = "second-shortcut")
+
+    val updated = listOf(first, second).upsertById(editedSecond)
+
+    assertEquals(listOf(first.copy(watchfaceShortcut = false), editedSecond), updated)
+  }
+
+  @Test
+  fun upsertByIdWithoutWatchfaceShortcutLeavesOtherShortcutFlagsUntouchedTest() {
+    val first = reorderRequest("first").copy(watchfaceShortcut = true)
+    val second = reorderRequest("second")
+    val editedSecond = second.copy(title = "second-edited")
+
+    val updated = listOf(first, second).upsertById(editedSecond)
+
+    assertEquals(listOf(first, editedSecond), updated)
+  }
+
+  @Test
+  fun upsertByIdTurnsTileDisplayOnTest() {
+    val requestParams = reorderRequest("tile-target")
+    val turnedOn = requestParams.copy(watchSync = true)
+
+    val updated = listOf(requestParams).upsertById(turnedOn)
+
+    assertEquals(true, updated.single().watchSync)
+  }
+
+  @Test
+  fun upsertByIdTurnsTileDisplayOffTest() {
+    val requestParams = reorderRequest("tile-target", watchSync = true)
+    val turnedOff = requestParams.copy(watchSync = false)
+
+    val updated = listOf(requestParams).upsertById(turnedOff)
+
+    assertEquals(false, updated.single().watchSync)
+  }
+
+  @Test
+  fun upsertByIdTurnsWatchfaceDisplayOffWithoutAffectingOtherRequestsTest() {
+    val target = reorderRequest("watchface-target").copy(watchfaceShortcut = true)
+    val other = reorderRequest("other")
+    val turnedOff = target.copy(watchfaceShortcut = false)
+
+    val updated = listOf(target, other).upsertById(turnedOff)
+
+    assertEquals(listOf(turnedOff, other), updated)
+  }
+
+  @Test
+  fun upsertByIdPreservesTileAndWatchfaceStateOnPlainContentEditTest() {
+    val requestParams = reorderRequest("edited").copy(watchSync = true, watchfaceShortcut = true)
+    val contentOnlyEdit = requestParams.copy(title = "renamed", url = "https://example.com/renamed")
+
+    val updated = listOf(requestParams).upsertById(contentOnlyEdit)
+
+    assertEquals(true, updated.single().watchSync)
+    assertEquals(true, updated.single().watchfaceShortcut)
+    assertEquals("renamed", updated.single().title)
+  }
+
+  @Test
+  fun removeByIdRemovesOnlyMatchingRequestTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+
+    val updated = listOf(first, second, third).removeById(second.id)
+
+    assertEquals(listOf(first, third), updated)
+  }
+
+  @Test
+  fun removeByIdWithUnknownIdIsNoOpTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+
+    val updated = listOf(first, second).removeById("unknown-id")
+
+    assertEquals(listOf(first, second), updated)
+  }
+
+  // 並び替え前の古いindexや一覧ではなく、現在の一覧からIDで対象を特定する
+  @Test
+  fun upsertByIdAfterMoveByIdUpdatesCorrectRequestAndKeepsReorderedPositionTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val reordered = listOf(first, second, third).moveById(first.id, 1)
+
+    val updated = reordered.upsertById(first.copy(watchSync = true))
+
+    assertEquals(listOf(second, first.copy(watchSync = true), third), updated)
+  }
+
+  @Test
+  fun removeByIdAfterMoveByIdDeletesCorrectRequestAndKeepsReorderedOrderTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val reordered = listOf(first, second, third).moveById(first.id, 1)
+
+    val updated = reordered.removeById(second.id)
+
+    assertEquals(listOf(first, third), updated)
+  }
+
+  @Test
+  fun isWatchSyncChangeAllowedTrueWhenTurningOnBelowLimitTest() {
+    val synced = reorderRequest("synced", watchSync = true)
+    val target = reorderRequest("target")
+    val requests = listOf(synced, target)
+
+    assertTrue(requests.isWatchSyncChangeAllowed(target.copy(watchSync = true), maxSyncCount = 2))
+  }
+
+  @Test
+  fun isWatchSyncChangeAllowedFalseWhenTurningOnDifferentRequestAtLimitTest() {
+    val syncedA = reorderRequest("synced-a", watchSync = true)
+    val syncedB = reorderRequest("synced-b", watchSync = true)
+    val target = reorderRequest("target")
+    val requests = listOf(syncedA, syncedB, target)
+
+    assertFalse(requests.isWatchSyncChangeAllowed(target.copy(watchSync = true), maxSyncCount = 2))
+  }
+
+  @Test
+  fun isWatchSyncChangeAllowedTrueForPlainEditOfAlreadySyncedRequestAtLimitTest() {
+    val syncedA = reorderRequest("synced-a", watchSync = true)
+    val syncedB = reorderRequest("synced-b", watchSync = true)
+    val requests = listOf(syncedA, syncedB)
+    val editedA = syncedA.copy(title = "synced-a-renamed")
+
+    assertTrue(requests.isWatchSyncChangeAllowed(editedA, maxSyncCount = 2))
+  }
+
+  @Test
+  fun isWatchSyncChangeAllowedTrueWhenTurningOffAtLimitTest() {
+    val syncedA = reorderRequest("synced-a", watchSync = true)
+    val syncedB = reorderRequest("synced-b", watchSync = true)
+    val requests = listOf(syncedA, syncedB)
+
+    assertTrue(requests.isWatchSyncChangeAllowed(syncedA.copy(watchSync = false), maxSyncCount = 2))
+  }
+
+  // DataStore transactionごとに最新一覧で上限を判定する必要がある
+  @Test
+  fun isWatchSyncChangeAllowedSequentialTogglesNeverExceedLimitTest() {
+    val maxSyncCount = 2
+    val syncedA = reorderRequest("synced-a", watchSync = true)
+    val unsyncedB = reorderRequest("unsynced-b")
+    val unsyncedC = reorderRequest("unsynced-c")
+    val requests = listOf(syncedA, unsyncedB, unsyncedC)
+
+    val turnOnB = unsyncedB.copy(watchSync = true)
+    assertTrue(requests.isWatchSyncChangeAllowed(turnOnB, maxSyncCount))
+    val afterB = requests.upsertById(turnOnB)
+
+    val turnOnC = unsyncedC.copy(watchSync = true)
+    assertFalse(afterB.isWatchSyncChangeAllowed(turnOnC, maxSyncCount))
+
+    assertEquals(maxSyncCount, afterB.count { it.watchSync })
   }
 }

@@ -60,7 +60,7 @@ fun RequestHistory(
           text = stringResource(if (responseParams.isMobile) {
             R.string.request_history_from_mobile
           } else {
-            R.string.request_history_from_wearlable
+            R.string.request_history_from_wear_os
           }),
           fontSize = 12.sp
         )
