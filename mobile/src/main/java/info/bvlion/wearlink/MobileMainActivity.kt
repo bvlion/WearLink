@@ -128,7 +128,10 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
           emptyList()
         }
       }
-      val response = responseHistory.findBySelectionKey(selectedResponseKey.value)
+      // digest計算を伴うためrecomposition毎の再検索を避け、履歴/キーが変わったときだけ解決する
+      val response = remember(responseHistory, selectedResponseKey.value) {
+        responseHistory.findBySelectionKey(selectedResponseKey.value)
+      }
       val discardReorder = {
         reorderMode.value = false
         reorderDraft.value = arrayListOf()
