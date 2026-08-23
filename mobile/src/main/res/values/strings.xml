@@ -18,7 +18,8 @@
   <string name="delete_execute_history_description">全ての実行履歴が削除されます。\nこの操作は元に戻せません。</string>
 
   <!-- request import -->
-  <string name="request_import_title">Request をインポート</string>
+  <string name="request_import_title">Request を全件インポート（置き換え）</string>
+  <string name="request_import_additive_title">Request を追加インポート</string>
   <string name="request_import_input_hint">Json 形式の Request</string>
   <string name="request_import_input_error_blank">入力してください</string>
   <string name="request_import_input_error_format">Json の値が不正です。一度エクスポートしてフォーマット確認のうえ統一してください。</string>
@@ -33,8 +34,9 @@
   <string name="local_network_access_grant">許可する</string>
   <string name="local_network_access_granted">許可済み</string>
   <string name="local_network_access_not_now">今はしない</string>
-  <string name="menu_title_export_request">Request をエクスポート</string>
-  <string name="menu_title_import_request">Request をインポート</string>
+  <string name="menu_title_export_request">Request を全件エクスポート</string>
+  <string name="menu_title_import_request">Request を全件インポート（置き換え）</string>
+  <string name="menu_title_import_request_additive">Request を追加インポート</string>
   <string name="menu_title_export_execution_history">実行履歴をエクスポート</string>
   <string name="menu_title_delete_execution_history">実行履歴を削除</string>
   <string name="menu_title_review">応援レビューを書く</string>
@@ -92,6 +94,9 @@
   <string name="saved_request_reorder_discard">破棄する</string>
   <string name="saved_request_reorder_move_up">上へ移動</string>
   <string name="saved_request_reorder_move_down">下へ移動</string>
+  <string name="saved_request_menu_select_export">選択してエクスポートする</string>
+  <string name="saved_request_select_export_count">%d件選択中</string>
+  <string name="saved_request_select_export_done">エクスポート</string>
 
   <!-- activity action -->
   <string name="request_created">「%s」を作成しました</string>
@@ -101,6 +106,7 @@
   <string name="copied_clipboard">クリップボードにコピーしました</string>
   <string name="copied_clipboard_error">エクスポートするデータがありません</string>
   <string name="request_imported">インポートしました</string>
+  <string name="request_appended">追加インポートしました</string>
   <string name="execute_history_deleted">実行履歴を削除しました</string>
   <string name="sync_wear_os">Wear OSと同期しました</string>
   <string name="sync_wear_os_error">Wear OS端末が見つかりません</string>

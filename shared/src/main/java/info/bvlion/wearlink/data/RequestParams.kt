@@ -76,6 +76,27 @@ data class RequestParams(
 
     fun List<RequestParams>.removeById(id: String): List<RequestParams> = filterNot { it.id == id }
 
+    fun List<RequestParams>.filterByIds(ids: Set<String>): List<RequestParams> = filter { it.id in ids }
+
+    // 既存Requestを残したまま追加するため、端末固有の状態(watchSync / watchfaceShortcut)は持ち込まず、
+    // IDが衝突する場合だけ新しいUUIDを発行する。import対象内の順序はJSON配列順のまま維持する。
+    fun List<RequestParams>.mergeAdditiveImport(imported: List<RequestParams>): List<RequestParams> {
+      val usedIds = map { it.id }.toMutableSet()
+      val sanitizedImported = imported.map { request ->
+        val sanitized = request.copy(watchSync = false, watchfaceShortcut = false)
+        if (usedIds.add(sanitized.id)) {
+          sanitized
+        } else {
+          var newId = UUID.randomUUID().toString()
+          while (!usedIds.add(newId)) {
+            newId = UUID.randomUUID().toString()
+          }
+          sanitized.copy(id = newId)
+        }
+      }
+      return sanitizedImported + this
+    }
+
     fun List<RequestParams>.isWatchSyncChangeAllowed(request: RequestParams, maxSyncCount: Int): Boolean {
       val wasSynced = findById(request.id)?.watchSync == true
       if (!request.watchSync || wasSynced) return true

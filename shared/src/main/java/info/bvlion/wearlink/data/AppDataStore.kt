@@ -8,6 +8,7 @@ import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
 import info.bvlion.wearlink.data.RequestParams.Companion.isWatchSyncChangeAllowed
+import info.bvlion.wearlink.data.RequestParams.Companion.mergeAdditiveImport
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.reorderByIds
 import info.bvlion.wearlink.data.RequestParams.Companion.removeById
@@ -65,6 +66,15 @@ class AppDataStore(context: Context) {
       pref[SAVED_REQUEST_KEY] = current.upsertById(requestToSave).toRequestParamsJson()
     }
     return accepted
+  }
+
+  // JSONのparse失敗時にeditを呼ばないことで、既存の保存済みRequestを変更せずに済ませる
+  suspend fun appendImportedRequests(json: String) {
+    val imported = json.parseRequestParams()
+    settingsDataStore.edit { pref ->
+      val current = pref[SAVED_REQUEST_KEY]?.parseRequestParams() ?: emptyList()
+      pref[SAVED_REQUEST_KEY] = current.mergeAdditiveImport(imported).toRequestParamsJson()
+    }
   }
 
   suspend fun deleteRequestById(id: String) = settingsDataStore.edit { pref ->

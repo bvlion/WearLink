@@ -1,8 +1,10 @@
 package info.bvlion.wearlink.data
 
 import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
+import info.bvlion.wearlink.data.RequestParams.Companion.filterByIds
 import info.bvlion.wearlink.data.RequestParams.Companion.findById
 import info.bvlion.wearlink.data.RequestParams.Companion.isWatchSyncChangeAllowed
+import info.bvlion.wearlink.data.RequestParams.Companion.mergeAdditiveImport
 import info.bvlion.wearlink.data.RequestParams.Companion.moveById
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.normalizeRequestParamsJson
@@ -602,5 +604,136 @@ class RequestParamsTest {
     assertFalse(afterB.isWatchSyncChangeAllowed(turnOnC, maxSyncCount))
 
     assertEquals(maxSyncCount, afterB.count { it.watchSync })
+  }
+
+  @Test
+  fun filterByIdsReturnsOnlyMatchingRequestsTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    val filtered = requests.filterByIds(setOf(first.id, third.id))
+
+    assertEquals(listOf(first, third), filtered)
+  }
+
+  @Test
+  fun filterByIdsPreservesSavedListOrderRegardlessOfSetOrderTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val third = reorderRequest("third")
+    val requests = listOf(first, second, third)
+
+    // Setの列挙順に依存せず、保存済み一覧の順序で返ることを確認する
+    val filtered = requests.filterByIds(setOf(third.id, first.id))
+
+    assertEquals(listOf(first, third), filtered)
+  }
+
+  @Test
+  fun filterByIdsWithEmptyIdsReturnsEmptyListTest() {
+    val requests = listOf(reorderRequest("first"), reorderRequest("second"))
+
+    assertTrue(requests.filterByIds(emptySet()).isEmpty())
+  }
+
+  @Test
+  fun filterByIdsWithAllIdsReturnsAllInOriginalOrderTest() {
+    val first = reorderRequest("first")
+    val second = reorderRequest("second")
+    val requests = listOf(first, second)
+
+    assertEquals(requests, requests.filterByIds(requests.map { it.id }.toSet()))
+  }
+
+  @Test
+  fun mergeAdditiveImportKeepsExistingRequestsTest() {
+    val existing = listOf(reorderRequest("existing-first"), reorderRequest("existing-second"))
+    val imported = listOf(reorderRequest("imported"))
+
+    val merged = existing.mergeAdditiveImport(imported)
+
+    assertTrue(merged.containsAll(existing))
+  }
+
+  @Test
+  fun mergeAdditiveImportOrdersImportedBeforeExistingInJsonOrderTest() {
+    val existingFirst = reorderRequest("existing-first")
+    val existingSecond = reorderRequest("existing-second")
+    val importedFirst = reorderRequest("imported-first")
+    val importedSecond = reorderRequest("imported-second")
+
+    val merged = listOf(existingFirst, existingSecond)
+      .mergeAdditiveImport(listOf(importedFirst, importedSecond))
+
+    assertEquals(
+      listOf(importedFirst.id, importedSecond.id, existingFirst.id, existingSecond.id),
+      merged.map { it.id }
+    )
+  }
+
+  @Test
+  fun mergeAdditiveImportAssignsNewIdOnCollisionWithExistingTest() {
+    val existing = reorderRequest("existing")
+    val colliding = reorderRequest("imported").copy(id = existing.id)
+
+    val merged = listOf(existing).mergeAdditiveImport(listOf(colliding))
+
+    assertEquals(2, merged.size)
+    assertEquals(existing, merged.single { it.title == "existing" })
+    assertNotEquals(existing.id, merged.single { it.title == "imported" }.id)
+  }
+
+  @Test
+  fun mergeAdditiveImportDeduplicatesIdsWithinImportBatchTest() {
+    val duplicateId = "duplicate-id"
+    val importedFirst = reorderRequest("imported-first").copy(id = duplicateId)
+    val importedSecond = reorderRequest("imported-second").copy(id = duplicateId)
+
+    val merged = emptyList<RequestParams>().mergeAdditiveImport(listOf(importedFirst, importedSecond))
+
+    assertEquals(2, merged.map { it.id }.toSet().size)
+  }
+
+  @Test
+  fun mergeAdditiveImportKeepsNonCollidingIdsTest() {
+    val existing = reorderRequest("existing")
+    val imported = reorderRequest("imported")
+
+    val merged = listOf(existing).mergeAdditiveImport(listOf(imported))
+
+    assertEquals(imported.id, merged.single { it.title == "imported" }.id)
+  }
+
+  @Test
+  fun mergeAdditiveImportSetsWatchSyncAndWatchfaceShortcutFalseForImportedTest() {
+    val imported = reorderRequest("imported", watchSync = true).copy(watchfaceShortcut = true)
+
+    val merged = emptyList<RequestParams>().mergeAdditiveImport(listOf(imported))
+
+    assertFalse(merged.single().watchSync)
+    assertFalse(merged.single().watchfaceShortcut)
+  }
+
+  @Test
+  fun mergeAdditiveImportDoesNotChangeExistingWatchSyncOrWatchfaceShortcutTest() {
+    val existingSynced = reorderRequest("existing-synced", watchSync = true)
+    val existingShortcut = reorderRequest("existing-shortcut").copy(watchfaceShortcut = true)
+    val imported = reorderRequest("imported")
+
+    val merged = listOf(existingSynced, existingShortcut).mergeAdditiveImport(listOf(imported))
+
+    assertEquals(existingSynced, merged.single { it.title == "existing-synced" })
+    assertEquals(existingShortcut, merged.single { it.title == "existing-shortcut" })
+  }
+
+  @Test
+  fun mergeAdditiveImportWithEmptyImportedReturnsExistingUnchangedTest() {
+    val existing = listOf(reorderRequest("existing-first"), reorderRequest("existing-second"))
+
+    val merged = existing.mergeAdditiveImport(emptyList())
+
+    assertEquals(existing, merged)
   }
 }

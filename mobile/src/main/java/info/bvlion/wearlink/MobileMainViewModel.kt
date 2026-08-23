@@ -14,6 +14,7 @@ import info.bvlion.wearlink.data.AppDataStore
 import info.bvlion.wearlink.data.ErrorDetail
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.deduplicateIds
+import info.bvlion.wearlink.data.RequestParams.Companion.filterByIds
 import info.bvlion.wearlink.data.RequestParams.Companion.needsRequestIdMigration
 import info.bvlion.wearlink.data.RequestParams.Companion.parseRequestParams
 import info.bvlion.wearlink.data.RequestParams.Companion.toRequestParamsJson
@@ -202,6 +203,31 @@ class MobileMainViewModel(application: Application) : AndroidViewModel(applicati
       dataStore.saveRequest(json)
     }
     showSnackbar(getString(R.string.request_imported))
+  }
+
+  fun copySelectedRequestsToClipboard(ids: Set<String>, getString: (Int) -> String) {
+    val clipData = savedRequest.value
+      ?.parseRequestParams()
+      ?.filterByIds(ids)
+      ?.takeIf { it.isNotEmpty() }
+      ?.let { ClipData.newPlainText("request", it.toRequestParamsJson()) }
+    clipData?.let {
+      viewModelScope.launch {
+        _clipboard.send(it)
+      }
+    }
+    showSnackbar(getString(if (clipData != null) {
+      R.string.copied_clipboard
+    } else {
+      R.string.copied_clipboard_error
+    }))
+  }
+
+  fun appendRequests(json: String, getString: (Int) -> String) {
+    viewModelScope.launch(Dispatchers.IO) {
+      dataStore.appendImportedRequests(json)
+    }
+    showSnackbar(getString(R.string.request_appended))
   }
 
   fun deleteResponses(getString: (Int) -> String) {
