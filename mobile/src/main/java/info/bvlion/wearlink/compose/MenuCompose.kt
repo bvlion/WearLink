@@ -29,6 +29,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.PlaylistAdd
 import androidx.compose.material.icons.filled.ContactMail
 import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Description
@@ -73,6 +74,7 @@ fun MenuList(
   syncWatch: () -> Unit = {},
   historyDelete: () -> Unit = {},
   savePasteRequest: (String) -> Unit = {},
+  appendPasteRequest: (String) -> Unit = {},
   copyToClipboard: (Boolean) -> Unit = {},
   isLocalNetworkPermissionGranted: Boolean = false,
   requestLocalNetworkPermission: () -> Unit = {},
@@ -167,6 +169,18 @@ fun MenuList(
     }
     MenuRow(stringResource(R.string.menu_title_import_request), Icons.Filled.Download) {
       shouldShowRequestImportDialogState.value = true
+    }
+
+    val shouldShowRequestAppendDialogState = rememberSaveable { mutableStateOf(false) }
+    if (shouldShowRequestAppendDialogState.value) {
+      RequestImportDialog(
+        onDismiss = { shouldShowRequestAppendDialogState.value = false },
+        onConfirm = { appendPasteRequest(it) },
+        title = stringResource(R.string.request_import_additive_title),
+      )
+    }
+    MenuRow(stringResource(R.string.menu_title_import_request_additive), Icons.AutoMirrored.Filled.PlaylistAdd) {
+      shouldShowRequestAppendDialogState.value = true
     }
 
     MenuRow(stringResource(R.string.menu_title_export_execution_history), Icons.Filled.Upload) {
@@ -279,7 +293,11 @@ private fun DeleteExecuteHistoryConfirmDialog(onDismiss: () -> Unit, onConfirm: 
 
 @SuppressLint("UnusedBoxWithConstraintsScope")
 @Composable
-private fun RequestImportDialog(onDismiss: () -> Unit, onConfirm: (String) -> Unit) {
+private fun RequestImportDialog(
+  onDismiss: () -> Unit,
+  onConfirm: (String) -> Unit,
+  title: String = stringResource(R.string.request_import_title),
+) {
   val context = LocalContext.current
   val pasteError = rememberSaveable { mutableStateOf("") }
   val pasteText = rememberSaveable { mutableStateOf("") }
@@ -303,7 +321,7 @@ private fun RequestImportDialog(onDismiss: () -> Unit, onConfirm: (String) -> Un
           Modifier.fillMaxSize().padding(16.dp),
         ) {
           Text(
-            text = stringResource(R.string.request_import_title),
+            text = title,
             modifier = Modifier.padding(bottom = 16.dp)
           )
           OutlinedTextField(

@@ -18,7 +18,8 @@
   <string name="delete_execute_history_description">All execution history will be deleted.\nThis action cannot be undone.</string>
 
   <!-- request import -->
-  <string name="request_import_title">Import Request</string>
+  <string name="request_import_title">Import Requests (Replace All)</string>
+  <string name="request_import_additive_title">Add Requests</string>
   <string name="request_import_input_hint">Request in JSON format</string>
   <string name="request_import_input_error_blank">Please enter a value</string>
   <string name="request_import_input_error_format">The JSON value is invalid. Please export once, check the format, and ensure consistency.</string>
@@ -33,8 +34,9 @@
   <string name="local_network_access_grant">Allow</string>
   <string name="local_network_access_granted">Allowed</string>
   <string name="local_network_access_not_now">Not now</string>
-  <string name="menu_title_export_request">Export Request</string>
-  <string name="menu_title_import_request">Import Request</string>
+  <string name="menu_title_export_request">Export All Requests</string>
+  <string name="menu_title_import_request">Import Requests (Replace All)</string>
+  <string name="menu_title_import_request_additive">Add Requests</string>
   <string name="menu_title_export_execution_history">Export Execution History</string>
   <string name="menu_title_delete_execution_history">Delete Execution History</string>
   <string name="menu_title_review">Write a Review</string>
@@ -92,6 +94,9 @@
   <string name="saved_request_reorder_discard">Discard</string>
   <string name="saved_request_reorder_move_up">Move up</string>
   <string name="saved_request_reorder_move_down">Move down</string>
+  <string name="saved_request_menu_select_export">Select requests to export</string>
+  <string name="saved_request_select_export_count">%d selected</string>
+  <string name="saved_request_select_export_done">Export</string>
 
   <!-- activity action -->
   <string name="request_created">%s Created</string>
@@ -101,6 +106,7 @@
   <string name="copied_clipboard">Copied to clipboard</string>
   <string name="copied_clipboard_error">No data available for export</string>
   <string name="request_imported">Imported</string>
+  <string name="request_appended">Added</string>
   <string name="execute_history_deleted">Execution history deleted</string>
   <string name="sync_wear_os">Synced with Wear OS</string>
   <string name="sync_wear_os_error">Wear OS device not found</string>

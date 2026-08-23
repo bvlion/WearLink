@@ -59,6 +59,7 @@ import info.bvlion.wearlink.compose.RequestCreate
 import info.bvlion.wearlink.compose.RequestHistoryDetailContent
 import info.bvlion.wearlink.compose.RequestHistoryList
 import info.bvlion.wearlink.compose.SavedRequestList
+import info.bvlion.wearlink.compose.SelectExportActionBar
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.Constant
 import info.bvlion.wearlink.data.RequestParams
@@ -98,6 +99,8 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       val reorderDraft = rememberSaveable { mutableStateOf(arrayListOf<RequestParams>()) }
       val reorderInitialIds = rememberSaveable { mutableStateOf(arrayListOf<String>()) }
       val showReorderDiscardDialog = rememberSaveable { mutableStateOf(false) }
+      val selectMode = rememberSaveable { mutableStateOf(false) }
+      val selectedRequestIds = rememberSaveable { mutableStateOf(arrayListOf<String>()) }
       val selectedResponseKey = rememberSaveable { mutableStateOf<String?>(null) }
 
       val snackbarHostState = remember { SnackbarHostState() }
@@ -138,6 +141,10 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
         showReorderDiscardDialog.value = false
       }
       val hasReorderChanges = reorderDraft.value.map { it.id } != reorderInitialIds.value
+      val exitSelectMode = {
+        selectMode.value = false
+        selectedRequestIds.value = arrayListOf()
+      }
       val localNetworkPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
       ) {
@@ -174,13 +181,17 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
       // responseが解決済みかではなく、selection key自体の有無で詳細表示中/復元待ちを判定する。
       // response == nullを条件にすると、Activity再生成直後でResponse履歴の復元待ちの間にBackすると
       // keyが残ったままHomeへ遷移し、履歴復元後にBottomSheetがHome上へ再表示されてしまう
-      BackHandler(reorderMode.value || selectedResponseKey.value != null || bottomMenuIndex.intValue > 1) {
+      BackHandler(
+        reorderMode.value || selectMode.value || selectedResponseKey.value != null || bottomMenuIndex.intValue > 1
+      ) {
         if (reorderMode.value) {
           if (hasReorderChanges) {
             showReorderDiscardDialog.value = true
           } else {
             discardReorder()
           }
+        } else if (selectMode.value) {
+          exitSelectMode()
         } else if (selectedResponseKey.value != null) {
           selectedResponseKey.value = null
         } else if (bottomMenuIndex.intValue > 1) {
@@ -224,6 +235,8 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                   SavedRequestList(
                     requests = if (reorderMode.value) reorderDraft.value else savedRequestParams,
                     reorderMode = reorderMode.value,
+                    selectMode = selectMode.value,
+                    selectedIds = selectedRequestIds.value.toSet(),
                     newCreateClick = { bottomMenuIndex.intValue = 1 },
                     topPadding = it.calculateTopPadding(),
                     bottomPadding = it.calculateBottomPadding(),
@@ -263,6 +276,15 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     },
                     moveDown = { request ->
                       reorderDraft.value = ArrayList(reorderDraft.value.moveById(request.id, 1))
+                    },
+                    startSelect = {
+                      selectedRequestIds.value = arrayListOf()
+                      selectMode.value = true
+                    },
+                    toggleSelect = { request ->
+                      selectedRequestIds.value = ArrayList(selectedRequestIds.value).apply {
+                        if (contains(request.id)) remove(request.id) else add(request.id)
+                      }
                     }
                   )
                   if (loading.value) {
@@ -331,6 +353,9 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     savePasteRequest = {
                       viewModel.saveRequest(it, getString)
                     },
+                    appendPasteRequest = {
+                      viewModel.appendRequests(it, getString)
+                    },
                     copyToClipboard = {
                       viewModel.copyToClipboard(it, getString)
                     },
@@ -366,6 +391,15 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     } else {
                       discardReorder()
                     }
+                  }
+                )
+              } else if (selectMode.value) {
+                SelectExportActionBar(
+                  selectedCount = selectedRequestIds.value.size,
+                  onCancel = exitSelectMode,
+                  onExport = {
+                    viewModel.copySelectedRequestsToClipboard(selectedRequestIds.value.toSet(), getString)
+                    exitSelectMode()
                   }
                 )
               } else {
