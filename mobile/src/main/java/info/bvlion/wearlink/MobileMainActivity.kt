@@ -94,7 +94,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
 
       val bottomMenuIndex = rememberSaveable { mutableIntStateOf(0) }
       val editRequest = rememberSaveable { mutableStateOf<RequestParams?>(null) }
-      val editRequestIndex = rememberSaveable { mutableIntStateOf(-1) }
       val reorderMode = rememberSaveable { mutableStateOf(false) }
       val reorderDraft = rememberSaveable { mutableStateOf(arrayListOf<RequestParams>()) }
       val reorderInitialIds = rememberSaveable { mutableStateOf(arrayListOf<String>()) }
@@ -228,15 +227,14 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     newCreateClick = { bottomMenuIndex.intValue = 1 },
                     topPadding = it.calculateTopPadding(),
                     bottomPadding = it.calculateBottomPadding(),
-                    edit = { index, request ->
-                      editRequestIndex.intValue = index
+                    edit = { request ->
                       editRequest.value = request
                       bottomMenuIndex.intValue = 1
                     },
                     send = { request -> viewModel.sendRequest(request, getString) },
-                    toggleTile = { index, request ->
+                    toggleTile = { request ->
                       viewModel.saveRequest(
-                        index,
+                        true,
                         request,
                         tileLimitErrorTitle,
                         tileLimitErrorDescription,
@@ -244,9 +242,9 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                         shouldToggleWatchSync = true,
                       )
                     },
-                    toggleWatchface = { index, request ->
+                    toggleWatchface = { request ->
                       viewModel.saveRequest(
-                        index,
+                        true,
                         request,
                         tileLimitErrorTitle,
                         tileLimitErrorDescription,
@@ -282,19 +280,18 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     editRequest.value?.parameters ?: "a=b",
                     editRequest.value?.watchSync ?: false,
                     editRequest.value?.watchfaceShortcut ?: false,
-                    editRequestIndex.intValue,
+                    editRequest.value != null,
                     it.calculateTopPadding(),
                     it.calculateBottomPadding(),
                     cancel = {
                       editRequest.value = null
-                      editRequestIndex.intValue = -1
                       bottomMenuIndex.intValue = 0
                     },
-                    save = { index, request ->
+                    save = { request ->
+                      val isUpdate = editRequest.value != null
                       editRequest.value = null
-                      editRequestIndex.intValue = -1
                       viewModel.saveRequest(
-                        index,
+                        isUpdate,
                         request,
                         tileLimitErrorTitle,
                         tileLimitErrorDescription,
@@ -304,7 +301,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                     },
                     delete = {
                       editRequest.value = null
-                      editRequestIndex.intValue = -1
                       viewModel.deleteRequest(it, getString)
                       bottomMenuIndex.intValue = 0
                     },
@@ -376,7 +372,6 @@ class MobileMainActivity : ComponentActivity(), MessageClient.OnMessageReceivedL
                 MenuBottomNavigation(bottomMenuIndex) {
                   if (it != 1) {
                     editRequest.value = null
-                    editRequestIndex.intValue = -1
                   }
                   selectedResponseKey.value = null
                 }

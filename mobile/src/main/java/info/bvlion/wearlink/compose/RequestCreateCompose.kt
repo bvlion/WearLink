@@ -59,10 +59,10 @@ fun RequestCreate(
   defaultBody: String,
   defaultWatchSync: Boolean,
   defaultWatchfaceShortcut: Boolean,
-  savedIndex: Int,
+  isEditing: Boolean,
   topPadding: Dp = 0.dp,
   bottomPadding: Dp = 0.dp,
-  save: (Int, RequestParams) -> Unit = { _, _ -> },
+  save: (RequestParams) -> Unit = {},
   cancel: () -> Unit = {},
   delete: (String) -> Unit = {},
   defaultId: String? = null,
@@ -309,7 +309,6 @@ fun RequestCreate(
         }
 
         save(
-          savedIndex,
           RequestParams(
             title = title.value,
             url = url.value,
@@ -329,7 +328,7 @@ fun RequestCreate(
         .height(48.dp),
       enabled = title.value.isNotEmpty() && URLUtil.isValidUrl(url.value)
     ) {
-      Text(text = if (savedIndex > -1) stringResource(R.string.update) else stringResource(R.string.create))
+      Text(text = if (isEditing) stringResource(R.string.update) else stringResource(R.string.create))
     }
 
     Row(
@@ -347,7 +346,7 @@ fun RequestCreate(
         modifier = Modifier
           .weight(1f)
           .padding(
-            end = if (savedIndex > -1) {
+            end = if (isEditing) {
               8.dp
             } else {
               0.dp
@@ -359,7 +358,7 @@ fun RequestCreate(
         Text(text = stringResource(R.string.cancel), modifier = Modifier.padding(start = 8.dp))
       }
 
-      if (savedIndex > -1) {
+      if (isEditing) {
         OutlinedButton(
           onClick = { showDeleteDialog.value = true },
           modifier = Modifier
@@ -459,7 +458,7 @@ private fun RequestCreatePreview() {
       "a=b",
       false,
       false,
-      0
+      true
     )
   }
 }
