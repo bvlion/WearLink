@@ -296,6 +296,32 @@ fun WearAppEnGrantedPreview() {
 }
 
 @Preview(
+  apiLevel = 37,
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "en",
+  fontScale = 2.0f,
+  name = "small round - en - large font - not granted"
+)
+@Composable
+fun WearAppEnNotGrantedLargeFontPreview() {
+  WearApp(isLocalNetworkPermissionGranted = false)
+}
+
+@Preview(
+  apiLevel = 37,
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "en",
+  fontScale = 2.0f,
+  name = "small round - en - large font - granted"
+)
+@Composable
+fun WearAppEnGrantedLargeFontPreview() {
+  WearApp(isLocalNetworkPermissionGranted = true)
+}
+
+@Preview(
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
   locale = "ja",
@@ -316,6 +342,20 @@ fun LocalNetworkAccessExplanationJaPreview() {
 )
 @Composable
 fun LocalNetworkAccessExplanationEnPreview() {
+  WearLinkTheme {
+    LocalNetworkAccessExplanation(onGrant = {}, onBack = {})
+  }
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "en",
+  fontScale = 2.0f,
+  name = "small round - en - large font - explanation"
+)
+@Composable
+fun LocalNetworkAccessExplanationEnLargeFontPreview() {
   WearLinkTheme {
     LocalNetworkAccessExplanation(onGrant = {}, onBack = {})
   }

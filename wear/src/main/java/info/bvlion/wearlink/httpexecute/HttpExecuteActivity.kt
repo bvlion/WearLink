@@ -22,6 +22,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Chip
@@ -118,13 +119,16 @@ fun HttpExecuteConfirm(
   onFinish: () -> Unit = {}
 ) {
   WearLinkTheme {
-    val listState = rememberScalingLazyListState()
+    // 確認文(index 0)を最初に表示する。デフォルトのindex 1中央開始のままだと、
+    // 長いRequest名+大きいfont scaleで確認文を読まないままNo/Yesが見えてしまう。
+    val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
     Scaffold(
       modifier = Modifier.fillMaxSize(),
       positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
     ) {
       ScalingLazyColumn(
         state = listState,
+        autoCentering = AutoCenteringParams(itemIndex = 0),
         modifier = Modifier
           .fillMaxSize()
           .background(MaterialTheme.colors.background),
@@ -159,6 +163,10 @@ fun HttpExecuteConfirm(
 
 private const val PREVIEW_LONG_REQUEST_TITLE =
   "とても長いRequest名を表示するテストケース用サンプルタイトルです"
+
+// Google Playの指摘スクリーンショット相当: スペースを含まない連続した長い文字列。
+private const val PREVIEW_LONG_REQUEST_TITLE_CONTINUOUS_EN =
+  "Maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 @Preview(
   device = WearDevices.SMALL_ROUND,
@@ -205,6 +213,18 @@ fun HttpExecuteConfirmLargeFontLongTitlePreview() {
 @Preview(
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
+  locale = "en",
+  fontScale = 2.0f,
+  name = "small round - en - large font - continuous long title"
+)
+@Composable
+fun HttpExecuteConfirmEnLargeFontContinuousLongTitlePreview() {
+  HttpExecuteConfirm(PREVIEW_LONG_REQUEST_TITLE_CONTINUOUS_EN)
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
   name = "small round - normal font"
 )
 @Composable
@@ -232,4 +252,16 @@ fun HttpExecuteLargeFontPreview() {
 @Composable
 fun HttpExecuteLargeFontLongTitlePreview() {
   HttpExecute(PREVIEW_LONG_REQUEST_TITLE)
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "en",
+  fontScale = 2.0f,
+  name = "small round - en - large font - continuous long title"
+)
+@Composable
+fun HttpExecuteEnLargeFontContinuousLongTitlePreview() {
+  HttpExecute(PREVIEW_LONG_REQUEST_TITLE_CONTINUOUS_EN)
 }
