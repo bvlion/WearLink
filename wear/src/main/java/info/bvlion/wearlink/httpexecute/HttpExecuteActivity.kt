@@ -95,15 +95,12 @@ fun HttpExecute(title: String) {
           .background(MaterialTheme.colors.background),
         contentAlignment = Alignment.Center
       ) {
-        // 元の全画面外周リングは維持しつつ、PositionIndicatorと同じ外周で
-        // 重ならないよう内側へ少し余白(strokeWidthと同じ12dp)を空ける。
         CircularProgressIndicator(
           indicatorColor = MaterialTheme.colors.secondary,
           trackColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
           strokeWidth = 12.dp,
           modifier = Modifier
             .fillMaxSize()
-            .padding(12.dp)
             .background(MaterialTheme.colors.background)
         )
         Text(
