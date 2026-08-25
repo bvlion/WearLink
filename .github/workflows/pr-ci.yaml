@@ -2,14 +2,6 @@ name: Pull Request CI
 
 on:
   pull_request:
-    paths:
-      - '**.kt'
-      - '**.xml'
-      - '**.kts'
-      - '**.properties'
-      - 'gradle/libs.versions.toml'
-      - '.github/actions/**'
-      - '.github/workflows/**'
 
 permissions:
   id-token: write
@@ -28,13 +20,29 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Detect Android-relevant changes
+        id: changes
+        run: |
+          BASE_SHA="${{ github.event.pull_request.base.sha }}"
+          HEAD_SHA="${{ github.event.pull_request.head.sha }}"
+          MERGE_BASE="$(git merge-base "$BASE_SHA" "$HEAD_SHA")"
+          CHANGED_FILES="$(git diff --name-only "$MERGE_BASE" "$HEAD_SHA")"
+          echo "$CHANGED_FILES"
+          if echo "$CHANGED_FILES" | grep -Eq '^(mobile/|wear/|shared/|build\.gradle\.kts$|settings\.gradle\.kts$|gradle\.properties$|gradle/|gradlew$|gradlew\.bat$|\.github/workflows/pr-ci\.yaml$)'; then
+            echo "android=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "android=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: set up JDK 17
+        if: steps.changes.outputs.android == 'true'
         uses: actions/setup-java@v5
         with:
           distribution: 'corretto'
           java-version: '17'
 
       - uses: actions/cache@v6
+        if: steps.changes.outputs.android == 'true'
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
@@ -42,26 +50,31 @@ jobs:
             ${{ runner.os }}-gradle-
 
       - name: Start Http Docker
+        if: steps.changes.outputs.android == 'true'
         run: docker run -p 80:80 -d --name httpbin kennethreitz/httpbin
 
       - name: Build mobile and wear debug APKs
+        if: steps.changes.outputs.android == 'true'
         run: ./gradlew :mobile:assembleDebug :wear:assembleDebug
-  
+
       - name: Wait for the service to start
+        if: steps.changes.outputs.android == 'true'
         run: |
           while ! curl --output /dev/null --silent --head --fail http://localhost; do
             sleep 1
           done
 
       - name: Run test
+        if: steps.changes.outputs.android == 'true'
         run: ./gradlew testDebugUnitTest
-  
+
       - name: Stop Docker container
+        if: steps.changes.outputs.android == 'true'
         run: docker stop httpbin
 
       - name: shared test report
         uses: dorny/test-reporter@v3
-        if: github.actor != 'dependabot[bot]'
+        if: steps.changes.outputs.android == 'true' && github.actor != 'dependabot[bot]'
         with:
           name: shared test
           path: shared/build/test-results/testDebugUnitTest/TEST-*.xml
@@ -70,7 +83,7 @@ jobs:
 
       - name: mobile test report
         uses: dorny/test-reporter@v3
-        if: github.actor != 'dependabot[bot]'
+        if: steps.changes.outputs.android == 'true' && github.actor != 'dependabot[bot]'
         with:
           name: mobile test
           path: mobile/build/test-results/testDebugUnitTest/TEST-*.xml
@@ -79,7 +92,7 @@ jobs:
 
       - name: wear test report
         uses: dorny/test-reporter@v3
-        if: github.actor != 'dependabot[bot]'
+        if: steps.changes.outputs.android == 'true' && github.actor != 'dependabot[bot]'
         with:
           name: wear test
           path: wear/build/test-results/testDebugUnitTest/TEST-*.xml
