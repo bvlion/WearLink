@@ -20,6 +20,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -30,7 +31,7 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.mobile.R
@@ -55,46 +56,7 @@ class ShortcutExecuteActivity : ComponentActivity() {
       val contentAlpha = remember { Animatable(1f) }
 
       WearLinkTheme(isDarkMode) {
-        Box(
-          modifier = Modifier
-            .fillMaxSize()
-            .alpha(contentAlpha.value)
-            .background(Color.Black.copy(alpha = 0.35f)),
-          contentAlignment = Alignment.Center
-        ) {
-          state.title?.let { title ->
-            Card(
-              modifier = Modifier.padding(horizontal = 48.dp),
-              colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
-            ) {
-              Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
-              ) {
-                CircularProgressIndicator(
-                  modifier = Modifier.size(28.dp),
-                  strokeWidth = 3.dp,
-                  color = MaterialTheme.colorScheme.primary
-                )
-                Text(
-                  text = title,
-                  style = MaterialTheme.typography.titleSmall,
-                  color = MaterialTheme.colorScheme.onSurface,
-                  textAlign = TextAlign.Center,
-                  maxLines = 2,
-                  overflow = TextOverflow.Ellipsis,
-                  modifier = Modifier.padding(top = 12.dp)
-                )
-                Text(
-                  text = stringResource(R.string.shortcut_execute_sending),
-                  style = MaterialTheme.typography.bodySmall,
-                  color = MaterialTheme.colorScheme.onSurfaceVariant,
-                  modifier = Modifier.padding(top = 4.dp)
-                )
-              }
-            }
-          }
-        }
+        ShortcutExecuteScreen(title = state.title, contentAlpha = contentAlpha.value)
       }
 
       LaunchedEffect(state) {
@@ -115,5 +77,69 @@ class ShortcutExecuteActivity : ComponentActivity() {
         }
       }
     }
+  }
+}
+
+@Composable
+private fun ShortcutExecuteScreen(title: String?, contentAlpha: Float) {
+  Box(
+    modifier = Modifier
+      .fillMaxSize()
+      .alpha(contentAlpha)
+      .background(Color.Black.copy(alpha = 0.35f)),
+    contentAlignment = Alignment.Center
+  ) {
+    title?.let {
+      Card(
+        modifier = Modifier.padding(horizontal = 48.dp),
+        colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
+      ) {
+        Column(
+          horizontalAlignment = Alignment.CenterHorizontally,
+          modifier = Modifier.padding(horizontal = 20.dp, vertical = 16.dp)
+        ) {
+          CircularProgressIndicator(
+            modifier = Modifier.size(28.dp),
+            strokeWidth = 3.dp,
+            color = MaterialTheme.colorScheme.primary
+          )
+          Text(
+            text = it,
+            style = MaterialTheme.typography.titleSmall,
+            color = MaterialTheme.colorScheme.onSurface,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.padding(top = 12.dp)
+          )
+          Text(
+            text = stringResource(R.string.shortcut_execute_sending),
+            style = MaterialTheme.typography.bodySmall,
+            color = MaterialTheme.colorScheme.onSurfaceVariant,
+            modifier = Modifier.padding(top = 4.dp)
+          )
+        }
+      }
+    }
+  }
+}
+
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+private fun ShortcutExecuteScreenPreview() {
+  WearLinkTheme {
+    ShortcutExecuteScreen(
+      title = "定期実行リクエスト",
+      contentAlpha = 1f
+    )
+  }
+}
+
+@Preview(showBackground = true, widthDp = 360)
+@Composable
+private fun ShortcutExecuteScreenLongTitlePreview() {
+  WearLinkTheme {
+    ShortcutExecuteScreen(
+      title = "非常に長いRequest名のストレステスト用文字列玄関の鍵長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い",
+      contentAlpha = 1f
+    )
   }
 }
