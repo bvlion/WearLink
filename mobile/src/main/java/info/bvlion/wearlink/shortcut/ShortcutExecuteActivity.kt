@@ -10,11 +10,14 @@ import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -82,16 +85,21 @@ class ShortcutExecuteActivity : ComponentActivity() {
 
 @Composable
 private fun ShortcutExecuteScreen(title: String?, contentAlpha: Float) {
-  Box(
+  BoxWithConstraints(
     modifier = Modifier
       .fillMaxSize()
       .alpha(contentAlpha)
       .background(Color.Black.copy(alpha = 0.35f)),
     contentAlignment = Alignment.Center
   ) {
+    // 非常に長いRequest名や改行、大きいfont scaleでもCardが画面の外へはみ出さないよう上限を設ける
+    val cardMaxHeight = maxHeight * 0.8f
+
     title?.let {
       Card(
-        modifier = Modifier.padding(horizontal = 48.dp),
+        modifier = Modifier
+          .padding(horizontal = 48.dp)
+          .heightIn(max = cardMaxHeight),
         colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
       ) {
         Column(
@@ -108,7 +116,10 @@ private fun ShortcutExecuteScreen(title: String?, contentAlpha: Float) {
             style = MaterialTheme.typography.titleSmall,
             color = MaterialTheme.colorScheme.onSurface,
             textAlign = TextAlign.Center,
-            modifier = Modifier.padding(top = 12.dp)
+            modifier = Modifier
+              .weight(weight = 1f, fill = false)
+              .verticalScroll(rememberScrollState())
+              .padding(top = 12.dp)
           )
           Text(
             text = stringResource(R.string.shortcut_execute_sending),
@@ -139,6 +150,17 @@ private fun ShortcutExecuteScreenLongTitlePreview() {
   WearLinkTheme {
     ShortcutExecuteScreen(
       title = "非常に長いRequest名のストレステスト用文字列玄関の鍵長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い",
+      contentAlpha = 1f
+    )
+  }
+}
+
+@Preview(showBackground = true, widthDp = 360, heightDp = 640)
+@Composable
+private fun ShortcutExecuteScreenMultilineTitlePreview() {
+  WearLinkTheme {
+    ShortcutExecuteScreen(
+      title = (1..30).joinToString(separator = "\n") { "改行ストレステスト行$it" },
       contentAlpha = 1f
     )
   }
