@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -130,13 +131,15 @@ private fun WearMainScreen(
   onRequestLocalNetworkPermission: () -> Unit,
   startMobileActivity: () -> Unit,
 ) {
-  val listState = rememberScalingLazyListState()
+  val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
   Scaffold(
     modifier = Modifier.fillMaxSize(),
     positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
   ) {
     ScalingLazyColumn(
       state = listState,
+      autoCentering = null,
+      contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
       modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colors.background),
@@ -201,13 +204,15 @@ private fun LocalNetworkAccessExplanation(
   onGrant: () -> Unit,
   onBack: () -> Unit,
 ) {
-  val listState = rememberScalingLazyListState()
+  val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
   Scaffold(
     modifier = Modifier.fillMaxSize(),
     positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
   ) {
     ScalingLazyColumn(
       state = listState,
+      autoCentering = null,
+      contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
       modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colors.background),

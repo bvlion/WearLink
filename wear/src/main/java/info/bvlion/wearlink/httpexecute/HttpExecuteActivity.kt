@@ -103,11 +103,10 @@ fun HttpExecute(title: String) {
             .fillMaxSize()
             .background(MaterialTheme.colors.background)
         )
-        // 元の40dp余白をスクロールviewportの外側の枠として使い、その内側だけをスクロールさせる。
         Box(
           modifier = Modifier
             .fillMaxSize()
-            .padding(40.dp)
+            .padding(48.dp)
             .requestFocusOnHierarchyActive()
             .rotaryScrollable(
               behavior = RotaryScrollableDefaults.behavior(scrollState),
@@ -149,7 +148,7 @@ fun HttpExecuteConfirm(
             focusRequester = focusRequester,
           )
           .verticalScroll(scrollState)
-          .padding(24.dp),
+          .padding(32.dp),
         verticalArrangement = Arrangement.Center,
       ) {
         Text(
@@ -313,7 +312,7 @@ fun HttpExecuteEnLargeFontContinuousLongTitlePreview() {
 }
 
 // 長い日本語メッセージをスクロールしても、本文が外周CircularProgressIndicatorの
-// 帯(40dpのスクロールviewport枠の外側)へ入り込まないことを確認する。
+// 帯へ入り込まないことを確認する。
 @Preview(
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
