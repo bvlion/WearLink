@@ -106,7 +106,7 @@ fun HttpExecute(title: String) {
         Box(
           modifier = Modifier
             .fillMaxSize()
-            .padding(48.dp)
+            .padding(40.dp)
             .requestFocusOnHierarchyActive()
             .rotaryScrollable(
               behavior = RotaryScrollableDefaults.behavior(scrollState),
@@ -148,7 +148,7 @@ fun HttpExecuteConfirm(
             focusRequester = focusRequester,
           )
           .verticalScroll(scrollState)
-          .padding(32.dp),
+          .padding(start = 24.dp, top = 32.dp, end = 24.dp, bottom = 24.dp),
         verticalArrangement = Arrangement.Center,
       ) {
         Text(
