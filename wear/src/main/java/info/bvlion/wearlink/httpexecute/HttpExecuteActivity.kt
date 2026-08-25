@@ -6,11 +6,10 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -80,10 +79,11 @@ class HttpExecuteActivity : ComponentActivity() {
 @Composable
 fun HttpExecute(title: String) {
   WearLinkTheme {
-    val scrollState = rememberScrollState()
+    // 単一itemのみのためデフォルト(itemIndex = 1)ではなくitem 0を中心に据える。
+    val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
     Scaffold(
       modifier = Modifier.fillMaxSize(),
-      positionIndicator = { PositionIndicator(scrollState = scrollState) },
+      positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
     ) {
       Box(
         modifier = Modifier
@@ -99,14 +99,21 @@ fun HttpExecute(title: String) {
             .fillMaxSize()
             .background(MaterialTheme.colors.background)
         )
-        Text(
-          modifier = Modifier
-            .verticalScroll(scrollState)
-            .padding(40.dp),
-          style = MaterialTheme.typography.body2,
-          textAlign = TextAlign.Center,
-          text = stringResource(R.string.execute_message, title)
-        )
+        ScalingLazyColumn(
+          state = listState,
+          autoCentering = AutoCenteringParams(itemIndex = 0),
+          contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
+          modifier = Modifier.fillMaxSize(),
+        ) {
+          item {
+            Text(
+              text = stringResource(R.string.execute_message, title),
+              style = MaterialTheme.typography.body2,
+              textAlign = TextAlign.Center,
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            )
+          }
+        }
       }
     }
   }
@@ -129,6 +136,7 @@ fun HttpExecuteConfirm(
       ScalingLazyColumn(
         state = listState,
         autoCentering = AutoCenteringParams(itemIndex = 0),
+        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
         modifier = Modifier
           .fillMaxSize()
           .background(MaterialTheme.colors.background),
