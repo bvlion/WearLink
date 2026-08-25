@@ -1,7 +1,6 @@
 package info.bvlion.wearlink.compose
 
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -52,10 +51,13 @@ fun RequestHistory(
   ) {
     Row(
       verticalAlignment = Alignment.CenterVertically,
-      horizontalArrangement = Arrangement.SpaceBetween,
       modifier = Modifier.fillMaxWidth()
     ) {
-      Column(modifier = Modifier.padding(start = 16.dp)) {
+      Column(
+        modifier = Modifier
+          .weight(1f)
+          .padding(start = 16.dp)
+      ) {
         Text(
           text = stringResource(if (responseParams.isMobile) {
             R.string.request_history_from_mobile
@@ -199,6 +201,25 @@ private fun RequestHistoryListEmptyPreview() {
 private fun RequestHistoryListHasItemPreview() {
   WearLinkTheme {
     RequestHistoryList(List(3) { dummyResponse })
+  }
+}
+
+// スペースを含まない長い日本語文字列でも折り返され、右側がはみ出さないことを確認するためのストレステスト用データ
+private val dummyResponseWithLongTitle = ResponseParams(
+  "非常に長いRequest名のストレステスト用文字列玄関の鍵長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い長い",
+  200,
+  45,
+  "aaaa",
+  "bbbb",
+  System.currentTimeMillis(),
+  false
+)
+
+@Preview(showBackground = true)
+@Composable
+private fun RequestHistoryListLongTitlePreview() {
+  WearLinkTheme {
+    RequestHistoryList(listOf(dummyResponseWithLongTitle))
   }
 }
 
