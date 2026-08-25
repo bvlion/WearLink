@@ -11,6 +11,7 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -25,10 +26,13 @@ import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
+import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CompactChip
 import androidx.wear.compose.material.MaterialTheme
+import androidx.wear.compose.material.PositionIndicator
+import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
 import androidx.wear.widget.ConfirmationOverlay
 import androidx.wear.tooling.preview.devices.WearDevices
@@ -127,61 +131,70 @@ private fun WearMainScreen(
   onRequestLocalNetworkPermission: () -> Unit,
   startMobileActivity: () -> Unit,
 ) {
-  ScalingLazyColumn(
-    modifier = Modifier
-      .fillMaxSize()
-      .background(MaterialTheme.colors.background),
+  val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+  Scaffold(
+    modifier = Modifier.fillMaxSize(),
+    positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
   ) {
-    item {
-      Text(
-        text = stringResource(info.bvlion.wearlink.shared.R.string.app_name),
-        style = MaterialTheme.typography.caption1,
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-        textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 8.dp)
-      )
-    }
-    item {
-      Chip(
-        onClick = startMobileActivity,
-        label = { Text(stringResource(R.string.main_launch_mobile)) },
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-      )
-    }
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+    ScalingLazyColumn(
+      state = listState,
+      autoCentering = null,
+      contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
+      modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colors.background),
+    ) {
       item {
         Text(
-          text = stringResource(R.string.local_network_access),
+          text = stringResource(info.bvlion.wearlink.shared.R.string.app_name),
           style = MaterialTheme.typography.caption1,
-          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 12.dp, bottom = 4.dp)
+          color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth().padding(top = 4.dp, bottom = 8.dp)
         )
       }
       item {
-        if (isLocalNetworkPermissionGranted) {
-          CompactChip(
-            onClick = {},
-            enabled = false,
-            colors = ChipDefaults.secondaryChipColors(),
-            label = { Text(stringResource(R.string.local_network_access_granted)) },
-            modifier = Modifier.padding(horizontal = 16.dp)
-          )
-        } else {
-          Chip(
-            onClick = onRequestLocalNetworkPermission,
-            label = { Text(stringResource(R.string.local_network_access_grant)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        Chip(
+          onClick = startMobileActivity,
+          label = { Text(stringResource(R.string.main_launch_mobile)) },
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        )
+      }
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.CINNAMON_BUN) {
+        item {
+          Text(
+            text = stringResource(R.string.local_network_access),
+            style = MaterialTheme.typography.caption1,
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 12.dp, bottom = 4.dp)
           )
         }
+        item {
+          if (isLocalNetworkPermissionGranted) {
+            CompactChip(
+              onClick = {},
+              enabled = false,
+              colors = ChipDefaults.secondaryChipColors(),
+              label = { Text(stringResource(R.string.local_network_access_granted)) },
+              modifier = Modifier.padding(horizontal = 16.dp)
+            )
+          } else {
+            Chip(
+              onClick = onRequestLocalNetworkPermission,
+              label = { Text(stringResource(R.string.local_network_access_grant)) },
+              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            )
+          }
+        }
       }
-    }
-    item {
-      Text(
-        text = stringResource(R.string.menu_title_version, BuildConfig.VERSION_NAME),
-        style = MaterialTheme.typography.caption3,
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
-        textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 4.dp)
-      )
+      item {
+        Text(
+          text = stringResource(R.string.menu_title_version, BuildConfig.VERSION_NAME),
+          style = MaterialTheme.typography.caption3,
+          color = MaterialTheme.colors.onSurface.copy(alpha = 0.6f),
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth().padding(top = 10.dp, bottom = 4.dp)
+        )
+      }
     }
   }
 }
@@ -191,41 +204,50 @@ private fun LocalNetworkAccessExplanation(
   onGrant: () -> Unit,
   onBack: () -> Unit,
 ) {
-  ScalingLazyColumn(
-    modifier = Modifier
-      .fillMaxSize()
-      .background(MaterialTheme.colors.background),
+  val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+  Scaffold(
+    modifier = Modifier.fillMaxSize(),
+    positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
   ) {
-    item {
-      Text(
-        text = stringResource(R.string.local_network_access),
-        style = MaterialTheme.typography.caption1,
-        textAlign = TextAlign.Center,
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 4.dp)
-      )
-    }
-    item {
-      Text(
-        text = stringResource(R.string.local_network_access_description),
-        style = MaterialTheme.typography.caption3,
-        color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 6.dp)
-      )
-    }
-    item {
-      Chip(
-        onClick = onGrant,
-        label = { Text(stringResource(R.string.local_network_access_grant)) },
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-      )
-    }
-    item {
-      Chip(
-        onClick = onBack,
-        colors = ChipDefaults.secondaryChipColors(),
-        label = { Text(stringResource(R.string.local_network_access_back)) },
-        modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 6.dp, bottom = 4.dp)
-      )
+    ScalingLazyColumn(
+      state = listState,
+      autoCentering = null,
+      contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
+      modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colors.background),
+    ) {
+      item {
+        Text(
+          text = stringResource(R.string.local_network_access),
+          style = MaterialTheme.typography.caption1,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 4.dp)
+        )
+      }
+      item {
+        Text(
+          text = stringResource(R.string.local_network_access_description),
+          style = MaterialTheme.typography.caption3,
+          color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 6.dp)
+        )
+      }
+      item {
+        Chip(
+          onClick = onGrant,
+          label = { Text(stringResource(R.string.local_network_access_grant)) },
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+        )
+      }
+      item {
+        Chip(
+          onClick = onBack,
+          colors = ChipDefaults.secondaryChipColors(),
+          label = { Text(stringResource(R.string.local_network_access_back)) },
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 6.dp, bottom = 4.dp)
+        )
+      }
     }
   }
 }
@@ -279,6 +301,58 @@ fun WearAppEnGrantedPreview() {
 }
 
 @Preview(
+  apiLevel = 37,
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "en",
+  fontScale = 1.24f,
+  name = "small round - en - large font - not granted"
+)
+@Composable
+fun WearAppEnNotGrantedLargeFontPreview() {
+  WearApp(isLocalNetworkPermissionGranted = false)
+}
+
+@Preview(
+  apiLevel = 37,
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "en",
+  fontScale = 1.24f,
+  name = "small round - en - large font - granted"
+)
+@Composable
+fun WearAppEnGrantedLargeFontPreview() {
+  WearApp(isLocalNetworkPermissionGranted = true)
+}
+
+@Preview(
+  apiLevel = 37,
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  fontScale = 1.24f,
+  name = "small round - ja - large font - not granted"
+)
+@Composable
+fun WearAppJaNotGrantedLargeFontPreview() {
+  WearApp(isLocalNetworkPermissionGranted = false)
+}
+
+@Preview(
+  apiLevel = 37,
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  fontScale = 1.24f,
+  name = "small round - ja - large font - granted"
+)
+@Composable
+fun WearAppJaGrantedLargeFontPreview() {
+  WearApp(isLocalNetworkPermissionGranted = true)
+}
+
+@Preview(
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
   locale = "ja",
@@ -299,6 +373,34 @@ fun LocalNetworkAccessExplanationJaPreview() {
 )
 @Composable
 fun LocalNetworkAccessExplanationEnPreview() {
+  WearLinkTheme {
+    LocalNetworkAccessExplanation(onGrant = {}, onBack = {})
+  }
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "en",
+  fontScale = 1.24f,
+  name = "small round - en - large font - explanation"
+)
+@Composable
+fun LocalNetworkAccessExplanationEnLargeFontPreview() {
+  WearLinkTheme {
+    LocalNetworkAccessExplanation(onGrant = {}, onBack = {})
+  }
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  fontScale = 1.24f,
+  name = "small round - ja - large font - explanation"
+)
+@Composable
+fun LocalNetworkAccessExplanationJaLargeFontPreview() {
   WearLinkTheme {
     LocalNetworkAccessExplanation(onGrant = {}, onBack = {})
   }
