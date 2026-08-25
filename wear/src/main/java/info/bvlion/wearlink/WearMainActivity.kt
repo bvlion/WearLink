@@ -24,6 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.wear.compose.foundation.lazy.AutoCenteringParams
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Chip
@@ -130,13 +131,14 @@ private fun WearMainScreen(
   onRequestLocalNetworkPermission: () -> Unit,
   startMobileActivity: () -> Unit,
 ) {
-  val listState = rememberScalingLazyListState()
+  val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
   Scaffold(
     modifier = Modifier.fillMaxSize(),
     positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
   ) {
     ScalingLazyColumn(
       state = listState,
+      autoCentering = AutoCenteringParams(itemIndex = 0),
       modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colors.background),
@@ -201,13 +203,14 @@ private fun LocalNetworkAccessExplanation(
   onGrant: () -> Unit,
   onBack: () -> Unit,
 ) {
-  val listState = rememberScalingLazyListState()
+  val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
   Scaffold(
     modifier = Modifier.fillMaxSize(),
     positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
   ) {
     ScalingLazyColumn(
       state = listState,
+      autoCentering = AutoCenteringParams(itemIndex = 0),
       modifier = Modifier
         .fillMaxSize()
         .background(MaterialTheme.colors.background),
@@ -322,6 +325,32 @@ fun WearAppEnGrantedLargeFontPreview() {
 }
 
 @Preview(
+  apiLevel = 37,
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  fontScale = 2.0f,
+  name = "small round - ja - large font - not granted"
+)
+@Composable
+fun WearAppJaNotGrantedLargeFontPreview() {
+  WearApp(isLocalNetworkPermissionGranted = false)
+}
+
+@Preview(
+  apiLevel = 37,
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  fontScale = 2.0f,
+  name = "small round - ja - large font - granted"
+)
+@Composable
+fun WearAppJaGrantedLargeFontPreview() {
+  WearApp(isLocalNetworkPermissionGranted = true)
+}
+
+@Preview(
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
   locale = "ja",
@@ -356,6 +385,20 @@ fun LocalNetworkAccessExplanationEnPreview() {
 )
 @Composable
 fun LocalNetworkAccessExplanationEnLargeFontPreview() {
+  WearLinkTheme {
+    LocalNetworkAccessExplanation(onGrant = {}, onBack = {})
+  }
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  fontScale = 2.0f,
+  name = "small round - ja - large font - explanation"
+)
+@Composable
+fun LocalNetworkAccessExplanationJaLargeFontPreview() {
   WearLinkTheme {
     LocalNetworkAccessExplanation(onGrant = {}, onBack = {})
   }

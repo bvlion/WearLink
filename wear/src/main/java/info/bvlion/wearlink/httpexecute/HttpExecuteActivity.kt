@@ -23,11 +23,15 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.wear.compose.foundation.requestFocusOnHierarchyActive
+import androidx.wear.compose.foundation.rotary.RotaryScrollableDefaults
+import androidx.wear.compose.foundation.rotary.rotaryScrollable
 import androidx.wear.compose.material.Button
 import androidx.wear.compose.material.ButtonDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
@@ -80,11 +84,15 @@ class HttpExecuteActivity : ComponentActivity() {
   }
 }
 
+// 外周CircularProgressIndicatorのstrokeWidth(12dp)帯とスクロール中の本文が
+// 重ならないよう、本文のスクロールviewportをリング内接円に収まる正方形に制限する。
+private const val EXECUTE_MESSAGE_SAFE_AREA_FRACTION = 0.6f
+
 @Composable
 fun HttpExecute(title: String) {
   WearLinkTheme {
-    // 先頭(offset 0)から必ず表示されるよう通常のスクロールにする。
     val scrollState = rememberScrollState()
+    val focusRequester = remember { FocusRequester() }
     Scaffold(
       modifier = Modifier.fillMaxSize(),
       positionIndicator = { PositionIndicator(scrollState = scrollState) },
@@ -103,15 +111,24 @@ fun HttpExecute(title: String) {
             .fillMaxSize()
             .background(MaterialTheme.colors.background)
         )
-        Text(
-          text = stringResource(R.string.execute_message, title),
-          style = MaterialTheme.typography.body2,
-          textAlign = TextAlign.Center,
+        Box(
           modifier = Modifier
-            .fillMaxWidth()
-            .verticalScroll(scrollState)
-            .padding(40.dp)
-        )
+            .fillMaxSize(EXECUTE_MESSAGE_SAFE_AREA_FRACTION)
+            .requestFocusOnHierarchyActive()
+            .rotaryScrollable(
+              behavior = RotaryScrollableDefaults.behavior(scrollState),
+              focusRequester = focusRequester,
+            )
+            .verticalScroll(scrollState),
+          contentAlignment = Alignment.Center
+        ) {
+          Text(
+            text = stringResource(R.string.execute_message, title),
+            style = MaterialTheme.typography.body2,
+            textAlign = TextAlign.Center,
+            modifier = Modifier.fillMaxWidth()
+          )
+        }
       }
     }
   }
@@ -124,8 +141,8 @@ fun HttpExecuteConfirm(
   onFinish: () -> Unit = {}
 ) {
   WearLinkTheme {
-    // 先頭(offset 0)から必ず確認文を表示できるよう通常のスクロールにする。
     val scrollState = rememberScrollState()
+    val focusRequester = remember { FocusRequester() }
     Scaffold(
       modifier = Modifier.fillMaxSize(),
       positionIndicator = { PositionIndicator(scrollState = scrollState) },
@@ -134,6 +151,11 @@ fun HttpExecuteConfirm(
         modifier = Modifier
           .fillMaxSize()
           .background(MaterialTheme.colors.background)
+          .requestFocusOnHierarchyActive()
+          .rotaryScrollable(
+            behavior = RotaryScrollableDefaults.behavior(scrollState),
+            focusRequester = focusRequester,
+          )
           .verticalScroll(scrollState)
           .padding(24.dp),
         verticalArrangement = Arrangement.Center,
@@ -147,9 +169,8 @@ fun HttpExecuteConfirm(
         BoxWithConstraints(modifier = Modifier.fillMaxWidth().padding(top = 16.dp)) {
           val fontScale = LocalDensity.current.fontScale
           val buttonGap = 8.dp
-          // Wear Materialの丸型Buttonは既定サイズ(52dp)が固定で、large fontだと
-          // ラベルが円形の外へクリップされるため、fontScaleに合わせて拡大する。
-          // ただしsmall round画面から2つ分がはみ出さないよう利用可能幅で上限を設ける。
+          // RoundButtonは既定52dpの円形にクリップされ、大きいfont scaleではラベルが
+          // 円の外へ切れるため、font scaleに合わせて拡大しつつ画面幅で上限を設ける。
           val buttonSize = (ButtonDefaults.DefaultButtonSize * fontScale.coerceAtLeast(1f))
             .coerceAtMost((maxWidth - buttonGap) / 2)
           Row(
@@ -239,6 +260,18 @@ fun HttpExecuteConfirmEnLargeFontContinuousLongTitlePreview() {
 @Preview(
   device = WearDevices.SMALL_ROUND,
   showSystemUi = true,
+  locale = "ja",
+  fontScale = 2.0f,
+  name = "small round - ja - large font - long title"
+)
+@Composable
+fun HttpExecuteConfirmJaLargeFontLongTitlePreview() {
+  HttpExecuteConfirm(PREVIEW_LONG_REQUEST_TITLE)
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
   name = "small round - normal font"
 )
 @Composable
@@ -278,4 +311,18 @@ fun HttpExecuteLargeFontLongTitlePreview() {
 @Composable
 fun HttpExecuteEnLargeFontContinuousLongTitlePreview() {
   HttpExecute(PREVIEW_LONG_REQUEST_TITLE_CONTINUOUS_EN)
+}
+
+// 長い日本語メッセージをスクロールしても、本文が外周CircularProgressIndicatorの
+// 帯へ入り込まないこと(EXECUTE_MESSAGE_SAFE_AREA_FRACTIONによる領域分離)を確認する。
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  fontScale = 2.0f,
+  name = "small round - ja - large font - long title"
+)
+@Composable
+fun HttpExecuteJaLargeFontLongTitlePreview() {
+  HttpExecute(PREVIEW_LONG_REQUEST_TITLE)
 }
