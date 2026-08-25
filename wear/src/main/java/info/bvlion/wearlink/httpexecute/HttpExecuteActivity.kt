@@ -5,11 +5,15 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,9 +25,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.wear.compose.foundation.lazy.AutoCenteringParams
-import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
-import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Chip
 import androidx.wear.compose.material.ChipDefaults
 import androidx.wear.compose.material.CircularProgressIndicator
@@ -79,41 +80,36 @@ class HttpExecuteActivity : ComponentActivity() {
 @Composable
 fun HttpExecute(title: String) {
   WearLinkTheme {
-    // 単一itemのみのためデフォルト(itemIndex = 1)ではなくitem 0を中心に据える。
-    val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    // ScalingLazyColumnの中央寄せだと長文時に先頭より下から表示されてしまうため、
+    // 通常のスクロール(先頭=offset 0)にしてメッセージを必ず先頭から表示する。
+    val scrollState = rememberScrollState()
     Scaffold(
       modifier = Modifier.fillMaxSize(),
-      positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
+      positionIndicator = { PositionIndicator(scrollState = scrollState) },
     ) {
-      Box(
+      Column(
         modifier = Modifier
           .fillMaxSize()
-          .background(MaterialTheme.colors.background),
-        contentAlignment = Alignment.Center
+          .background(MaterialTheme.colors.background)
+          .verticalScroll(scrollState)
+          .padding(horizontal = 24.dp)
+          .padding(top = 32.dp, bottom = 32.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
       ) {
+        // 全画面外周のリングだとPositionIndicatorと重なって見えるため、
+        // スクロールコンテンツ内の小さなインジケーターに変更する。
         CircularProgressIndicator(
           indicatorColor = MaterialTheme.colors.secondary,
           trackColor = MaterialTheme.colors.onBackground.copy(alpha = 0.1f),
-          strokeWidth = 12.dp,
-          modifier = Modifier
-            .fillMaxSize()
-            .background(MaterialTheme.colors.background)
+          strokeWidth = 4.dp,
+          modifier = Modifier.size(40.dp)
         )
-        ScalingLazyColumn(
-          state = listState,
-          autoCentering = AutoCenteringParams(itemIndex = 0),
-          contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
-          modifier = Modifier.fillMaxSize(),
-        ) {
-          item {
-            Text(
-              text = stringResource(R.string.execute_message, title),
-              style = MaterialTheme.typography.body2,
-              textAlign = TextAlign.Center,
-              modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-            )
-          }
-        }
+        Text(
+          text = stringResource(R.string.execute_message, title),
+          style = MaterialTheme.typography.body2,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth().padding(top = 16.dp)
+        )
       }
     }
   }
@@ -126,42 +122,41 @@ fun HttpExecuteConfirm(
   onFinish: () -> Unit = {}
 ) {
   WearLinkTheme {
-    // 確認文(index 0)を最初に表示する。デフォルトのindex 1中央開始のままだと、
-    // 長いRequest名+大きいfont scaleで確認文を読まないままNo/Yesが見えてしまう。
-    val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+    // ScalingLazyColumnの中央寄せだと長文時に確認文の先頭より下から表示されてしまうため、
+    // 通常のスクロール(先頭=offset 0)にして確認文を必ず先頭から表示する。
+    val scrollState = rememberScrollState()
     Scaffold(
       modifier = Modifier.fillMaxSize(),
-      positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
+      positionIndicator = { PositionIndicator(scrollState = scrollState) },
     ) {
-      ScalingLazyColumn(
-        state = listState,
-        autoCentering = AutoCenteringParams(itemIndex = 0),
-        contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
+      Column(
         modifier = Modifier
           .fillMaxSize()
-          .background(MaterialTheme.colors.background),
+          .background(MaterialTheme.colors.background)
+          .verticalScroll(scrollState)
+          .padding(horizontal = 24.dp)
+          .padding(top = 32.dp, bottom = 32.dp),
       ) {
-        item {
-          Text(
-            text = stringResource(R.string.execute_message_confirm, title),
-            style = MaterialTheme.typography.body2,
-            textAlign = TextAlign.Center,
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-          )
-        }
-        item {
+        Text(
+          text = stringResource(R.string.execute_message_confirm, title),
+          style = MaterialTheme.typography.body2,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth()
+        )
+        Row(
+          modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+          horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
           Chip(
             onClick = onFinish,
             colors = ChipDefaults.secondaryChipColors(),
             label = { Text(stringResource(R.string.execute_message_confirm_no)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 12.dp)
+            modifier = Modifier.weight(1f)
           )
-        }
-        item {
           Chip(
             onClick = onExecute,
             label = { Text(stringResource(R.string.execute_message_confirm_yes)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 6.dp, bottom = 4.dp)
+            modifier = Modifier.weight(1f)
           )
         }
       }
@@ -174,7 +169,7 @@ private const val PREVIEW_LONG_REQUEST_TITLE =
 
 // Google Playの指摘スクリーンショット相当: スペースを含まない連続した長い文字列。
 private const val PREVIEW_LONG_REQUEST_TITLE_CONTINUOUS_EN =
-  "Maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  "Maaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
 
 @Preview(
   device = WearDevices.SMALL_ROUND,
