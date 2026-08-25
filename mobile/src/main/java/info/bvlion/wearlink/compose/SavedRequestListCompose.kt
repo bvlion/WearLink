@@ -30,6 +30,7 @@ import androidx.compose.material.icons.filled.IosShare
 import androidx.compose.material.icons.filled.KeyboardArrowDown
 import androidx.compose.material.icons.filled.KeyboardArrowUp
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Reorder
 import androidx.compose.material.icons.filled.ViewCarousel
 import androidx.compose.material.icons.filled.Watch
 import androidx.compose.runtime.Composable
@@ -179,6 +180,7 @@ private fun SavedRequest(
           HorizontalDivider()
           DropdownMenuItem(
             text = { Text(stringResource(R.string.saved_request_menu_reorder)) },
+            leadingIcon = { Icon(Icons.Filled.Reorder, contentDescription = null) },
             onClick = {
               menuExpanded = false
               startReorder()
