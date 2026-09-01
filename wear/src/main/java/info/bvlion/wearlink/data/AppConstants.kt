@@ -70,8 +70,9 @@ object AppConstants {
   suspend fun resolvePhoneConnectionStatus(context: Context): PhoneConnectionStatus {
     val connector = WearMobileConnector(context)
 
-    // 起動は失敗したがスマホ版へは到達できている＝一時的な失敗とみなす
-    if (connector.isMobileAppReachable()) return PhoneConnectionStatus.UNKNOWN
+    // false（問い合わせは成功しスマホ版が見つからなかった）以外は原因を断定しない。
+    // true = 到達できているのに起動失敗（一時的）、null = 問い合わせ自体が失敗。
+    if (connector.isMobileAppReachable() != false) return PhoneConnectionStatus.UNKNOWN
 
     val phoneConnected = connector.isPhoneConnected()
     val remoteStatus = try {
