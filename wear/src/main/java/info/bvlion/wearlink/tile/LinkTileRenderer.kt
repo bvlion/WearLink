@@ -48,6 +48,8 @@ class LinkTileRenderer(context: Context) : SingleTileLayoutRenderer<LinkTileStat
     )
 }
 
+private const val OPEN_MAIN_ACTIVITY_CLICKABLE_ID = "openMainActivity"
+
 private fun linkTileLayout(
   context: Context,
   deviceParameters: DeviceParametersBuilders.DeviceParameters,
@@ -60,8 +62,12 @@ private fun linkTileLayout(
       .setModifiers(
         ModifiersBuilders.Modifiers.Builder().setClickable(
           ModifiersBuilders.Clickable.Builder()
-            .setId(AppConstants.START_MOBILE_ACTIVITY)
-            .setOnClick(ActionBuilders.LoadAction.Builder().build())
+            .setId(OPEN_MAIN_ACTIVITY_CLICKABLE_ID)
+            .setOnClick(
+              ActionBuilders.LaunchAction.Builder()
+                .setAndroidActivity(ClickAction.openMainActivity(context))
+                .build()
+            )
             .build()
         )
           .build()

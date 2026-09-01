@@ -8,7 +8,6 @@ import info.bvlion.wearlink.request.WearMobileConnector
 import kotlinx.coroutines.flow.first
 
 object AppConstants {
-  const val START_MOBILE_ACTIVITY = "info.bvlion.START_MOBILE_ACTIVITY"
   const val SYNC_STORE_DATA = "info.bvlion.SYNC_STORE_DATA"
 
   /** mobile / wear は同一 applicationId で、Play リスティングも 1 つ */

@@ -4,15 +4,15 @@
 
   <!-- スマホで開く失敗時の案内 -->
   <string name="phone_playstore_opened">スマートフォンで Google Play を開きました</string>
+  <string name="phone_playstore_open_failed">Google Play を開けませんでした</string>
   <string name="phone_status_open_play">スマートフォンの Google Play を開く</string>
-  <string name="phone_status_retry">再確認</string>
   <string name="phone_status_back">戻る</string>
   <string name="phone_app_required_title">スマートフォン版が必要です</string>
   <string name="phone_app_required_description">Request の作成・管理にはスマートフォン版 WearLink が必要です。ペアリングしたスマートフォンの Google Play から WearLink をインストールしてください。</string>
   <string name="phone_disconnected_title">スマートフォンに接続できません</string>
   <string name="phone_disconnected_description">スマートフォンとの接続を確認できませんでした。スマートフォンが近くにあり、WearLink と同期できる状態か確認してください。</string>
-  <string name="phone_status_unknown_title">スマートフォンで確認してください</string>
-  <string name="phone_status_unknown_description">スマートフォンで WearLink を開けませんでした。スマートフォンに WearLink がインストールされ、同期できる状態か確認してください。</string>
+  <string name="phone_status_unknown_title">スマートフォン版を開けませんでした</string>
+  <string name="phone_status_unknown_description">スマートフォン版 WearLink を開けませんでしたが、原因を判別できませんでした。スマートフォンで WearLink が利用できる状態か確認してください。</string>
   <string name="local_network_access">LAN内のURLへのアクセス</string>
   <string name="local_network_access_description">LAN内のURLへRequestを送る場合には、Androidの「付近のデバイス」への許可が必要です。インターネット上のURLだけを利用する場合、この権限は許可しなくても利用できます。WearLinkでは位置情報や端末間の距離を取得しません。</string>
   <string name="local_network_access_grant">許可する</string>
@@ -28,9 +28,8 @@
   <string name="execute_message_confirm_no">いいえ</string>
 
   <!-- service -->
-  <string name="tiles_toast_called_mobile">スマートフォンのアプリを呼び出します</string>
   <string name="tiles_toast_synced">同期しました</string>
-  <string name="tiles_toast_not_found_mobile">スマートフォンが見つかりませんでした</string>
+  <string name="tiles_toast_sync_failed">同期できませんでした</string>
 
   <!-- tile -->
   <string name="tile_sync_button">同期</string>

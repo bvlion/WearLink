@@ -35,7 +35,6 @@ import androidx.wear.compose.material.MaterialTheme
 import androidx.wear.compose.material.PositionIndicator
 import androidx.wear.compose.material.Scaffold
 import androidx.wear.compose.material.Text
-import androidx.wear.widget.ConfirmationOverlay
 import androidx.wear.tooling.preview.devices.WearDevices
 import info.bvlion.wearlink.data.AppConstants
 import info.bvlion.wearlink.data.AppConstants.PhoneConnectionStatus
@@ -71,17 +70,16 @@ class WearMainActivity : ComponentActivity() {
             )
           }
         },
-        openPhone = { onResult ->
+        openPhone = { onFailure ->
           AppConstants.startMobileActivity(
             this,
             successProcess = {
               Toast.makeText(this, getString(R.string.main_launched_mobile), Toast.LENGTH_SHORT).show()
-              onResult(null)
             }
           ) {
             // 起動できなかった原因を分類してから案内画面へ遷移する
             lifecycleScope.launch {
-              onResult(AppConstants.resolvePhoneConnectionStatus(this@WearMainActivity))
+              onFailure(AppConstants.resolvePhoneConnectionStatus(this@WearMainActivity))
             }
           }
         },
@@ -92,9 +90,8 @@ class WearMainActivity : ComponentActivity() {
               Toast.makeText(this, getString(R.string.phone_playstore_opened), Toast.LENGTH_SHORT).show()
             }
           ) {
-            ConfirmationOverlay()
-              .setType(ConfirmationOverlay.FAILURE_ANIMATION)
-              .showOn(this)
+            // 状態は再判定せず、開けなかったことだけ伝えて案内画面に留まる
+            Toast.makeText(this, getString(R.string.phone_playstore_open_failed), Toast.LENGTH_SHORT).show()
           }
         }
       )
@@ -116,7 +113,7 @@ class WearMainActivity : ComponentActivity() {
 fun WearApp(
   isLocalNetworkPermissionGranted: Boolean = false,
   requestLocalNetworkPermission: () -> Unit = {},
-  openPhone: (onResult: (PhoneConnectionStatus?) -> Unit) -> Unit = {},
+  openPhone: (onFailure: (PhoneConnectionStatus) -> Unit) -> Unit = {},
   openPhonePlayStore: () -> Unit = {},
 ) {
   val showLocalNetworkAccessExplanationState = rememberSaveable { mutableStateOf(false) }
@@ -141,7 +138,6 @@ fun WearApp(
         PhoneStatusExplanation(
           status = phoneGuidanceState.value!!,
           onOpenPlayStore = openPhonePlayStore,
-          onRetry = { openPhone { phoneGuidanceState.value = it } },
           onBack = { phoneGuidanceState.value = null }
         )
       }
@@ -291,7 +287,6 @@ private fun LocalNetworkAccessExplanation(
 private fun PhoneStatusExplanation(
   status: PhoneConnectionStatus,
   onOpenPlayStore: () -> Unit,
-  onRetry: () -> Unit,
   onBack: () -> Unit,
 ) {
   val titleRes = when (status) {
@@ -304,10 +299,8 @@ private fun PhoneStatusExplanation(
     PhoneConnectionStatus.PHONE_DISCONNECTED -> R.string.phone_disconnected_description
     PhoneConnectionStatus.UNKNOWN -> R.string.phone_status_unknown_description
   }
-  // 未接続と断定できるときだけ Play Store 導線を出さない
-  val showOpenPlayStore = status != PhoneConnectionStatus.PHONE_DISCONNECTED
-  // 未インストールと断定できるときは再確認しても結果は変わらない
-  val showRetry = status != PhoneConnectionStatus.MOBILE_APP_MISSING
+  // 未インストールと断定できるときだけ、行動につながる Play Store 導線を出す
+  val showOpenPlayStore = status == PhoneConnectionStatus.MOBILE_APP_MISSING
 
   val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
   Scaffold(
@@ -344,16 +337,6 @@ private fun PhoneStatusExplanation(
             onClick = onOpenPlayStore,
             label = { Text(stringResource(R.string.phone_status_open_play)) },
             modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
-          )
-        }
-      }
-      if (showRetry) {
-        item {
-          Chip(
-            onClick = onRetry,
-            colors = ChipDefaults.secondaryChipColors(),
-            label = { Text(stringResource(R.string.phone_status_retry)) },
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 6.dp)
           )
         }
       }
@@ -534,7 +517,7 @@ fun PhoneStatusExplanationAppRequiredJaPreview() {
   WearLinkTheme {
     PhoneStatusExplanation(
       status = PhoneConnectionStatus.MOBILE_APP_MISSING,
-      onOpenPlayStore = {}, onRetry = {}, onBack = {}
+      onOpenPlayStore = {}, onBack = {}
     )
   }
 }
@@ -550,7 +533,7 @@ fun PhoneStatusExplanationDisconnectedJaPreview() {
   WearLinkTheme {
     PhoneStatusExplanation(
       status = PhoneConnectionStatus.PHONE_DISCONNECTED,
-      onOpenPlayStore = {}, onRetry = {}, onBack = {}
+      onOpenPlayStore = {}, onBack = {}
     )
   }
 }
@@ -567,7 +550,7 @@ fun PhoneStatusExplanationUnknownJaLargeFontPreview() {
   WearLinkTheme {
     PhoneStatusExplanation(
       status = PhoneConnectionStatus.UNKNOWN,
-      onOpenPlayStore = {}, onRetry = {}, onBack = {}
+      onOpenPlayStore = {}, onBack = {}
     )
   }
 }
@@ -583,7 +566,7 @@ fun PhoneStatusExplanationUnknownEnPreview() {
   WearLinkTheme {
     PhoneStatusExplanation(
       status = PhoneConnectionStatus.UNKNOWN,
-      onOpenPlayStore = {}, onRetry = {}, onBack = {}
+      onOpenPlayStore = {}, onBack = {}
     )
   }
 }
