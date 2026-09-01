@@ -1,6 +1,18 @@
 <resources>
   <string name="main_launched_mobile">Opened the app on your phone</string>
   <string name="main_launch_mobile">Open the app on your phone</string>
+
+  <!-- Guidance shown when opening the phone app fails -->
+  <string name="phone_playstore_opened">Opened Google Play on your phone</string>
+  <string name="phone_status_open_play">Open Google Play on your phone</string>
+  <string name="phone_status_retry">Check again</string>
+  <string name="phone_status_back">Back</string>
+  <string name="phone_app_required_title">Phone app required</string>
+  <string name="phone_app_required_description">You need the WearLink phone app to create and manage requests. Install WearLink from Google Play on your paired phone.</string>
+  <string name="phone_disconnected_title">Can\'t connect to your phone</string>
+  <string name="phone_disconnected_description">Couldn\'t reach your phone. Make sure your phone is nearby and able to sync with WearLink.</string>
+  <string name="phone_status_unknown_title">Check on your phone</string>
+  <string name="phone_status_unknown_description">Couldn\'t open WearLink on your phone. Make sure WearLink is installed on your phone and able to sync.</string>
   <string name="local_network_access">Access to LAN URLs</string>
   <string name="local_network_access_description">Sending requests to a URL on your LAN requires Android\'s “Nearby devices” permission. If you only use URLs on the internet, you can use the app without granting this permission. WearLink does not access your location or the distance to other devices.</string>
   <string name="local_network_access_grant">Allow</string>

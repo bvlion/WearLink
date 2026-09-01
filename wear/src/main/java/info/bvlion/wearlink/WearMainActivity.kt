@@ -25,6 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
+import androidx.lifecycle.lifecycleScope
 import androidx.wear.compose.foundation.lazy.ScalingLazyColumn
 import androidx.wear.compose.foundation.lazy.rememberScalingLazyListState
 import androidx.wear.compose.material.Chip
@@ -37,9 +38,11 @@ import androidx.wear.compose.material.Text
 import androidx.wear.widget.ConfirmationOverlay
 import androidx.wear.tooling.preview.devices.WearDevices
 import info.bvlion.wearlink.data.AppConstants
+import info.bvlion.wearlink.data.AppConstants.PhoneConnectionStatus
 import info.bvlion.wearlink.ui.theme.WearLinkTheme
 import info.bvlion.wearlink.wear.BuildConfig
 import info.bvlion.wearlink.wear.R
+import kotlinx.coroutines.launch
 
 class WearMainActivity : ComponentActivity() {
   private val isLocalNetworkPermissionGranted = mutableStateOf(false)
@@ -68,11 +71,25 @@ class WearMainActivity : ComponentActivity() {
             )
           }
         },
-        startMobileActivity = {
+        openPhone = { onResult ->
           AppConstants.startMobileActivity(
             this,
             successProcess = {
               Toast.makeText(this, getString(R.string.main_launched_mobile), Toast.LENGTH_SHORT).show()
+              onResult(null)
+            }
+          ) {
+            // 起動できなかった原因を分類してから案内画面へ遷移する
+            lifecycleScope.launch {
+              onResult(AppConstants.resolvePhoneConnectionStatus(this@WearMainActivity))
+            }
+          }
+        },
+        openPhonePlayStore = {
+          AppConstants.openPhonePlayStore(
+            this,
+            successProcess = {
+              Toast.makeText(this, getString(R.string.phone_playstore_opened), Toast.LENGTH_SHORT).show()
             }
           ) {
             ConfirmationOverlay()
@@ -99,28 +116,42 @@ class WearMainActivity : ComponentActivity() {
 fun WearApp(
   isLocalNetworkPermissionGranted: Boolean = false,
   requestLocalNetworkPermission: () -> Unit = {},
-  startMobileActivity: () -> Unit = {},
+  openPhone: (onResult: (PhoneConnectionStatus?) -> Unit) -> Unit = {},
+  openPhonePlayStore: () -> Unit = {},
 ) {
   val showLocalNetworkAccessExplanationState = rememberSaveable { mutableStateOf(false) }
+  val phoneGuidanceState = rememberSaveable { mutableStateOf<PhoneConnectionStatus?>(null) }
 
   WearLinkTheme {
-    if (showLocalNetworkAccessExplanationState.value) {
-      BackHandler {
-        showLocalNetworkAccessExplanationState.value = false
-      }
-      LocalNetworkAccessExplanation(
-        onGrant = {
+    when {
+      showLocalNetworkAccessExplanationState.value -> {
+        BackHandler {
           showLocalNetworkAccessExplanationState.value = false
-          requestLocalNetworkPermission()
-        },
-        onBack = { showLocalNetworkAccessExplanationState.value = false }
-      )
-    } else {
-      WearMainScreen(
-        isLocalNetworkPermissionGranted = isLocalNetworkPermissionGranted,
-        onRequestLocalNetworkPermission = { showLocalNetworkAccessExplanationState.value = true },
-        startMobileActivity = startMobileActivity
-      )
+        }
+        LocalNetworkAccessExplanation(
+          onGrant = {
+            showLocalNetworkAccessExplanationState.value = false
+            requestLocalNetworkPermission()
+          },
+          onBack = { showLocalNetworkAccessExplanationState.value = false }
+        )
+      }
+      phoneGuidanceState.value != null -> {
+        BackHandler { phoneGuidanceState.value = null }
+        PhoneStatusExplanation(
+          status = phoneGuidanceState.value!!,
+          onOpenPlayStore = openPhonePlayStore,
+          onRetry = { openPhone { phoneGuidanceState.value = it } },
+          onBack = { phoneGuidanceState.value = null }
+        )
+      }
+      else -> {
+        WearMainScreen(
+          isLocalNetworkPermissionGranted = isLocalNetworkPermissionGranted,
+          onRequestLocalNetworkPermission = { showLocalNetworkAccessExplanationState.value = true },
+          onOpenPhone = { openPhone { phoneGuidanceState.value = it } }
+        )
+      }
     }
   }
 }
@@ -129,7 +160,7 @@ fun WearApp(
 private fun WearMainScreen(
   isLocalNetworkPermissionGranted: Boolean,
   onRequestLocalNetworkPermission: () -> Unit,
-  startMobileActivity: () -> Unit,
+  onOpenPhone: () -> Unit,
 ) {
   val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
   Scaffold(
@@ -155,7 +186,7 @@ private fun WearMainScreen(
       }
       item {
         Chip(
-          onClick = startMobileActivity,
+          onClick = onOpenPhone,
           label = { Text(stringResource(R.string.main_launch_mobile)) },
           modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
         )
@@ -245,6 +276,92 @@ private fun LocalNetworkAccessExplanation(
           onClick = onBack,
           colors = ChipDefaults.secondaryChipColors(),
           label = { Text(stringResource(R.string.local_network_access_back)) },
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 6.dp, bottom = 4.dp)
+        )
+      }
+    }
+  }
+}
+
+/**
+ * 「スマホで開く」に失敗した後、分類した原因に応じてユーザーの次の行動を案内する。
+ * LAN 権限説明画面と同じ全画面 + ScalingLazyColumn の構成に揃えている。
+ */
+@Composable
+private fun PhoneStatusExplanation(
+  status: PhoneConnectionStatus,
+  onOpenPlayStore: () -> Unit,
+  onRetry: () -> Unit,
+  onBack: () -> Unit,
+) {
+  val titleRes = when (status) {
+    PhoneConnectionStatus.MOBILE_APP_MISSING -> R.string.phone_app_required_title
+    PhoneConnectionStatus.PHONE_DISCONNECTED -> R.string.phone_disconnected_title
+    PhoneConnectionStatus.UNKNOWN -> R.string.phone_status_unknown_title
+  }
+  val descriptionRes = when (status) {
+    PhoneConnectionStatus.MOBILE_APP_MISSING -> R.string.phone_app_required_description
+    PhoneConnectionStatus.PHONE_DISCONNECTED -> R.string.phone_disconnected_description
+    PhoneConnectionStatus.UNKNOWN -> R.string.phone_status_unknown_description
+  }
+  // 未接続と断定できるときだけ Play Store 導線を出さない
+  val showOpenPlayStore = status != PhoneConnectionStatus.PHONE_DISCONNECTED
+  // 未インストールと断定できるときは再確認しても結果は変わらない
+  val showRetry = status != PhoneConnectionStatus.MOBILE_APP_MISSING
+
+  val listState = rememberScalingLazyListState(initialCenterItemIndex = 0)
+  Scaffold(
+    modifier = Modifier.fillMaxSize(),
+    positionIndicator = { PositionIndicator(scalingLazyListState = listState) },
+  ) {
+    ScalingLazyColumn(
+      state = listState,
+      autoCentering = null,
+      contentPadding = PaddingValues(horizontal = 10.dp, vertical = 24.dp),
+      modifier = Modifier
+        .fillMaxSize()
+        .background(MaterialTheme.colors.background),
+    ) {
+      item {
+        Text(
+          text = stringResource(titleRes),
+          style = MaterialTheme.typography.caption1,
+          textAlign = TextAlign.Center,
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 8.dp, bottom = 4.dp)
+        )
+      }
+      item {
+        Text(
+          text = stringResource(descriptionRes),
+          style = MaterialTheme.typography.caption3,
+          color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+          modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(bottom = 6.dp)
+        )
+      }
+      if (showOpenPlayStore) {
+        item {
+          Chip(
+            onClick = onOpenPlayStore,
+            label = { Text(stringResource(R.string.phone_status_open_play)) },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+          )
+        }
+      }
+      if (showRetry) {
+        item {
+          Chip(
+            onClick = onRetry,
+            colors = ChipDefaults.secondaryChipColors(),
+            label = { Text(stringResource(R.string.phone_status_retry)) },
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 6.dp)
+          )
+        }
+      }
+      item {
+        Chip(
+          onClick = onBack,
+          colors = ChipDefaults.secondaryChipColors(),
+          label = { Text(stringResource(R.string.phone_status_back)) },
           modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp).padding(top = 6.dp, bottom = 4.dp)
         )
       }
@@ -403,5 +520,70 @@ fun LocalNetworkAccessExplanationEnLargeFontPreview() {
 fun LocalNetworkAccessExplanationJaLargeFontPreview() {
   WearLinkTheme {
     LocalNetworkAccessExplanation(onGrant = {}, onBack = {})
+  }
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  name = "small round - ja - phone app required"
+)
+@Composable
+fun PhoneStatusExplanationAppRequiredJaPreview() {
+  WearLinkTheme {
+    PhoneStatusExplanation(
+      status = PhoneConnectionStatus.MOBILE_APP_MISSING,
+      onOpenPlayStore = {}, onRetry = {}, onBack = {}
+    )
+  }
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  name = "small round - ja - phone disconnected"
+)
+@Composable
+fun PhoneStatusExplanationDisconnectedJaPreview() {
+  WearLinkTheme {
+    PhoneStatusExplanation(
+      status = PhoneConnectionStatus.PHONE_DISCONNECTED,
+      onOpenPlayStore = {}, onRetry = {}, onBack = {}
+    )
+  }
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "ja",
+  fontScale = 1.24f,
+  name = "small round - ja - large font - phone status unknown"
+)
+@Composable
+fun PhoneStatusExplanationUnknownJaLargeFontPreview() {
+  WearLinkTheme {
+    PhoneStatusExplanation(
+      status = PhoneConnectionStatus.UNKNOWN,
+      onOpenPlayStore = {}, onRetry = {}, onBack = {}
+    )
+  }
+}
+
+@Preview(
+  device = WearDevices.SMALL_ROUND,
+  showSystemUi = true,
+  locale = "en",
+  name = "small round - en - phone status unknown"
+)
+@Composable
+fun PhoneStatusExplanationUnknownEnPreview() {
+  WearLinkTheme {
+    PhoneStatusExplanation(
+      status = PhoneConnectionStatus.UNKNOWN,
+      onOpenPlayStore = {}, onRetry = {}, onBack = {}
+    )
   }
 }

@@ -62,6 +62,7 @@ kotlin {
 dependencies {
   implementation(project(":shared"))
   implementation(libs.play.services.wearable)
+  implementation(libs.kotlinx.coroutines.play.services)
   implementation(libs.wear)
   implementation(libs.wear.remote.interactions)
   implementation(libs.androidx.ui)

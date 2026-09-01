@@ -12,6 +12,25 @@ class WearMobileConnector(context: Context) {
 
   private val messageClient by lazy { Wearable.getMessageClient(context) }
   private val capabilityClient by lazy { Wearable.getCapabilityClient(context) }
+  private val nodeClient by lazy { Wearable.getNodeClient(context) }
+
+  /** ペアリング済みスマホに、到達可能なスマホ版 WearLink があるか */
+  suspend fun isMobileAppReachable(): Boolean = try {
+    capabilityClient
+      .getCapability(MOBILE_CAPABILITY, CapabilityClient.FILTER_REACHABLE)
+      .await()
+      .nodes
+      .isNotEmpty()
+  } catch (exception: Exception) {
+    false
+  }
+
+  /** スマホ自体と現在接続できているか（スマホ版アプリの有無は問わない） */
+  suspend fun isPhoneConnected(): Boolean = try {
+    nodeClient.connectedNodes.await().isNotEmpty()
+  } catch (exception: Exception) {
+    false
+  }
 
   suspend fun sendMessageToMobile(
     path: String,
