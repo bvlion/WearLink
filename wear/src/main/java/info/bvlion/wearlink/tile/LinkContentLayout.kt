@@ -1,14 +1,18 @@
 package info.bvlion.wearlink.tile
 
 import android.content.Context
+import androidx.wear.protolayout.ColorBuilders.argb
 import androidx.wear.protolayout.DeviceParametersBuilders
 import androidx.wear.protolayout.LayoutElementBuilders
 import androidx.wear.protolayout.ModifiersBuilders
 import androidx.wear.protolayout.material.ChipColors
 import androidx.wear.protolayout.material.CompactChip
+import androidx.wear.protolayout.material.Text
+import androidx.wear.protolayout.material.Typography
 import androidx.wear.protolayout.material.layouts.MultiSlotLayout
 import info.bvlion.wearlink.data.RequestParams
 import info.bvlion.wearlink.ui.theme.tilesColors
+import info.bvlion.wearlink.wear.R
 
 object LinkContentLayout {
   fun create(
@@ -20,6 +24,7 @@ object LinkContentLayout {
     MultiSlotLayout.Builder()
       .apply {
         when (state.requests.size) {
+          0 -> addSlotContent(emptyLayout(context))
           1 -> addSlotContent(
             linkLayout1(
               context,
@@ -82,6 +87,17 @@ object LinkContentLayout {
           }
         }
       }.build()
+
+  private fun emptyLayout(context: Context) = LayoutElementBuilders.Column.Builder()
+    .addContent(
+      Text.Builder(context, context.getString(R.string.tile_empty_message))
+        .setTypography(Typography.TYPOGRAPHY_CAPTION1)
+        .setColor(argb(tilesColors.onSurface))
+        .setMaxLines(3)
+        .setMultilineAlignment(LayoutElementBuilders.TEXT_ALIGN_CENTER)
+        .build()
+    )
+    .build()
 
   private fun linkLayout1(
     context: Context,

@@ -32,6 +32,7 @@
 
   <!-- tile -->
   <string name="tile_sync_button">同期</string>
+  <string name="tile_empty_message">タイルに表示するリクエストがありません</string>
 
   <!-- complication -->
   <string name="complication_text">実行</string>
