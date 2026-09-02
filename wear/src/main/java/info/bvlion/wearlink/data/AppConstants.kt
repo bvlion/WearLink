@@ -10,18 +10,10 @@ import kotlinx.coroutines.flow.first
 object AppConstants {
   const val SYNC_STORE_DATA = "info.bvlion.SYNC_STORE_DATA"
 
-  /** mobile / wear は同一 applicationId で、Play リスティングも 1 つ */
-  private const val PLAY_STORE_URL = "market://details?id=net.ambitious.android.wearlink"
-
-  /** 「スマホで開く」失敗時に、原因を分類できた範囲で表す */
+  /** UNKNOWN は「原因を断定できなかった」であり、未接続や未インストールを意味しない */
   enum class PhoneConnectionStatus {
-    /** スマホ版 WearLink が未インストールと判断できる */
     MOBILE_APP_MISSING,
-
-    /** スマホ自体と接続できていないと判断できる */
     PHONE_DISCONNECTED,
-
-    /** 古い Wear OS など、状態だけでは原因を判別できない */
     UNKNOWN,
   }
 
@@ -32,12 +24,18 @@ object AppConstants {
     errorProcess: () -> Unit = {}
   ) = startRemoteActivity(context, url, successProcess, errorProcess)
 
-  /** ペアリング済みスマホの Google Play で WearLink のストアページを開く */
+  // wear と mobile は applicationId を共有し Play リスティングも 1 つのため、
+  // wear 自身の packageName でスマホ版のストアページが開く
   fun openPhonePlayStore(
     context: Context,
     successProcess: () -> Unit,
     errorProcess: () -> Unit = {}
-  ) = startRemoteActivity(context, PLAY_STORE_URL, successProcess, errorProcess)
+  ) = startRemoteActivity(
+    context,
+    "market://details?id=${context.packageName}",
+    successProcess,
+    errorProcess
+  )
 
   private fun startRemoteActivity(
     context: Context,
@@ -62,15 +60,13 @@ object AppConstants {
 
   /**
    * 「スマホで開く」が失敗した後に呼び、原因を分類する。
-   * CapabilityClient にスマホ版が見えないことだけで「未インストール」と断定せず、
-   * スマホ自体の到達可否や RemoteActivityHelper の状態も加味する。
-   * 古い Wear OS では availabilityStatus が STATUS_UNKNOWN のため、その場合は断定しない。
+   * CapabilityClient にスマホ版が見えないことだけでは「未インストール」と断定しない。
+   * 古い Wear OS では availabilityStatus が常に STATUS_UNKNOWN になるため、その場合も断定しない。
    */
   suspend fun resolvePhoneConnectionStatus(context: Context): PhoneConnectionStatus {
     val connector = WearMobileConnector(context)
 
-    // false（問い合わせは成功しスマホ版が見つからなかった）以外は原因を断定しない。
-    // true = 到達できているのに起動失敗（一時的）、null = 問い合わせ自体が失敗。
+    // true = 到達できるのに起動失敗（一時的）、null = 問い合わせ自体が失敗。どちらも断定しない
     if (connector.isMobileAppReachable() != false) return PhoneConnectionStatus.UNKNOWN
 
     val phoneConnected = connector.isPhoneConnected()

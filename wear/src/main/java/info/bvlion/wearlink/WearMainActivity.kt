@@ -77,7 +77,6 @@ class WearMainActivity : ComponentActivity() {
               Toast.makeText(this, getString(R.string.main_launched_mobile), Toast.LENGTH_SHORT).show()
             }
           ) {
-            // 起動できなかった原因を分類してから案内画面へ遷移する
             lifecycleScope.launch {
               onFailure(AppConstants.resolvePhoneConnectionStatus(this@WearMainActivity))
             }
@@ -279,10 +278,7 @@ private fun LocalNetworkAccessExplanation(
   }
 }
 
-/**
- * 「スマホで開く」に失敗した後、分類した原因に応じてユーザーの次の行動を案内する。
- * LAN 権限説明画面と同じ全画面 + ScalingLazyColumn の構成に揃えている。
- */
+/** 画面構成は LocalNetworkAccessExplanation に揃えている */
 @Composable
 private fun PhoneStatusExplanation(
   status: PhoneConnectionStatus,

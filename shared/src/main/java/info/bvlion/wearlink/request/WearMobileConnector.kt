@@ -14,10 +14,7 @@ class WearMobileConnector(context: Context) {
   private val capabilityClient by lazy { Wearable.getCapabilityClient(context) }
   private val nodeClient by lazy { Wearable.getNodeClient(context) }
 
-  /**
-   * ペアリング済みスマホに、到達可能なスマホ版 WearLink があるか。
-   * 問い合わせ自体に失敗した場合は「未インストール」と区別するため null を返す。
-   */
+  /** 問い合わせ自体に失敗した場合は、未インストールと区別するため null を返す */
   suspend fun isMobileAppReachable(): Boolean? = try {
     capabilityClient
       .getCapability(MOBILE_CAPABILITY, CapabilityClient.FILTER_REACHABLE)
@@ -28,7 +25,7 @@ class WearMobileConnector(context: Context) {
     null
   }
 
-  /** スマホ自体と現在接続できているか（スマホ版アプリの有無は問わない） */
+  /** スマホ版アプリの有無は問わず、スマホ自体と接続できているか */
   suspend fun isPhoneConnected(): Boolean = try {
     nodeClient.connectedNodes.await().isNotEmpty()
   } catch (exception: Exception) {
