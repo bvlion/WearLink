@@ -13,9 +13,10 @@
       android:name="com.google.android.wearable"
       android:required="true" />
 
+    <!-- Request の作成・管理はスマホ版 WearLink が必須のため non-standalone -->
     <meta-data
       android:name="com.google.android.wearable.standalone"
-      android:value="true" />
+      android:value="false" />
 
     <activity
       android:name="info.bvlion.wearlink.WearMainActivity"

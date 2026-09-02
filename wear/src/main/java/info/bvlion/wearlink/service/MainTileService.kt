@@ -46,20 +46,6 @@ class MainTileService : SuspendingTileService() {
 
   override suspend fun tileRequest(requestParams: RequestBuilders.TileRequest): TileBuilders.Tile {
     when (requestParams.currentState.lastClickableId) {
-      AppConstants.START_MOBILE_ACTIVITY -> {
-        AppConstants.startMobileActivity(
-          this,
-          successProcess = {
-            startActivity(
-              Intent(this, ToastActivity::class.java)
-                .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-                .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, getString(R.string.tiles_toast_called_mobile))
-            )
-          }
-        ) {
-          showNotFindMobileToast()
-        }
-      }
       AppConstants.SYNC_STORE_DATA -> {
         AppConstants.startMobileActivity(
           this,
@@ -78,12 +64,12 @@ class MainTileService : SuspendingTileService() {
                     )
                   }
                 ) {
-                  showNotFindMobileToast()
+                  showSyncFailedToast()
                 }
             }
           }
         ) {
-          showNotFindMobileToast()
+          showSyncFailedToast()
         }
       }
     }
@@ -100,11 +86,11 @@ class MainTileService : SuspendingTileService() {
     )
   }
 
-  private fun showNotFindMobileToast() =
+  private fun showSyncFailedToast() =
     startActivity(
       Intent(this, ToastActivity::class.java)
         .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
-        .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, getString(R.string.tiles_toast_not_found_mobile))
+        .putExtra(ToastActivity.EXTRA_TOAST_MESSAGE, getString(R.string.tiles_toast_sync_failed))
     )
 
   companion object {
