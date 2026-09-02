@@ -122,3 +122,16 @@ fun LinkTileRendererPreview() {
     }
   )
 }
+
+@Preview(device = WearDevices.SMALL_ROUND, showSystemUi = true)
+@Composable
+fun LinkTileRendererEmptyPreview() {
+  val context = LocalContext.current
+  TilePreviewData(
+    onTileRequest = { request ->
+      TilePreviewHelper.singleTimelineEntryTileBuilder(
+        LinkTileRenderer(context).renderTile(LinkTileState(emptyList()), request.deviceConfiguration)
+      ).build()
+    }
+  )
+}

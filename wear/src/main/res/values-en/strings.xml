@@ -32,6 +32,7 @@
 
   <!-- tile -->
   <string name="tile_sync_button">Sync</string>
+  <string name="tile_empty_message">No requests to show on the tile</string>
 
   <!-- complication -->
   <string name="complication_text">Execute</string>

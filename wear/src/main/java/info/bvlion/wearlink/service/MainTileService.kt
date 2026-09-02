@@ -17,10 +17,9 @@ import info.bvlion.wearlink.request.WearMobileConnector
 import info.bvlion.wearlink.tile.LinkTileRenderer
 import info.bvlion.wearlink.tile.LinkTileState
 import info.bvlion.wearlink.toast.ToastActivity
-import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalHorologistApi::class)
@@ -28,18 +27,7 @@ import kotlinx.coroutines.launch
 class MainTileService : SuspendingTileService() {
   private val dataStore by lazy { AppDataStore.getDataStore(this) }
 
-  private val savedRequest = MutableStateFlow<String?>("")
-
   private val render by lazy { LinkTileRenderer(this) }
-
-  override fun onCreate() {
-    super.onCreate()
-    CoroutineScope(Dispatchers.IO).launch {
-      dataStore.getSavedRequest.collect {
-        savedRequest.value = it
-      }
-    }
-  }
 
   override suspend fun resourcesRequest(requestParams: RequestBuilders.ResourcesRequest): ResourceBuilders.Resources =
     render.produceRequestedResources(true, requestParams)
@@ -76,7 +64,7 @@ class MainTileService : SuspendingTileService() {
 
     return render.renderTimeline(
       LinkTileState(
-        savedRequest.value
+        dataStore.getSavedRequest.first()
           ?.takeIf { it.isNotEmpty() }
           ?.parseRequestParams()
           ?.filter { it.watchSync }
