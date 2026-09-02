@@ -24,8 +24,6 @@ object AppConstants {
     errorProcess: () -> Unit = {}
   ) = startRemoteActivity(context, url, successProcess, errorProcess)
 
-  // wear と mobile は applicationId を共有し Play リスティングも 1 つのため、
-  // wear 自身の packageName でスマホ版のストアページが開く
   fun openPhonePlayStore(
     context: Context,
     successProcess: () -> Unit,

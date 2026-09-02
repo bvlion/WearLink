@@ -2,7 +2,6 @@
   <string name="main_launched_mobile">スマートフォンのアプリを起動しました</string>
   <string name="main_launch_mobile">スマートフォンでアプリを開く</string>
 
-  <!-- スマホで開く失敗時の案内 -->
   <string name="phone_playstore_opened">スマートフォンで Google Play を開きました</string>
   <string name="phone_playstore_open_failed">Google Play を開けませんでした</string>
   <string name="phone_status_open_play">スマートフォンの Google Play を開く</string>

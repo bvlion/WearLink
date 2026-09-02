@@ -89,7 +89,6 @@ class WearMainActivity : ComponentActivity() {
               Toast.makeText(this, getString(R.string.phone_playstore_opened), Toast.LENGTH_SHORT).show()
             }
           ) {
-            // 状態は再判定せず、開けなかったことだけ伝えて案内画面に留まる
             Toast.makeText(this, getString(R.string.phone_playstore_open_failed), Toast.LENGTH_SHORT).show()
           }
         }
@@ -278,7 +277,6 @@ private fun LocalNetworkAccessExplanation(
   }
 }
 
-/** 画面構成は LocalNetworkAccessExplanation に揃えている */
 @Composable
 private fun PhoneStatusExplanation(
   status: PhoneConnectionStatus,

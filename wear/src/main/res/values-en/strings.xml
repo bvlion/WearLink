@@ -2,7 +2,6 @@
   <string name="main_launched_mobile">Opened the app on your phone</string>
   <string name="main_launch_mobile">Open the app on your phone</string>
 
-  <!-- Guidance shown when opening the phone app fails -->
   <string name="phone_playstore_opened">Opened Google Play on your phone</string>
   <string name="phone_playstore_open_failed">Couldn\'t open Google Play</string>
   <string name="phone_status_open_play">Open Google Play on your phone</string>
