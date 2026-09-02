@@ -18,9 +18,9 @@
   <string name="delete_execute_history_description">全ての実行履歴が削除されます。\nこの操作は元に戻せません。</string>
 
   <!-- request import -->
-  <string name="request_import_title">Request を全件インポート（置き換え）</string>
-  <string name="request_import_additive_title">Request を追加インポート</string>
-  <string name="request_import_input_hint">Json 形式の Request</string>
+  <string name="request_import_title">リクエストを全件インポート（置き換え）</string>
+  <string name="request_import_additive_title">リクエストを追加インポート</string>
+  <string name="request_import_input_hint">Json 形式のリクエスト</string>
   <string name="request_import_input_error_blank">入力してください</string>
   <string name="request_import_input_error_format">Json の値が不正です。一度エクスポートしてフォーマット確認のうえ統一してください。</string>
 
@@ -30,13 +30,13 @@
   <string name="view_mode_light">ライト</string>
   <string name="menu_title_sync_with_wear_os">Wear OSと同期</string>
   <string name="local_network_access">LAN内のURLへのアクセス</string>
-  <string name="local_network_access_description">LAN内のURLへRequestを送る場合には、Androidの「付近のデバイス」への許可が必要です。インターネット上のURLだけを利用する場合、この権限は許可しなくても利用できます。WearLinkでは位置情報や端末間の距離を取得しません。</string>
+  <string name="local_network_access_description">LAN内のURLへリクエストを送る場合には、Androidの「付近のデバイス」への許可が必要です。インターネット上のURLだけを利用する場合、この権限は許可しなくても利用できます。WearLinkでは位置情報や端末間の距離を取得しません。</string>
   <string name="local_network_access_grant">許可する</string>
   <string name="local_network_access_granted">許可済み</string>
   <string name="local_network_access_not_now">今はしない</string>
-  <string name="menu_title_export_request">Request を全件エクスポート</string>
-  <string name="menu_title_import_request">Request を全件インポート（置き換え）</string>
-  <string name="menu_title_import_request_additive">Request を追加インポート</string>
+  <string name="menu_title_export_request">リクエストを全件エクスポート</string>
+  <string name="menu_title_import_request">リクエストを全件インポート（置き換え）</string>
+  <string name="menu_title_import_request_additive">リクエストを追加インポート</string>
   <string name="menu_title_export_execution_history">実行履歴をエクスポート</string>
   <string name="menu_title_delete_execution_history">実行履歴を削除</string>
   <string name="menu_title_review">応援レビューを書く</string>
@@ -111,11 +111,11 @@
   <string name="sync_wear_os">Wear OSと同期しました</string>
   <string name="sync_wear_os_error">Wear OS端末が見つかりません</string>
   <string name="tile_limit_error_title">タイルに表示できません</string>
-  <string name="tile_limit_error_description">タイルに表示できるRequestは%s件までです。\n別のRequestをタイルから外してから追加してください。</string>
+  <string name="tile_limit_error_description">タイルに表示できるリクエストは%s件までです。\n別のリクエストをタイルから外してから追加してください。</string>
 
   <!-- shortcut -->
-  <string name="shortcut_request_not_found">対象のRequestが見つかりません</string>
-  <string name="shortcut_request_deleted">Requestが削除されています</string>
+  <string name="shortcut_request_not_found">対象のリクエストが見つかりません</string>
+  <string name="shortcut_request_deleted">リクエストが削除されています</string>
   <string name="shortcut_request_success">「%s」を送信しました</string>
   <string name="shortcut_request_failure">「%s」の送信に失敗しました</string>
   <string name="shortcut_execute_sending">送信中…</string>
