@@ -3,7 +3,8 @@ http request from Wear OS
 
 ## 開発環境
 
-* Java 1７
+* JDK 25 LTS（Gradle / CI実行環境）
+* Java / Kotlin target 17
 * Android Studio
 
 ## 配信環境
