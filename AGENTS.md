@@ -9,7 +9,7 @@ WearLink は Kotlin で実装された Android マルチモジュールプロジ
 - `shared/`: mobileとwearで共有する通信処理、データモデル、DataStore、HTTP関連処理
 - `fastlane/metadata/android/`: Google Play掲載情報
 
-Java 17と、リポジトリ同梱のGradle Wrapperを使用します。
+Gradle / CIの実行環境にはJDK 25 LTSを使用し、Java / Kotlinのtargetは17を維持します。Gradleはリポジトリ同梱のWrapperを使用します。
 
 ## Worktree
 
