@@ -34,12 +34,12 @@ jobs:
             echo "android=false" >> "$GITHUB_OUTPUT"
           fi
 
-      - name: set up JDK 17
+      - name: set up JDK 25
         if: steps.changes.outputs.android == 'true'
         uses: actions/setup-java@v6
         with:
           distribution: 'corretto'
-          java-version: '17'
+          java-version: '25'
 
       - uses: actions/cache@v6
         if: steps.changes.outputs.android == 'true'
